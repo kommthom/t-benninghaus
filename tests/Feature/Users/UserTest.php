@@ -65,7 +65,7 @@ describe('user', function () {
 
         get(route('users.show', ['id' => $post->user->id, 'tab' => 'posts']))
             ->assertSuccessful()
-            ->assertSeeText('已刪除');
+            ->assertSeeText('Deleted');
     });
 
     test('guest can\'t see others soft deleted post in posts tab', function () {
@@ -75,7 +75,7 @@ describe('user', function () {
 
         get(route('users.show', ['id' => $post->user->id, 'tab' => 'posts']))
             ->assertSuccessful()
-            ->assertDontSeeText('文章將於6天後刪除');
+            ->assertDontSeeText('The article will be deleted in 6 days.');
     });
 
     test('user can see own comments in posts tab', function () {

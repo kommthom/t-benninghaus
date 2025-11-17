@@ -22,9 +22,9 @@ class CommentForm extends Form
     #[Validate(
         rule: ['required', 'min:5', 'max:2000'],
         message: [
-            'required' => '請填寫留言內容',
-            'min' => '留言內容至少 5 個字元',
-            'max' => '留言內容最多 2000 個字元',
+            'required' => 'Please fill in the message content.',
+            'min' => 'The message must be at least 5 characters long',
+            'max' => 'Message content up to 2000 characters',
         ],
         onUpdate: false,
     )]

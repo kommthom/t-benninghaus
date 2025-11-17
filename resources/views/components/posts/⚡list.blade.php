@@ -16,7 +16,7 @@ new class extends Component {
 
     public ?int $tagId = null;
 
-    public string $badge = '全部文章';
+    public string $badge = __('All articles');
 
     #[Url]
     public string $order = PostOrderOptions::LATEST->value;
@@ -208,7 +208,7 @@ new class extends Component {
     <x-card
       class="flex h-36 w-full items-center justify-center transition duration-150 ease-in hover:-translate-x-2 dark:text-zinc-50"
     >
-      <span>Whoops！此分類底下還沒有文章，趕緊寫一篇吧！</span>
+      <span>{{ __('Whoops! There are no articles under this category yet, hurry up and write one!') }}</span>
     </x-card>
   @endforelse
 

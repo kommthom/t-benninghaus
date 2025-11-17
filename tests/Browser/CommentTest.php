@@ -12,21 +12,21 @@ test('comment form can be submitted', function () {
 
     $message = 'Hello World! This is my first comment.';
 
-    $page->click('新增留言')
+    $page->click('Add New Comment')
         ->fill('create-comment-body', $message)
         ->click('#create-comment-submit-button')
         ->assertSee($message);
 
     $message = 'Hello World! This is my second comment.';
 
-    $page->click('新增留言')
+    $page->click('Add New Comment')
         ->fill('create-comment-body', $message)
         ->click('#create-comment-submit-button')
         ->assertSee($message);
 
     $message = 'Hello World! This is my third comment.';
 
-    $page->click('新增留言')
+    $page->click('Add New Comment')
         ->fill('create-comment-body', $message)
         ->click('#create-comment-submit-button')
         ->assertSee($message);

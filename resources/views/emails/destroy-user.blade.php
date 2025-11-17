@@ -1,15 +1,15 @@
 <x-mail::message>
-  # 帳號刪除確認
+  # {{ __('Account Deletion Confirmation') }}
 
-  如果您確定要刪除帳號，請點選下方的按鈕連結 (連結將在 5 分鐘後失效)。
+  {{ __('If you are sure you want to delete your account, please click on the button link below (the link will expire in 5 minutes).') }}
 
   <x-mail::button
     :url="$destroyLink"
     color="error"
   >
-    確認刪除帳號
+    {{ __('Confirm Account Deletion') }}
   </x-mail::button>
 
-  謝謝,<br>
+  {{ __('Thank you,') }}<br>
   {{ config('app.name') }}
 </x-mail::message>

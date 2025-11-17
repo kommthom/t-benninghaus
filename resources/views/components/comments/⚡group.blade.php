@@ -72,7 +72,7 @@ new class extends Component {
 
         // Check the comment is not deleted
         if (is_null($comment)) {
-            $this->dispatch(event: 'toast', status: 'danger', message: '該留言已被刪除！');
+            $this->dispatch(event: 'toast', status: 'danger', message: __('This comment has been deleted!'));
 
             return;
         }
@@ -85,7 +85,7 @@ new class extends Component {
 
         $this->dispatch(event: 'update-comments-count');
 
-        $this->dispatch(event: 'toast', status: 'success', message: '成功刪除留言！');
+        $this->dispatch(event: 'toast', status: 'success', message: __('Successfully deleted comment!'));
     }
 };
 ?>

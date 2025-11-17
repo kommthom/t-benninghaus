@@ -34,5 +34,5 @@ test('if the embedded twitter link is an invalid link, return the alternative ht
 
     postJson('/api/oembed/twitter', ['url' => 'https://twitter.com/TwitterDev/status/123456789', 'theme' => 'dark'])
         ->assertStatus(400)
-        ->assertJson(['html' => '<p style="font-size:1.5em;">Twitter 連結發生錯誤... 🥲</p>']);
+        ->assertJson(['html' => '<p style="font-size:1.5em;">Twitter Connection error occurred... ??</p>']);
 });

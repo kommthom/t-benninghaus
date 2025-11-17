@@ -123,7 +123,7 @@ new class extends Component {
     <div class="flex flex-col gap-5">
       <div class="flex items-center justify-center space-x-2 text-2xl text-zinc-900 dark:text-zinc-50">
         <x-icons.chat-dots class="w-8" />
-        <span>編輯留言</span>
+        <span>{{�__('Edit Message') }}</span>
       </div>
 
       <form
@@ -139,7 +139,7 @@ new class extends Component {
         >
           <div class="space-x-4">
             <span class="font-semibold dark:text-zinc-50"> {{ auth()->user()->name }}</span>
-            <span class="text-zinc-400">{{ now()->format('Y 年 m 月 d 日') }}</span>
+            <span class="text-zinc-400">{{ now()->format(__('Y year m month d day')) }}</span>
           </div>
 
           <div
@@ -167,7 +167,7 @@ new class extends Component {
             x-on:keydown.tab.prevent="tabToFourSpaces"
             x-model="comment.body"
             rows="12"
-            placeholder="寫下你的留言吧！**支援 Markdown**"
+            placeholder="{{ __('Write your message here! **Supports Markdown**') }}"
             required
           />
         </div>
@@ -179,12 +179,12 @@ new class extends Component {
             x-on:change="previewChanged"
             x-bind:disabled="comment.body === ''"
           >
-            預覽
+            {{ __('Preview') }}
           </x-toggle-switch>
 
           <x-button>
             <x-icons.save class="w-5" />
-            <span class="ml-2">更新</span>
+            <span class="ml-2">{{ __('Update') }}</span>
           </x-button>
         </div>
       </form>

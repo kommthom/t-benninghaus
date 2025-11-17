@@ -92,9 +92,9 @@ describe('edit post', function () {
             ->assertDispatched(
                 'toast',
                 status: 'success',
-                // if the original status is true, then the message should be '文章狀態已切換為公開'
+                // if the original status is true, then the message should be 'Article restored'
                 // because the status is toggled to false
-                message: $privateStatus ? '文章狀態已切換為公開' : '文章狀態已切換為私人',
+                message: $privateStatus ? 'Article restored' : 'Article status has been switched to private',
             );
 
         $post->refresh();

@@ -7,7 +7,7 @@ use Livewire\Component;
 new class extends Component {
     public function render()
     {
-        $title = Route::currentRouteName() === 'root' ? config('app.name') : '所有文章';
+        $title = Route::currentRouteName() === 'root' ? config('app.name') : __('All articles');
 
         return $this->view()->title($title);
     }

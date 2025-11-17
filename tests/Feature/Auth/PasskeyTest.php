@@ -55,7 +55,7 @@ test('passkey can be registered', function () {
         ]),
     ])
         ->call('store')
-        ->assertDispatched('toast', status: 'success', message: '成功建立密碼金鑰！')
+        ->assertDispatched('toast', status: 'success', message: 'Passkey created successfully!')
         ->assertDispatched('reset-passkey-name');
 
     expect($user->passkeys)->toHaveCount(1);

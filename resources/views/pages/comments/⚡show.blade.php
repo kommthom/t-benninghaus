@@ -33,7 +33,7 @@ new class extends Component {
 
         // Check a comment is not deleted
         if (is_null($comment)) {
-            $this->dispatch(event: 'toast', status: 'danger', message: '該留言已被刪除！');
+            $this->dispatch(event: 'toast', status: 'danger', message: __('This comment has been deleted!'));
 
             $this->redirect(url: route('root'), navigate: true);
 
@@ -46,16 +46,16 @@ new class extends Component {
 
         $this->dispatch(event: 'update-comments-count');
 
-        $this->dispatch(event: 'toast', status: 'success', message: '成功刪除留言！');
+        $this->dispatch(event: 'toast', status: 'success', message: __('Successfully deleted comment!'));
 
         $this->redirect(url: route('root'), navigate: true);
     }
 
     public function render()
     {
-        $user = $this->comment->user_id ? $this->comment->user->name : '訪客';
+        $user = $this->comment->user_id ? $this->comment->user->name : __('Visitor');
 
-        return $this->view()->title($user . '的留言');
+        return $this->view()->title($user . __('\'s comment'));
     }
 };
 ?>
@@ -110,11 +110,11 @@ new class extends Component {
     <div class="flex items-stretch justify-center">
       <div class="flex w-full max-w-3xl flex-col items-center justify-start px-2 xl:px-0">
         <div class="flex w-full items-center justify-end text-zinc-500 md:justify-between dark:text-zinc-400">
-          <span class="hidden md:inline">「{{ $comment->post->title }}」的留言</span>
+          <span class="hidden md:inline">{{ $comment->post->title . __('\'s message') }}</span>
 
           <div class="flex gap-2 hover:text-zinc-600 hover:dark:text-zinc-300">
             <x-icons.file-earmark-richtext class="w-4" />
-            <a href="{{ route('posts.show', ['id' => $comment->post->id, 'slug' => $comment->post->slug]) }}">返回文章</a>
+            <a href="{{ route('posts.show', ['id' => $comment->post->id, 'slug' => $comment->post->slug]) }}">{{ __('Return to article') }}</a>
           </div>
         </div>
 
@@ -137,16 +137,16 @@ new class extends Component {
               @else
                 <x-icons.question-circle-fill class="size-10 text-zinc-300 dark:text-zinc-500" />
 
-                <span class="dark:text-zinc-50">訪客</span>
+                <span class="dark:text-zinc-50">{{ __('Visitor') }}</span>
               @endif
 
               <time
                 class="hidden text-zinc-400 md:block"
                 datetime="{{ date('d-m-Y', strtotime($comment->created_at)) }}"
-              >{{ date('Y 年 m 月 d 日', strtotime($comment->created_at)) }}</time>
+              >{{ date(__('Y year m month d day'), strtotime($comment->created_at)) }}</time>
 
               @if ($comment->created_at->toString() !== $comment->updated_at->toString())
-                <span class="text-zinc-400">(已編輯)</span>
+                <span class="text-zinc-400">{{ __('(Edited)') }}</span>
               @endif
             </div>
 
@@ -166,7 +166,7 @@ new class extends Component {
                     x-on:click="openEditCommentModal"
                   >
                     <x-icons.pencil class="w-4" />
-                    <span class="ml-2">編輯</span>
+                    <span class="ml-2">{{ __('Edit') }}</span>
                   </button>
                 @endif
 
@@ -175,10 +175,10 @@ new class extends Component {
                     class="flex cursor-pointer items-center hover:text-zinc-500 dark:hover:text-zinc-300"
                     type="button"
                     wire:click="destroyComment({{ $comment->id }})"
-                    wire:confirm="你確定要刪除該留言？"
+                    wire:confirm="{{ __('Are you sure you want to delete this comment?') }}"
                   >
                     <x-icons.trash class="w-4" />
-                    <span class="ml-2">刪除</span>
+                    <span class="ml-2">{{ __('Delete') }}</span>
                   </button>
                 @endif
               @endauth
@@ -187,12 +187,12 @@ new class extends Component {
                 <button
                   class="flex cursor-pointer items-center hover:text-zinc-500 dark:hover:text-zinc-300"
                   data-comment-id="{{ $comment->id }}"
-                  data-comment-user-name="{{ is_null($comment->user_id) ? '訪客' : $comment->user->name }}"
+                  data-comment-user-name="{{ is_null($comment->user_id) ? __('Visitor') : $comment->user->name }}"
                   type="button"
                   x-on:click="openCreateCommentModal"
                 >
                   <x-icons.reply-fill class="w-4" />
-                  <span class="ml-2">回覆</span>
+                  <span class="ml-2">{{ __('Reply') }}</span>
                 </button>
               @endif
             </div>

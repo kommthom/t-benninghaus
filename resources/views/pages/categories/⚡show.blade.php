@@ -33,7 +33,7 @@ new class extends Component {
         {{-- 文章列表 --}}
         <livewire:posts.list
           :categoryId="$category->id"
-          :badge="$category->name . '：' . $category->description"
+          :badge="{{ $category->name . _(':') . ' ' . $category->description }}"
         />
       </div>
 

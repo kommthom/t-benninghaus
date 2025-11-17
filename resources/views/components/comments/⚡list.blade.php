@@ -156,7 +156,7 @@ new class extends Component {
           class="mr-2 size-5"
           wire:loading
         />
-        <span>顯示更多留言</span>
+        <span>{{ __('Show more comments') }}</span>
       </button>
     </div>
   @endif

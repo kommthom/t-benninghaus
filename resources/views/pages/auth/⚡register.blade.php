@@ -12,7 +12,7 @@ use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('註冊')] class extends Component {
+new #[Title('Register')] class extends Component {
     public string $name = '';
 
     public string $email = '';
@@ -59,7 +59,7 @@ new #[Title('註冊')] class extends Component {
         return this.submitIsEnabled === false;
       },
       informationOnSubmitButton() {
-        return this.submitIsEnabled ? '註冊' : '驗證中';
+        return this.submitIsEnabled ? 'Register' : 'Verifying';
       },
       init() {
         turnstile.ready(() => {
@@ -84,7 +84,7 @@ new #[Title('註冊')] class extends Component {
       wire:navigate
     >
       <x-icons.arrow-left-circle class="w-6" />
-      <span class="ml-2">返回登入</span>
+      <span class="ml-2">{{ __('Back to Login') }}</span>
     </a>
   </div>
 
@@ -93,7 +93,7 @@ new #[Title('註冊')] class extends Component {
       {{-- 頁面標題 --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.person-plus class="w-6" />
-        <span class="ml-4">註冊</span>
+        <span class="ml-4">{{ __('Registration') }}</span>
       </div>
 
       <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
@@ -110,7 +110,7 @@ new #[Title('註冊')] class extends Component {
             id="name"
             type="text"
             value="{{ old('name') }}"
-            placeholder="會員名稱 (只能使用英文、數字、_ 或是 -)"
+            placeholder="{{ __('Member Name (can only use English letters, numbers, _, or -)') }}"
             required
             autofocus
             wire:model="name"
@@ -122,27 +122,27 @@ new #[Title('註冊')] class extends Component {
             id="email"
             type="text"
             value="{{ old('email') }}"
-            placeholder="電子信箱"
+            placeholder="{{ __('Email') }}"
             required
             wire:model="email"
           />
 
-          {{-- 密碼 --}}
+          {{-- Password --}}
           <x-floating-label-input
             class="mt-6"
             id="password"
             type="password"
-            placeholder="密碼"
+            placeholder="{{ __('Password') }}"
             required
             wire:model="password"
           />
 
-          {{-- 確認密碼 --}}
+          {{-- Confirm Password --}}
           <x-floating-label-input
             class="mt-6"
             id="password_confirmation"
             type="password"
-            placeholder="確認密碼"
+            placeholder="{{ __('Confirm Password') }}"
             required
             wire:model="password_confirmation"
           />

@@ -20,7 +20,7 @@ test('the author can delete his comment', function () {
         ->assertDispatched('update-comments-count')
         ->assertDispatched('toast',
             status: 'success',
-            message: '成功刪除留言！',
+            message: 'Successfully deleted comment!',
         );
 
     $this->assertDatabaseMissing('comments', ['id' => $comment->id]);
@@ -42,7 +42,7 @@ test('post author can delete other users comment', function () {
         ->assertDispatched('update-comments-count')
         ->assertDispatched('toast',
             status: 'success',
-            message: '成功刪除留言！',
+            message: 'Successfully deleted comment!',
         );
 
     $this->assertDatabaseMissing('comments', ['id' => $comment->id]);
@@ -64,5 +64,5 @@ it('will show alert when user want to delete the deleted comment', function () {
         'commentGroupName' => 1,
     ])
         ->call('destroyComment', id: $commentId)
-        ->assertDispatched('toast', status: 'danger', message: '該留言已被刪除！');
+        ->assertDispatched('toast', status: 'danger', message: 'This comment has been deleted!');
 });

@@ -1,8 +1,8 @@
 @component('mail::message')
-  # 成功建立新的密碼金鑰
+  # {{ __('Successfully created a new passkey') }}
 
-  你的帳號已成功建立一個新的密碼金鑰「{{ $passkeyName }}」。
+ {{ __('A new passkey ') }}}{{ __('has been successfully created for your account.') }}
 
-  謝謝,<br>
+  {{ __('Thank you,') }}<br>
   {{ config('app.name') }}
 @endcomponent

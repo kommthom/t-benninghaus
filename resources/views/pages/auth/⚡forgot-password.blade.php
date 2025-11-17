@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('忘記密碼')] class extends Component {
+new #[Title('Forgot password')] class extends Component {
     public string $email = '';
 
     public function sendPasswordResetLink(): void
@@ -30,7 +30,7 @@ new #[Title('忘記密碼')] class extends Component {
       wire:navigate
     >
       <x-icons.arrow-left-circle class="w-6" />
-      <span class="ml-2">返回登入</span>
+      <span class="ml-2">{{ __('Back to Login') }}</span>
     </a>
   </div>
 
@@ -39,7 +39,7 @@ new #[Title('忘記密碼')] class extends Component {
       {{-- 頁面標題 --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.question-circle class="w-6" />
-        <span class="ml-4">忘記密碼</span>
+        <span class="ml-4">{{ __('Forgot password') }}</span>
       </div>
 
       <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">

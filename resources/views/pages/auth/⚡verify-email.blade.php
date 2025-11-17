@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('驗證電子郵件')] class extends Component {
+new #[Title('Verify Email')] class extends Component {
     public function mount(): void
     {
         if (Auth::user()->hasVerifiedEmail()) {
@@ -41,7 +41,7 @@ new #[Title('驗證電子郵件')] class extends Component {
       wire:navigate
     >
       <x-icons.arrow-left-circle class="w-6" />
-      <span class="ml-2">返回文章列表</span>
+      <span class="ml-2">{{ __('Return to article list') }}</span>
     </a>
   </div>
 
@@ -50,7 +50,7 @@ new #[Title('驗證電子郵件')] class extends Component {
       {{-- 頁面標題 --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.person-check class="w-6" />
-        <span class="ml-4">驗證 Email</span>
+        <span class="ml-4">{{ __('Verify Email') }}</span>
       </div>
 
       <x-card class="mt-4 w-full overflow-hidden sm:max-w-md">

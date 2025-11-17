@@ -27,7 +27,7 @@ class DestroyUserMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '刪除帳號確認',
+            subject: __('Confirm Account Deletion'),
         );
     }
 

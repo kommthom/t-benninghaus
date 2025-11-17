@@ -168,7 +168,7 @@ new class extends Component {
 
                   @if ($post->created_at->toDateString() !== $post->updated_at->toDateString())
                     <time datetime="{{ $post->updated_at->toDateString() }}">
-                      {{ '(最後更新於 ' . $post->updated_at->toDateString() . ')' }}
+                      {{ __('(Last updated ') . $post->updated_at->toDateString() . ')' }}
                     </time>
                   @endif
                 </div>
@@ -178,7 +178,7 @@ new class extends Component {
                 <div class="hidden items-center md:flex">
                   <x-icons.book-half class="w-4" />
 
-                  <span class="ml-2">{{ $this->readTime }} 分鐘</span>
+                  <span class="ml-2">{{ $this->readTime . __('minutes') }}</span>
                 </div>
 
                 <div class="hidden md:block">&bull;</div>

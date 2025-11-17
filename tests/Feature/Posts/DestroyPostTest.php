@@ -18,7 +18,7 @@ describe('destroy post', function () {
             'authorId'  => $post->user_id,
         ])
             ->call('destroy', $post->id)
-            ->assertDispatched('toast', status: 'success', message: '成功刪除文章！')
+            ->assertDispatched('toast', status: 'success', message: 'Successfully deleted post!')
             ->assertRedirect(route('users.show', [
                 'id'                 => $post->user_id,
                 'tab'                => 'posts',
@@ -66,7 +66,7 @@ describe('destroy post', function () {
 
         Livewire::test('posts.mobile-menu', ['postId' => $post->id])
             ->call('destroy', $post->id)
-            ->assertDispatched('toast', status: 'success', message: '成功刪除文章！')
+            ->assertDispatched('toast', status: 'success', message: 'Successfully deleted post!')
             ->assertRedirect(route('users.show', [
                 'id'                 => $post->user_id,
                 'tab'                => 'posts',
@@ -109,7 +109,7 @@ describe('destroy post', function () {
             'year'   => $post->created_at->format('Y'),
         ])
             ->call('destroy', $post->id)
-            ->assertDispatched('toast', status: 'success', message: '文章已刪除');
+            ->assertDispatched('toast', status: 'success', message: 'Article deleted');
 
         $this->assertSoftDeleted('posts', ['id' => $post->id]);
     });
@@ -162,7 +162,7 @@ describe('destroy post', function () {
             'year'   => $post->created_at->format('Y'),
         ])
             ->call('restore', $post->id)
-            ->assertDispatched('toast', status: 'success', message: '文章已恢復');
+            ->assertDispatched('toast', status: 'success', message: 'Article has been restored');
 
         $this->assertNotSoftDeleted('posts', ['id' => $post->id]);
     });

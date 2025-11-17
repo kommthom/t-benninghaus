@@ -27,7 +27,7 @@ class Captcha implements ValidationRule
         ]);
 
         if (! ($response->successful() && $response->json('success'))) {
-            $fail('驗證失敗');
+            $fail(__('Verification failed'));
         }
     }
 }

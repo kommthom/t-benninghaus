@@ -64,7 +64,7 @@ new class extends Component {
   >
     <x-icons.search class="size-4 transition duration-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-50" />
 
-    <span class="transition duration-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-50">搜尋</span>
+    <span class="transition duration-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-50">{{ __('Search') }}</span>
 
     <kbd
       class="font-noto-sans inline-flex items-center rounded-sm bg-zinc-300 px-2 py-1 dark:bg-zinc-500 dark:text-zinc-200"
@@ -117,7 +117,7 @@ new class extends Component {
               <label
                 class="hidden"
                 for="searchBox"
-              >搜尋</label>
+              >{{ __('Search') }}</label>
 
               <input
                 class="outline-hidden focus:ring-3 w-full rounded-xl border border-zinc-400 bg-zinc-50 px-10 py-2 text-xl placeholder-zinc-400 focus:border-indigo-300 focus:ring-indigo-200/50 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder-white"
@@ -126,7 +126,7 @@ new class extends Component {
                 x-ref="searchBar"
                 wire:model.live.debounce.500ms="search"
                 autocomplete="off"
-                placeholder="搜尋文章"
+                placeholder="{{ __('Search articles') }}"
               />
 
               <div class="absolute left-3 top-3.5 text-lg text-zinc-400 dark:text-zinc-50">
@@ -146,7 +146,7 @@ new class extends Component {
                 wire:transition
               >
                 @if ($results->count() > 0)
-                  <div class="flex items-center justify-center">搜尋結果</div>
+                  <div class="flex items-center justify-center">{{ __('Search Results') }}</div>
 
                   <hr class="my-2 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
 
@@ -168,7 +168,7 @@ new class extends Component {
                   </ul>
                 @else
                   <div class="flex h-16 items-center justify-center">
-                    抱歉...找不到相關文章
+                    {{ __('Sorry...no related articles found.') }}
                   </div>
                 @endif
 

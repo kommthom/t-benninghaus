@@ -62,7 +62,7 @@ new class extends Component {
       <div class="flex items-center justify-center gap-6">
         <div class="flex items-center gap-2 dark:text-zinc-50">
           <x-icons.chat-square-text class="size-5" />
-          <span>{{ $commentCounts }} 則留言</span>
+          <span>{{ $commentCounts }} {{ __('Then leave a message.') }}</span>
         </div>
 
         <div class="relative inline-block text-left">
@@ -81,7 +81,7 @@ new class extends Component {
               wire:loading.remove
               wire:target="changeOrder"
             />
-            <span>排序依據</span>
+            <span>{{ __('Sort by') }}</span>
           </button>
 
           <div
@@ -126,9 +126,9 @@ new class extends Component {
           <x-icons.chat-dots class="w-5" />
 
           @if (auth()->check())
-            <span class="ml-2">新增留言</span>
+            <span class="ml-2">{{ __('Add New Comment') }}</span>
           @else
-            <span class="ml-2">訪客留言</span>
+            <span class="ml-2">{{ __('Guest Comments') }}</span>
           @endif
         </div>
       </button>

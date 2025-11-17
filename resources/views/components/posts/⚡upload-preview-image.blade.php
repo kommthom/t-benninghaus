@@ -17,9 +17,9 @@ new class extends Component {
         Validate(
             ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:1024'],
             message: [
-                'image' => '必須是圖片',
-                'mimes' => '圖片格式必須是 jpeg, png, jpg',
-                'max' => '圖片大小不能超過 1024 KB',
+                'image' => __('Must be an image'),
+                'mimes' => __('Image format must be jpeg, png, jpg'),
+                'max' => __('Image size cannot exceed 1024 KB'),
             ],
         ),
     ]
@@ -68,7 +68,7 @@ new class extends Component {
           'dark:border-indigo-300');
       },
       removePreviewUrl() {
-        if (confirm('你確定要刪除預覽圖嗎？')) {
+        if (confirm('Are you sure you want to delete the preview image?')) {
           $wire.set('imageUrl', null);
         }
       }
@@ -106,7 +106,7 @@ new class extends Component {
 
       <span
         class="absolute right-2 top-2 inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-sm font-medium text-emerald-700 ring-1 ring-inset ring-emerald-700/10 dark:bg-gray-50 dark:text-gray-700 dark:ring-gray-700/10"
-      >預覽圖</span>
+      >{{ __('Preview') }}</span>
     </div>
   @else
     {{-- Upload Area --}}
@@ -136,7 +136,7 @@ new class extends Component {
           x-show="uploading"
         />
 
-        <p>預覽圖 (jpg, jpeg or png)</p>
+        <p>{{ __('Preview Image (jpg, jpeg or png)') }}</p>
 
         @error('image')
           <span class="text-red-500">{{ $message }}</span>

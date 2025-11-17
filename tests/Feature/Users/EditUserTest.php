@@ -46,7 +46,7 @@ describe('edit user', function () {
             ->set('name', 'New_legal_name')
             ->set('introduction', fake()->realText(120))
             ->call('update', user: $user)
-            ->assertDispatched('toast', status: 'success', message: '個人資料更新成功');
+            ->assertDispatched('toast', status: 'success', message: 'Personal information updated successfully');
     });
 
     test('if the name format is not correct, the name cannot be updated', function () {

@@ -47,7 +47,7 @@ new class extends Component {
         $publicKeyCredential = $serializer->fromJson($data['passkey'], PublicKeyCredential::class);
 
         if (!$publicKeyCredential->response instanceof AuthenticatorAttestationResponse) {
-            $this->dispatch('toast', status: 'danger', message: '密碼金鑰無效');
+            $this->dispatch('toast', status: 'danger', message: __('Invalid Passkey'));
 
             return;
         }
@@ -55,7 +55,7 @@ new class extends Component {
         $options = Session::get('passkey-registration-options');
 
         if (!$options) {
-            $this->dispatch('toast', status: 'danger', message: '密碼金鑰無效');
+            $this->dispatch('toast', status: 'danger', message: __('Invalid Passkey'));
 
             return;
         }
@@ -68,7 +68,7 @@ new class extends Component {
         try {
             $publicKeyCredentialSource = AuthenticatorAttestationResponseValidator::create($csmFactory->requestCeremony())->check(authenticatorAttestationResponse: $publicKeyCredential->response, publicKeyCredentialCreationOptions: $publicKeyCredentialCreationOptions, host: request()->getHost());
         } catch (Throwable) {
-            $this->dispatch('toast', status: 'danger', message: '密碼金鑰無效');
+            $this->dispatch('toast', status: 'danger', message: __('Invalid Passkey'));
 
             return;
         }
@@ -88,7 +88,7 @@ new class extends Component {
 
         Mail::to($this->user)->queue(new CreatePasskeyMail(passkeyName: $data['name']));
 
-        $this->dispatch('toast', status: 'success', message: '成功建立密碼金鑰！');
+        $this->dispatch('toast', status: 'success', message: __('Passkey created successfully!'));
         $this->dispatch('reset-passkey-name');
     }
 
@@ -100,7 +100,7 @@ new class extends Component {
 
         $passkey->delete();
 
-        $this->dispatch('toast', status: 'success', message: '成功刪除密碼金鑰！');
+        $this->dispatch('toast', status: 'success', message: __('Passkey deleted successfully!'));
     }
 };
 ?>
@@ -121,7 +121,7 @@ new class extends Component {
         if (!this.browserSupportsWebAuthn()) {
           $wire.dispatch('toast', {
             status: 'danger',
-            message: '不支援 WebAuthn'
+            message: 'WebAuthn not supported'
           });
 
           return;
@@ -130,7 +130,7 @@ new class extends Component {
         if (this.name === '') {
           $wire.dispatch('toast', {
             status: 'danger',
-            message: '請輸入密碼金鑰名稱'
+            message: 'Please enter a Passkey name'
           });
 
           return;
@@ -146,7 +146,7 @@ new class extends Component {
         } catch (e) {
           $wire.dispatch('toast', {
             status: 'danger',
-            message: '註冊失敗，請重新註冊'
+            message: 'Registration failed, please register again'
           });
 
           return;
@@ -171,7 +171,7 @@ new class extends Component {
 
       <x-card class="flex w-full flex-col justify-center gap-6 md:max-w-2xl">
         <div class="space-y-4">
-          <h1 class="w-full text-center text-2xl dark:text-zinc-50">密碼金鑰</h1>
+          <h1 class="w-full text-center text-2xl dark:text-zinc-50">{{ __('Passkey') }}</h1>
           <hr class="h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
         </div>
 
@@ -179,7 +179,7 @@ new class extends Component {
         <x-auth-validation-errors :errors="$errors" />
 
         <x-quotes.success>
-          註冊密碼金鑰後，將無法使用密碼進行登入
+          {{ __('After registering a Passkey, you will no longer be able to log in with a password') }}
         </x-quotes.success>
 
         <form
@@ -189,7 +189,7 @@ new class extends Component {
           <x-floating-label-input
             id="name"
             type="text"
-            placeholder="密碼金鑰名稱"
+            placeholder="{{ __('Passkey Name') }}"
             x-model="name"
           />
         </form>
@@ -211,7 +211,7 @@ new class extends Component {
                     {{ $passkey->name }}
                   </p>
                   <p class="mt-1 flex truncate text-xs/5 text-zinc-500 dark:text-zinc-400">
-                    建立於 {{ $passkey->created_at->diffForHumans() }}
+                    {{ __('Established on') . $passkey->created_at->diffForHumans() }}
                   </p>
                 </div>
               </div>
@@ -222,12 +222,12 @@ new class extends Component {
                   </p>
                   <p class="mt-1 text-xs/5 text-zinc-500 dark:text-zinc-400">
                     @if ($passkey->last_used_at)
-                      上次使用於
+                      {{ __('Last Used On') }}
                       <time datetime="{{ $passkey->last_used_at }}">
                         {{ $passkey->last_used_at->diffForHumans() }}
                       </time>
                     @else
-                      尚未使用
+                      {{ __('Never Used') }}
                     @endif
                   </p>
                 </div>
@@ -235,9 +235,9 @@ new class extends Component {
                   class="-m-2.5 block cursor-pointer p-2.5 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
                   type="button"
                   wire:click="destroy({{ $passkey->id }})"
-                  wire:confirm="你確定要刪除這個密碼金鑰嗎？"
+                  wire:confirm="{{ __('Are you sure you want to delete this passkey?') }}"
                 >
-                  <span class="sr-only">開啟編輯選單</span>
+                  <span class="sr-only">{{ __('Open Edit Menu') }}</span>
                   <x-icons.x class="size-6" />
                 </button>
 
@@ -249,7 +249,7 @@ new class extends Component {
         <div class="flex items-center justify-end">
           <x-button form="passkey">
             <x-icons.save class="w-5" />
-            <span class="ml-2">新增密碼金鑰</span>
+            <span class="ml-2">{{ __('Add Passkey') }}</span>
           </x-button>
         </div>
       </x-card>

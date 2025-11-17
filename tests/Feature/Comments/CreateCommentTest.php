@@ -22,7 +22,7 @@ test('non-logged-in users can leave a anonymous comment', function () {
         ->assertDispatched('update-comments-count')
         ->assertDispatched('toast',
             status: 'success',
-            message: '成功新增留言！',
+            message: 'Successfully added comment!',
         );
 
     $this->assertDatabaseHas('comments', [
@@ -50,7 +50,7 @@ test('logged-in users can leave a comment', function () {
         ->assertDispatched('update-comments-count')
         ->assertDispatched('toast',
             status: 'success',
-            message: '成功新增留言！',
+            message: 'Successfully added comment!',
         );
 
     $this->assertDatabaseHas('comments', [
@@ -71,7 +71,7 @@ test('the message must be at least 5 characters long', function () {
         ->set('captchaToken', 'fake-captcha-response')
         ->call('save')
         ->assertHasErrors(['form.body' => 'min:5'])
-        ->assertSeeText('留言內容至少 5 個字元');
+        ->assertSeeText('The message must be at least 5 characters long');
 });
 
 test('the message must be less than 2000 characters', function () {
@@ -84,7 +84,7 @@ test('the message must be less than 2000 characters', function () {
         ->set('captchaToken', 'fake-captcha-response')
         ->call('save')
         ->assertHasErrors(['form.body' => 'max:2000'])
-        ->assertSeeText('留言內容最多 2000 個字元');
+        ->assertSeeText('Message content up to 2000 characters');
 });
 
 test('the message must have the captcha token', function () {
@@ -96,7 +96,7 @@ test('the message must have the captcha token', function () {
         ->set('form.body', $body)
         ->call('save')
         ->assertHasErrors()
-        ->assertSeeText('未完成驗證');
+        ->assertSeeText('Incomplete verification');
 });
 
 it('can see the comment preview', function () {
@@ -148,7 +148,7 @@ it('can reply to others comment', function () {
         ->assertDispatched('update-comments-count')
         ->assertDispatched('toast',
             status: 'success',
-            message: '成功新增留言！',
+            message: 'Successfully added comment!',
         );
 });
 
@@ -164,7 +164,7 @@ it('will show alert, when user want to reply to deleted post', function () {
         ->set('form.body', 'Hello World!')
         ->set('captchaToken', 'fake-captcha-response')
         ->call('save')
-        ->assertDispatched(event: 'toast', status: 'danger', message: '無法回覆！文章已被刪除！');
+        ->assertDispatched(event: 'toast', status: 'danger', message: 'Unable to reply! The article has been deleted!');
 });
 
 it('will show alert, when user want to reply to deleted comment', function () {
@@ -181,5 +181,5 @@ it('will show alert, when user want to reply to deleted comment', function () {
         ->set('form.body', 'Hello World!')
         ->set('captchaToken', 'fake-captcha-response')
         ->call('save', parentId: $commentId)
-        ->assertDispatched(event: 'toast', status: 'danger', message: '無法回覆！留言已被刪除！');
+        ->assertDispatched(event: 'toast', status: 'danger', message: 'Unable to reply! Message has been deleted!');
 });

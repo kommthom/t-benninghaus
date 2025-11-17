@@ -24,7 +24,7 @@ use Webauthn\PublicKeyCredential;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialSource;
 
-new #[Title('登入')] class extends Component {
+new #[Title('Login')] class extends Component {
     public string $email = '';
 
     public string $password = '';
@@ -60,7 +60,7 @@ new #[Title('登入')] class extends Component {
 
         // If the user has PassKeys, he won't be able to log in using just the password
         if (Auth::user()->passkeys()->count() > 0) {
-            session()->flash('status', '您的帳號已註冊密碼金鑰，請使用密碼金鑰進行登入');
+            session()->flash('status', __('Your account has registered a passkey, please use the passkey to log in.'));
 
             Auth::logout();
 
@@ -70,7 +70,7 @@ new #[Title('登入')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->dispatch('toast', status: 'success', message: '登入成功！');
+        $this->dispatch('toast', status: 'success', message: __('Login successful!'));
 
         $this->redirectIntended(route('root', absolute: false), navigate: true);
     }
@@ -86,7 +86,7 @@ new #[Title('登入')] class extends Component {
         $publicKeyCredential = $serializer->fromJson($data['answer'], PublicKeyCredential::class);
 
         if (!$publicKeyCredential->response instanceof AuthenticatorAssertionResponse) {
-            $this->dispatch('toast', status: 'danger', message: '密碼金鑰無效');
+            $this->dispatch('toast', status: 'danger', message: __('Invalid password key'));
 
             return;
         }
@@ -96,7 +96,7 @@ new #[Title('登入')] class extends Component {
         $passkey = Passkey::query()->where('credential_id', $rawId)->where('owner_type', User::class)->first();
 
         if (!$passkey) {
-            $this->dispatch('toast', status: 'danger', message: '密碼金鑰無效');
+            $this->dispatch('toast', status: 'danger', message: __('Invalid password key'));
 
             return;
         }
@@ -106,7 +106,7 @@ new #[Title('登入')] class extends Component {
         $options = Session::get('passkey-authentication-options');
 
         if (!$options) {
-            $this->dispatch('toast', status: 'danger', message: '密碼金鑰無效');
+            $this->dispatch('toast', status: 'danger', message: __('Invalid password key'));
 
             return;
         }
@@ -116,7 +116,7 @@ new #[Title('登入')] class extends Component {
         try {
             AuthenticatorAssertionResponseValidator::create(new CeremonyStepManagerFactory()->requestCeremony())->check(publicKeyCredentialSource: $publicKeyCredentialSource, authenticatorAssertionResponse: $publicKeyCredential->response, publicKeyCredentialRequestOptions: $publicKeyCredentialRequestOptions, host: request()->getHost(), userHandle: null);
         } catch (AuthenticatorResponseVerificationException) {
-            $this->dispatch('toast', status: 'danger', message: '密碼金鑰無效');
+            $this->dispatch('toast', status: 'danger', message: __('Invalid password key'));
 
             return;
         }
@@ -130,7 +130,7 @@ new #[Title('登入')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->dispatch('toast', status: 'success', message: '登入成功！');
+        $this->dispatch('toast', status: 'success', message: __('Login successful!'));
 
         $this->redirectIntended(route('root', absolute: false), navigate: true);
     }
@@ -191,7 +191,7 @@ new #[Title('登入')] class extends Component {
         } catch (error) {
           $wire.dispatch('toast', {
             status: 'danger',
-            message: '登入失敗，請稍後再試'
+            message: __('Login failed, please try again later')
           });
 
           return;
@@ -211,7 +211,7 @@ new #[Title('登入')] class extends Component {
       wire:navigate
     >
       <x-icons.arrow-left-circle class="w-6" />
-      <span class="ml-2">返回文章列表</span>
+      <span class="ml-2">{{ __('Return to article list') }}</span>
     </a>
   </div>
 
@@ -220,7 +220,7 @@ new #[Title('登入')] class extends Component {
       {{-- 頁面標題 --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.door-open class="w-6" />
-        <span class="ml-4">登入</span>
+        <span class="ml-4">{{ __('Login') }}</span>
       </div>
 
       {{-- 登入表單 --}}
@@ -245,18 +245,18 @@ new #[Title('登入')] class extends Component {
           <x-floating-label-input
             id="email"
             type="text"
-            placeholder="電子信箱"
+            placeholder="{{ __('Email') }}"
             wire:model="email"
             required
             autofocus
           />
 
-          {{-- 密碼 --}}
+          {{-- Password --}}
           <x-floating-label-input
             class="mt-6"
             id="password"
             type="password"
-            placeholder="密碼"
+            placeholder="{{ __('Password') }}"
             wire:model="password"
             required
           />
@@ -267,7 +267,7 @@ new #[Title('登入')] class extends Component {
               name="remember"
               wire:model="remember"
             >
-              記住我
+              {{ __('Remember me') }}
             </x-checkbox>
 
             @if (Route::has('password.request'))
@@ -281,7 +281,7 @@ new #[Title('登入')] class extends Component {
             @endif
           </div>
 
-          <x-button class="mt-6 w-full">登入</x-button>
+          <x-button class="mt-6 w-full">{{ __('Login') }}</x-button>
         </form>
 
         {{-- Passkey login --}}
@@ -304,7 +304,7 @@ new #[Title('登入')] class extends Component {
             x-on:click="loginWithPasskey"
           >
             <x-icons.fingerprint class="size-5" />
-            <span>使用密碼金鑰</span>
+            <span>{{ __('Use Passkeys') }}</span>
           </button>
         </div>
       </x-card>

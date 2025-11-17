@@ -15,7 +15,7 @@ new class extends Component {
 
         auth()->user()->unreadNotifications->markAsRead();
 
-        return $this->view()->with(compact('notifications'))->title('我的通知');
+        return $this->view()->with(compact('notifications'))->title(__('My Notifications'));
     }
 };
 ?>
@@ -29,7 +29,7 @@ new class extends Component {
         {{-- 頁面標題 --}}
         <div class="flex items-center justify-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
           <x-icons.bell class="w-6" />
-          <span class="ml-4">我的通知</span>
+          <span class="ml-4">{{ __('My Notifications') }}</span>
         </div>
 
         {{-- 通知列表 --}}
@@ -43,7 +43,7 @@ new class extends Component {
               {{-- 文章標題 --}}
               <div class="mt-2 space-x-2 md:mt-0">
 
-                <span class="dark:text-zinc-50">在你的文章中</span>
+                <span class="dark:text-zinc-50">{{ __('In your article') }}</span>
                 <a
                   class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-50"
                   href="{{ $notification->data['post_link'] }}"
@@ -51,7 +51,7 @@ new class extends Component {
                 >
                   {{ $notification->data['post_title'] }}
                 </a>
-                <span class="dark:text-zinc-50">有了新的言</span>
+                <span class="dark:text-zinc-50">{{ __('Having new words') }}</span>
               </div>
 
               {{-- 通知時間 --}}
@@ -70,7 +70,7 @@ new class extends Component {
 
         @empty
           <x-card class="flex h-24 w-full items-center justify-center dark:text-zinc-50">
-            <span>沒有消息通知！</span>
+            <span>{{ __('No notifications!') }}</span>
           </x-card>
         @endforelse
 

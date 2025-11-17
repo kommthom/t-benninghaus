@@ -25,6 +25,6 @@ class TwitterOembedController extends Controller
 
         return $response->successful()
             ? $response
-            : response()->json(['html' => '<p style="font-size:1.5em;">Twitter 連結發生錯誤... 🥲</p>'], 400);
+            : response()->json(['html' => '<p style="font-size:1.5em;">{{ __("Twitter link encountered an error... ??") }}</p>'], 400);
     }
 }

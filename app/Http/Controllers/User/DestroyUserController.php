@@ -31,6 +31,6 @@ class DestroyUserController extends Controller
         $user->delete();
 
         return to_route('posts.index')
-            ->with('alert', ['status' => 'success', 'message' => '帳號已刪除！']);
+            ->with('alert', ['status' => 'success', 'message' => __('Account deleted!')]);
     }
 }

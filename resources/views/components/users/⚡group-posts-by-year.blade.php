@@ -28,7 +28,7 @@ new class extends Component {
 
         $this->refreshPostsByYear();
 
-        $this->dispatch('toast', status: 'success', message: $post->is_private ? '文章狀態已切換為私人' : '文章狀態已切換為公開');
+        $this->dispatch('toast', status: 'success', message: $post->is_private ? __('Article status has been switched to private') : __('Article status has been switched to public'));
     }
 
     public function restore(int $postId): void
@@ -41,7 +41,7 @@ new class extends Component {
 
         $this->refreshPostsByYear();
 
-        $this->dispatch('toast', status: 'success', message: '文章已恢復');
+        $this->dispatch('toast', status: 'success', message: __()'Article restored'));
     }
 
     public function destroy(Post $post): void
@@ -54,7 +54,7 @@ new class extends Component {
 
         $this->dispatch('refreshUserPosts');
 
-        $this->dispatch('toast', status: 'success', message: '文章已刪除');
+        $this->dispatch('toast', status: 'success', message: __('Article deleted'));
     }
 
     public function refreshPostsByYear(): void
@@ -89,14 +89,14 @@ new class extends Component {
 
       <div class="ml-2 w-full">
         @if ($post->trashed())
-          <span class="text-red-400 line-through">{{ $post->title . ' (已刪除)' }}</span>
+          <span class="text-red-400 line-through">{{ $post->title . __(' (Deleted)') }}</span>
         @elseif ($post->is_private)
           <a
             class="duration-200 ease-out hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-50"
             href="{{ $post->link_with_slug }}"
             wire:navigate
           >
-            {{ $post->title . ' (未公開)' }}
+            {{ $post->title . __(' (Unpublished)') }}
           </a>
         @else
           <a
@@ -119,9 +119,9 @@ new class extends Component {
             <button
               class="cursor-pointer text-zinc-500 duration-200 ease-out hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
               type="button"
-              title="還原文章"
+              title="{{ __('Restore Article') }}"
               wire:loading.attr="disabled"
-              wire:confirm="你確定要還原該文章？"
+              wire:confirm="{{ __('Are you sure you want to restore this article?') }}"
               wire:click="restore({{ $post->id }})"
             >
               <x-icons.arrow-counterclockwise class="w-5" />
@@ -132,9 +132,9 @@ new class extends Component {
               <button
                 class="cursor-pointer text-zinc-500 duration-200 ease-out hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
                 type="button"
-                title="公開文章"
+                title="{{ __('Publish Article') }}"
                 wire:loading.attr="disabled"
-                wire:confirm="你確定要將該文章設為公開？"
+                wire:confirm="{{ __('Are you sure you want to make this article public?') }}"
                 wire:click="privateStatusToggle({{ $post->id }})"
               >
                 <x-icons.lock class="w-5" />
@@ -143,9 +143,9 @@ new class extends Component {
               <button
                 class="cursor-pointer text-zinc-500 duration-200 ease-out hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
                 type="button"
-                title="關閉文章"
+                title="{{ __('Close Article') }}"
                 wire:loading.attr="disabled"
-                wire:confirm="你確定要將該文章設為不公開？"
+                wire:confirm="{{ __('Are you sure you want to make this article unpublished?') }}"
                 wire:click="privateStatusToggle({{ $post->id }})"
               >
 
@@ -157,7 +157,7 @@ new class extends Component {
             <a
               class="text-zinc-500 duration-200 ease-out hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
               href="{{ route('posts.edit', ['id' => $post->id]) }}"
-              title="編輯文章"
+              title="{{ __('Edit Article') }}"
               role="button"
               wire:navigate
             >
@@ -168,9 +168,9 @@ new class extends Component {
             <button
               class="cursor-pointer text-red-400 duration-200 ease-out hover:text-red-700 dark:hover:text-red-200"
               type="button"
-              title="刪除文章"
+              title="{{ __('Delete Article') }}"
               wire:loading.attr="disabled"
-              wire:confirm="你確定要刪除文章嗎？（7 天之內可以還原）"
+              wire:confirm="{{ __('Are you sure you want to delete the article? (It can be restored within 7 days)') }}"
               wire:click.stop="destroy({{ $post->id }})"
             >
               <x-icons.x class="w-5" />

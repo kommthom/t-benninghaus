@@ -29,7 +29,7 @@ new class extends Component {
     {
         $logout();
 
-        $this->dispatch('toast', status: 'success', message: '成功登出！');
+        $this->dispatch('toast', status: 'success', message: __('Successfully logged out!'));
 
         $this->redirect(route('login'), navigate: true);
     }
@@ -140,7 +140,7 @@ new class extends Component {
         {{-- make sure both url are decode in aws lambda --}}
         :selected="urldecode(request()->url()) === urldecode(route('posts.index'))"
       >
-        全部文章
+        {{ __('All articles') }}
       </x-skew-underline-link>
 
       @foreach ($categories as $category)
@@ -183,7 +183,7 @@ new class extends Component {
             href="{{ route('register') }}"
             wire:navigate
           >
-            註冊
+            {{ __('Registration') }}
           </a>
         @endif
 
@@ -193,7 +193,7 @@ new class extends Component {
           wire:navigate
         >
           <x-icons.door-open class="w-5" />
-          <span class="ml-2">登入</span>
+          <span class="ml-2">{{ __('Log in') }}</span>
         </a>
       @endguest
 
@@ -246,25 +246,25 @@ new class extends Component {
           >
             <x-dropdown.link href="{{ route('posts.create') }}">
               <x-icons.pencil class="w-4" />
-              <span class="ml-2">新增文章</span>
+              <span class="ml-2">{{ __('Add Article') }}</span>
             </x-dropdown.link>
 
             <x-dropdown.link href="{{ route('users.show', ['id' => auth()->id()]) }}">
               <x-icons.info-circle class="w-4" />
-              <span class="ml-2">個人資訊</span>
+              <span class="ml-2">{{ __('Personal Information') }}</span>
             </x-dropdown.link>
 
             <x-dropdown.link href="{{ route('settings.users.edit', ['id' => auth()->id()]) }}">
               <x-icons.geer-fill class="w-4" />
-              <span class="ml-2">設定</span>
+              <span class="ml-2">{{ __('Settings') }}</span>
             </x-dropdown.link>
 
             <x-dropdown.button
-              wire:confirm="你確定要登出嗎？"
+              wire:confirm="{{ __('Are you sure you want to log out?') }}"
               wire:click="logout"
             >
               <x-icons.box-arrow-left class="w-4" />
-              <span class="ml-2">登出</span>
+              <span class="ml-2">{{ __('Log Out') }}</span>
             </x-dropdown.button>
           </x-dropdown.menu>
         </div>
@@ -406,25 +406,25 @@ new class extends Component {
               >
                 <x-dropdown.link href="{{ route('posts.create') }}">
                   <x-icons.pencil class="w-4" />
-                  <span class="ml-2">新增文章</span>
+                  <span class="ml-2">{{ __('Add Article') }}</span>
                 </x-dropdown.link>
 
                 <x-dropdown.link href="{{ route('users.show', ['id' => auth()->id()]) }}">
                   <x-icons.info-circle class="w-4" />
-                  <span class="ml-2">個人資訊</span>
+                  <span class="ml-2">{{ __('Personal Information') }}</span>
                 </x-dropdown.link>
 
                 <x-dropdown.link href="{{ route('settings.users.edit', ['id' => auth()->id()]) }}">
                   <x-icons.geer-fill class="w-4" />
-                  <span class="ml-2">設定</span>
+                  <span class="ml-2">{{ __('Settings') }}</span>
                 </x-dropdown.link>
 
                 <x-dropdown.button
-                  wire:confirm="你確定要登出嗎？"
+                  wire:confirm="{{ __('Are you sure you want to log out?') }}"
                   wire:click="logout"
                 >
                   <x-icons.box-arrow-left class="w-4" />
-                  <span class="ml-2">登出</span>
+                  <span class="ml-2">{{ __('Log Out') }}</span>
                 </x-dropdown.button>
               </x-dropdown.menu>
             </div>
@@ -456,7 +456,7 @@ new class extends Component {
         wire:navigate
       >
         <x-icons.home class="w-4" />
-        <span class="ml-2">全部文章</span>
+        <span class="ml-2">{{ __('All articles') }}</span>
       </a>
 
       @foreach ($categories as $category)

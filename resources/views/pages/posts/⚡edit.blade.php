@@ -37,14 +37,14 @@ new class extends Component {
     {
         $this->form->update($post);
 
-        $this->dispatch('toast', status: 'success', message: '成功更新文章！');
+        $this->dispatch('toast', status: 'success', message: __('Successfully updated article!'));
 
         $this->redirect($post->link_with_slug, navigate: true);
     }
 
     public function render()
     {
-        return $this->view()->title('編輯文章');
+        return $this->view()->title(__('Edit article'));
     }
 };
 ?>
@@ -172,7 +172,7 @@ new class extends Component {
           {{-- title --}}
           <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
             <x-icons.pencil-square class="w-6" />
-            <span class="ml-4">編輯文章</span>
+            <span class="ml-4">{{ __('Edit article') }}</span>
           </div>
 
           {{-- editor --}}
@@ -200,7 +200,7 @@ new class extends Component {
                     required
                   >
                     @slot('label')
-                      分類
+                      {{ __('Category') }}
                     @endslot
 
                     @foreach ($categories as $category)
@@ -218,7 +218,7 @@ new class extends Component {
                     name="is-private"
                     wire:model.change="form.is_private"
                   >
-                    文章不公開
+                    {{ __('Article Private') }}
                   </x-checkbox>
                 </div>
 
@@ -229,7 +229,7 @@ new class extends Component {
                     name="title"
                     type="text"
                     wire:model.live.debounce.500ms="form.title"
-                    placeholder="文章標題"
+                    placeholder="{{ __('Article Title') }}"
                     required
                     autofocus
                   />
@@ -243,13 +243,13 @@ new class extends Component {
                   <label
                     class="hidden"
                     for="tags"
-                  >標籤 (最多 5 個)</label>
+                  >{{ __('Tags (max 5)') }}</label>
 
                   <input
                     class="tagify-custom-look dark:border-zinc-600! border-zinc-300! w-full rounded-md bg-white dark:bg-zinc-700"
                     id="tags"
                     type="text"
-                    placeholder="標籤 (最多 5 個)"
+                    placeholder="{{ __('Tags (max 5)') }}"
                     x-ref="tags"
                   >
                 </div>
@@ -287,7 +287,7 @@ new class extends Component {
                     <x-icons.animate-spin />
                   </span>
 
-                  <span class="ml-2">儲存</span>
+                  <span class="ml-2">{{ __('Save') }}</span>
                 </x-button>
               </div>
             </form>

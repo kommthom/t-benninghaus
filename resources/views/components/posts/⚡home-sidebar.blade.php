@@ -27,14 +27,14 @@ new class extends Component {
 @script
   <script>
     Alpine.data('postsHomeSidebarPart', () => ({
-      rssLinkLabel: '訂閱 RSS',
+      rssLinkLabel: 'Subscribe to RSS',
       copyWebFeedUrl() {
         navigator.clipboard.writeText(this.$el.getAttribute('href')).then(
-          () => this.rssLinkLabel = '複製成功',
-          () => this.rssLinkLabel = '複製失敗'
+          () => this.rssLinkLabel = 'Copied successfully',
+          () => this.rssLinkLabel = 'Copy failed'
         );
 
-        setTimeout(() => this.rssLinkLabel = '複製 RSS 網址', 2000);
+        setTimeout(() => this.rssLinkLabel = 'Copy RSS URL', 2000);
       }
     }));
   </script>
@@ -54,7 +54,7 @@ new class extends Component {
     <hr class="my-4 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
 
     <span class="group-gradient-underline-grow leading-relaxed">
-      這是一個使用 TALL Stack 開發的部落格，用來記錄自己學習的過程，與生活上的大小事。🚀
+      {{ __('This is a blog developed using the TALL Stack, used to record my learning process and the big and small things in life. ??') }}
     </span>
 
     <div class="mt-8 flex items-center justify-center">
@@ -65,7 +65,7 @@ new class extends Component {
       >
         <div class="relative z-0 flex items-center text-zinc-200 transition duration-500 ease-in-out">
           <x-icons.pencil class="w-5" />
-          <span class="ml-2">新增文章</span>
+          <span class="ml-2">{{ __('Add New Article') }}</span>
         </div>
       </a>
     </div>
@@ -74,13 +74,13 @@ new class extends Component {
   <x-card class="dark:text-zinc-50">
     <div class="flex items-center justify-center">
       <x-icons.rss class="w-5" />
-      <span class="ml-2">RSS 訂閱</span>
+      <span class="ml-2">{{ __('RSS Subscription') }}</span>
     </div>
 
     <hr class="my-4 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
 
     <span class="group-gradient-underline-grow leading-relaxed">
-      取得最新文章的通知！🔔
+      {{ __('Get notified of the latest articles! ??') }}
     </span>
 
     <div class="mt-8 flex items-center justify-center">
@@ -97,12 +97,12 @@ new class extends Component {
     </div>
   </x-card>
 
-  {{-- 熱門標籤 --}}
+  {{-- Popular Tags --}}
   @if ($popularTags->count())
     <x-card class="dark:text-zinc-50">
       <div class="flex items-center justify-center">
         <x-icons.tags class="w-5" />
-        <span class="ml-2">熱門標籤</span>
+        <span class="ml-2">{{ __('Popular Tags') }}</span>
       </div>
 
       <hr class="my-4 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
@@ -117,12 +117,12 @@ new class extends Component {
     </x-card>
   @endif
 
-  {{-- 學習資源推薦 --}}
+  {{-- Learning Resources Recommendation --}}
   @if ($links->count())
     <x-card class="dark:text-zinc-50">
       <div class="flex items-center justify-center">
         <x-icons.file-earmark-code class="w-5" />
-        <span class="ml-2">學習資源推薦</span>
+        <span class="ml-2">{{ __('Learning Resources Recommendation') }}</span>
       </div>
 
       <hr class="my-4 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">

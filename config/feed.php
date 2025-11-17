@@ -19,7 +19,7 @@ return [
             'url' => '/post/feed',
 
             'title' => 'DocFunc',
-            'description' => '紀錄生活上的大小事！',
+            'description' => __("Record life's big and small events!"),
             'language' => 'zh-TW',
 
             /*

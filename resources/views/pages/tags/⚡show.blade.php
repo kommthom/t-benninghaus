@@ -28,7 +28,7 @@ new class extends Component {
         {{-- 文章列表 --}}
         <livewire:posts.list
           :tagId="$tag->id"
-          :badge="'標籤：' . $tag->name"
+          :badge="'{{ __('Tags:') }}' . $tag->name"
         />
       </div>
 

@@ -44,7 +44,7 @@ describe('user password', function () {
             ->set('new_password', $newPassword)
             ->set('new_password_confirmation', $newPassword)
             ->call('update', user: $user)
-            ->assertDispatched('toast', status: 'success', message: '密碼更新成功！');
+            ->assertDispatched('toast', status: 'success', message: 'Password updated successfully!');
 
         $user->refresh();
 

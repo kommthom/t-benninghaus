@@ -50,7 +50,7 @@ describe('destroy user', function () {
 
         Livewire::test('pages::settings.users.destroy', ['id' => $user->id])
             ->call('sendDestroyEmail', user: $user)
-            ->assertDispatched('toast', status: 'success', message: '已寄出信件！');
+            ->assertDispatched('toast', status: 'success', message: 'Letter sent!');
 
         Mail::assertQueued(DestroyUserMail::class);
     });

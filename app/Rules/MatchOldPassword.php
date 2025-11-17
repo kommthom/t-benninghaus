@@ -19,7 +19,7 @@ class MatchOldPassword implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! Hash::check($value, auth()->user()->password)) {
-            $fail('舊密碼錯誤');
+            $fail(__('Old password incorrect'));
         }
     }
 }

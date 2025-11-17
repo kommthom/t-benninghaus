@@ -62,7 +62,7 @@ test('you will see a red ping animation on notification icon when there is a com
             </span>
         HTML, false);
 
-    get(route('notifications.index'))->assertDontSeeText('沒有消息通知！');
+    get(route('notifications.index'))->assertDontSeeText('No notifications!');
 });
 
 test('if you reply to your own post, there will be no notification', function () {

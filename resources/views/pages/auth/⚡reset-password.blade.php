@@ -11,7 +11,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('重設密碼')] class extends Component {
+new #[Title('Reset Password')] class extends Component {
     // token will be passed in the URL,
     // and auto binding will take care of it
     #[Locked]
@@ -77,7 +77,7 @@ new #[Title('重設密碼')] class extends Component {
       {{-- 頁面標題 --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.question-circle class="w-6" />
-        <span class="ml-4">重設密碼</span>
+        <span class="ml-4">{{ __('Reset Password') }}</span>
       </div>
 
       <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
@@ -89,7 +89,7 @@ new #[Title('重設密碼')] class extends Component {
           <x-floating-label-input
             id="email"
             type="text"
-            placeholder="電子信箱"
+            placeholder="{{ __('Email') }}"
             required
             readonly
             wire:model="email"
@@ -100,7 +100,7 @@ new #[Title('重設密碼')] class extends Component {
             class="mt-6"
             id="password"
             type="password"
-            placeholder="新密碼"
+            placeholder="{{ __('New password') }}"
             required
             autofocus
             wire:model="password"
@@ -111,7 +111,7 @@ new #[Title('重設密碼')] class extends Component {
             class="mt-6"
             id="password_confirmation"
             type="password"
-            placeholder="確認新密碼"
+            placeholder="{{ __('Confirm new password') }}"
             required
             wire:model="password_confirmation"
           />

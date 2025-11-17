@@ -34,7 +34,7 @@ new class extends Component {
                 'captchaToken' => ['required', new Captcha()],
             ],
             messages: [
-                'captchaToken.required' => '未完成驗證',
+                'captchaToken.required' => __('Incomplete verification'),
             ],
         );
 
@@ -42,7 +42,7 @@ new class extends Component {
         $post = Post::find(id: $this->postId, columns: ['id', 'user_id']);
 
         if (!$post) {
-            $this->dispatch(event: 'toast', status: 'danger', message: '無法回覆！文章已被刪除！');
+            $this->dispatch(event: 'toast', status: 'danger', message: __('Unable to reply! The article has been deleted!'));
 
             $this->redirect(url: route('posts.index'), navigate: true);
 
@@ -54,7 +54,7 @@ new class extends Component {
             $parentIsExists = Comment::query()->whereId($this->form->parent_id)->wherePostId($post->id)->exists();
 
             if (!$parentIsExists) {
-                $this->dispatch(event: 'toast', status: 'danger', message: '無法回覆！留言已被刪除！');
+                $this->dispatch(event: 'toast', status: 'danger', message: __('Unable to reply! Message has been deleted!'));
 
                 return;
             }
@@ -87,7 +87,7 @@ new class extends Component {
 
         $this->dispatch(event: 'update-comments-count');
 
-        $this->dispatch(event: 'toast', status: 'success', message: '成功新增留言！');
+        $this->dispatch(event: 'toast', status: 'success', message: __('Successfully added comment!'));
     }
 };
 ?>
@@ -132,7 +132,7 @@ new class extends Component {
       },
       tabToFourSpaces,
       replyToLabel() {
-        return `回覆 ${this.modal.replyTo} 的留言`;
+        return "Reply ${this.modal.replyTo} 's message";
       },
       previewChanged(event) {
         if (event.target.checked) {
@@ -206,7 +206,7 @@ new class extends Component {
     <div class="flex flex-col gap-5">
       <div class="flex items-center justify-center space-x-2 text-2xl text-zinc-900 dark:text-zinc-50">
         <x-icons.chat-dots class="w-8" />
-        <span>新增留言</span>
+        <span>{{ __('Add New Comment') }}</span>
       </div>
 
       <div
@@ -229,9 +229,9 @@ new class extends Component {
         >
           <div class="relative space-x-4">
             <span class="font-semibold dark:text-zinc-50">
-              {{ auth()->check() ? auth()->user()->name : '訪客' }}
+              {{ auth()->check() ? auth()->user()->name : __('Visitor') }}
             </span>
-            <span class="text-zinc-400">{{ now()->format('Y 年 m 月 d 日') }}</span>
+            <span class="text-zinc-400">{{ now()->format(__('Y year m month d day')) }}</span>
           </div>
           <div
             class="rich-text h-80 overflow-auto"
@@ -259,7 +259,7 @@ new class extends Component {
             x-on:keydown.tab.prevent="tabToFourSpaces"
             x-model="comment.body"
             rows="12"
-            placeholder="寫下你的留言吧！**支援 Markdown**"
+            placeholder="{{ __('Write your message here! **Supports Markdown**') }}"
             required
           />
         </div>
@@ -277,7 +277,7 @@ new class extends Component {
             x-on:change="previewChanged"
             x-bind:disabled="comment.body === ''"
           >
-            預覽
+            {{ __('Preview') }}
           </x-toggle-switch>
 
           <x-button
@@ -294,7 +294,7 @@ new class extends Component {
               x-cloak
               x-show="modal.isSubmitEnabled === false"
             />
-            <span x-text="modal.isSubmitEnabled ? '回覆' : '驗證中'"></span>
+            <span x-text="modal.isSubmitEnabled ? {{ __('Reply') }} : {{ __('Verifying') }}"></span>
           </x-button>
         </div>
       </form>
