@@ -21,12 +21,6 @@ new class extends Component {
     #[Locked]
     public CommentOrderOptions $order = CommentOrderOptions::POPULAR;
 
-    #[On('update-comments-count')]
-    public function updateCommentsCount(): void
-    {
-        $this->commentCounts = Comment::query()->where('post_id', $this->postId)->count();
-    }
-
     public function changeOrder(CommentOrderOptions $order): void
     {
         $this->order = $order;
@@ -37,15 +31,21 @@ new class extends Component {
 @script
   <script>
     Alpine.data('commentsBoardPart', () => ({
+      observers: [],
       orderDropdownIsOpen: false,
       changeOrder() {
-        $wire.changeOrder(this.$el.dataset.order);
+        this.$wire.changeOrder(this.$el.dataset.orderValue);
         this.orderDropdownIsOpen = false;
       },
-      openCreateCommentModal() {
-        this.$dispatch('open-create-comment-modal', {
-          parentId: null,
-          replyTo: ''
+      init() {
+        let highlightCommentObserver = highlightObserver(this.$root);
+        this.observers.push(highlightCommentObserver);
+
+        highlightAllInElement(this.$root);
+      },
+      destroy() {
+        this.observers.forEach((observer) => {
+          observer.disconnect();
         });
       }
     }));
@@ -62,12 +62,14 @@ new class extends Component {
       <div class="flex items-center justify-center gap-6">
         <div class="flex items-center gap-2 dark:text-zinc-50">
           <x-icons.chat-square-text class="size-5" />
-          <span>{{ $commentCounts }} {{ __('Then leave a message.') }}</span>
+          <span wire:text="commentCounts"></span>
+          {{ __('Then leave a message.') }}
         </div>
 
         <div class="relative inline-block text-left">
           <button
             class="inline-flex w-full cursor-pointer items-center justify-center gap-2 text-zinc-900 dark:text-zinc-50"
+            data-test-id="comments.order.toggle"
             type="button"
             x-on:click="orderDropdownIsOpen = true"
           >
@@ -98,7 +100,8 @@ new class extends Component {
             <div class="w-full py-1">
               @foreach (CommentOrderOptions::cases() as $commentOrder)
                 <button
-                  data-order="{{ $commentOrder->value }}"
+                  data-order-value="{{ $commentOrder->value }}"
+                  data-test-id="comments.order.option"
                   type="button"
                   @class([
                       'flex w-full justify-start px-4 py-2 cursor-pointer',
@@ -119,8 +122,10 @@ new class extends Component {
       <button
         class="before:bg-lividus-600 dark:bg-lividus-700 group relative cursor-pointer overflow-hidden rounded-xl bg-emerald-600 px-6 py-2 [transform:translateZ(0)] before:absolute before:bottom-0 before:left-0 before:h-full before:w-full before:origin-[100%_100%] before:scale-x-0 before:transition before:duration-500 before:ease-in-out hover:before:origin-[0_0] hover:before:scale-x-100 dark:before:bg-emerald-700"
         type="button"
-        {{-- the comment group name should be full name --}}
-        x-on:click="openCreateCommentModal"
+        x-on:click="$dispatch('open-create-comment-modal', {
+          parentId: null,
+          replyTo: ''
+        })"
       >
         <div class="relative z-0 flex items-center text-lg text-zinc-200 transition duration-500 ease-in-out">
           <x-icons.chat-dots class="w-5" />
@@ -135,20 +140,12 @@ new class extends Component {
     </div>
   </div>
 
-  {{-- new root comment will show here --}}
-  <livewire:comments.group
-    :post-id="$postId"
-    :post-user-id="$postUserId"
-    :comment-group-name="'root-new-comment-group'"
-    :key="'root-new-comment-group-order-by-' . $order->value"
-  />
-
   {{-- root comment list --}}
   <livewire:comments.list
     :post-id="$postId"
     :post-user-id="$postUserId"
     :order="$order"
-    :key="'root-comment-list-order-by-' . $order->value"
+    :key="'comments-order-by-' . $order->value"
   />
 
   {{-- create comment modal --}}

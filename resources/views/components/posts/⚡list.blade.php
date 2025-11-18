@@ -47,7 +47,9 @@ new class extends Component {
             ->paginate(10)
             ->withQueryString();
 
-        return $this->view(compact('posts'));
+        return $this->view([
+            'posts' => $posts,
+        ]);
     }
 };
 ?>
@@ -60,7 +62,7 @@ new class extends Component {
         this.tabRepositionMarker(tabButton);
         this.order = tabButton.id.replace('-tab-button', '');
 
-        $wire.changeOrder(this.order);
+        this.$wire.changeOrder(this.order);
       },
       tabRepositionMarker(tabButton) {
         this.$refs.tabMarker.style.width = tabButton.offsetWidth + 'px';

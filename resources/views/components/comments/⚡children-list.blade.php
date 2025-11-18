@@ -1,29 +1,24 @@
 <?php
 
-declare(strict_types=1);
-
-use App\Enums\CommentOrderOptions;
 use App\Models\Comment;
 use App\Traits\MarkdownConverter;
-use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
-use Livewire\Attributes\Renderless;
 use Livewire\Component;
 
 new class extends Component {
     use MarkdownConverter;
 
-    private const int PER_PAGE = 10;
+    public const int PER_PAGE = 10;
 
     #[Locked]
-    public int $postId;
+    public int $parentId;
 
     #[Locked]
     public int $postUserId;
 
     #[Locked]
-    public CommentOrderOptions $order = CommentOrderOptions::LATEST;
+    public int $childrenCount;
 
     /**
      * The array of comments list, the format is below:
@@ -34,48 +29,38 @@ new class extends Component {
      *     'body': string,
      *     'created_at': string,
      *     'updated_at': string,
-     *     'children_count': int,
      *     'user_name': string|null,
      *     'user_gravatar_url': string|null,
      * }>
      */
     public array $comments = [];
 
-    public array $loadingLabel = [
-        'is_visible' => true,
+    public array $loadMoreButton = [
+        'is_active' => false,
+        'label' => '',
     ];
 
     public function mount(): void
     {
-        $this->loadMoreComments();
+        if ($this->childrenCount > 0) {
+            $this->loadMoreButton['is_active'] = true;
+            $this->loadMoreButton['label'] = $this->childrenCount . ' 則回覆';
+        }
     }
 
     private function getComments(): array
     {
         $comments = Comment::query()
             ->select(['comments.id', 'comments.user_id', 'comments.body', 'comments.created_at', 'comments.updated_at', 'users.name as user_name', 'users.email as user_email'])
-            // Use a sub query to generate a children_count column,
             // this line must be after the select method
-            ->withCount('children')
             ->join('users', 'comments.user_id', '=', 'users.id', 'left')
-            ->when($this->order === CommentOrderOptions::LATEST, function (Builder $query) {
-                $query->latest('comments.id');
-            })
-            ->when($this->order === CommentOrderOptions::OLDEST, function (Builder $query) {
-                $query->oldest('comments.id');
-            })
-            ->when($this->order === CommentOrderOptions::POPULAR, function (Builder $query) {
-                $query->orderByDesc('children_count');
-            })
             // Don't show new comments, avoid showing duplicate comments,
             // New comments have already showed in a new comment group.
             ->whereNotIn('comments.id', array_keys($this->comments))
-            ->where('comments.post_id', $this->postId)
-            // When parent id is not null,
-            // it means this comment list is children of another comment.
-            ->where('comments.parent_id', null)
+            ->where('comments.parent_id', $this->parentId)
             // Plus-one is needed here because we need to determine whether there is a next page.
             ->limit(self::PER_PAGE + 1)
+            ->orderBy('comments.created_at')
             ->get()
             ->keyBy('id')
             ->toArray();
@@ -91,26 +76,28 @@ new class extends Component {
         return array_map($callback, $comments);
     }
 
-    public function loadMoreComments(): void
+    public function loadMoreChildren(): void
     {
         $comments = $this->getComments();
 
         if (count($comments) <= self::PER_PAGE) {
-            $this->loadingLabel['is_visible'] = false;
+            $this->loadMoreButton['is_active'] = false;
         }
+
+        $this->loadMoreButton['label'] = '顯示更多回覆';
 
         $comments = array_slice($comments, 0, self::PER_PAGE, true);
 
         $this->comments += $comments;
     }
 
-    #[On('create-comment-in-root-list')]
+    #[On('create-comment-in-comment-{parentId}-children-list')]
     public function createComment(array $comment): void
     {
         $this->comments = [$comment['id'] => $comment] + $this->comments;
     }
 
-    #[On('update-comment-in-root-list')]
+    #[On('update-comment-in-comment-{parentId}-children-list')]
     public function updateComment(int $id, string $body, string $updatedAt): void
     {
         $this->comments[$id]['body'] = $body;
@@ -123,7 +110,7 @@ new class extends Component {
 
         // Check the comment is not deleted
         if ($comment === null) {
-            $this->dispatch(event: 'toast', status: 'danger', message: __('This comment has been deleted!'));
+            $this->dispatch(event: 'toast', status: 'danger', message: '該留言已被刪除！');
 
             return;
         }
@@ -134,39 +121,18 @@ new class extends Component {
 
         unset($this->comments[$id]);
 
-        $this->dispatch(event: 'toast', status: 'success', message: __('Successfully deleted comment!'));
+        $this->dispatch(event: 'toast', status: 'success', message: '成功刪除留言！');
     }
 };
 ?>
 
-@script
-  <script>
-    Alpine.data('rootCommentList', () => ({
-      loadMoreComments() {
-        let y = window.scrollY;
-
-        this.$wire.loadMoreComments().then(() => {
-          window.scrollTo({
-            top: y,
-            behavior: 'instant'
-          });
-        });
-      }
-    }));
-  </script>
-@endscript
-
-{{-- 留言列表 --}}
 <div
-  class="w-full"
-  id="root-comment-list"
-  data-test-id="comments.root-list"
-  x-data="rootCommentList"
+  class="relative pl-4 before:absolute before:bottom-0 before:left-0 before:top-0 before:w-1 before:rounded-full before:bg-emerald-400/20 before:contain-none md:pl-8 dark:before:bg-indigo-500/20"
+  data-test-id="comments.children-list"
 >
   @foreach ($comments as $comment)
     <x-dashed-card
-      class="comment-card mt-6"
-      data-test-id="comments.card"
+      class="mt-6"
       wire:key="comment-card-{{ $comment['id'] }}-{{ $comment['updated_at'] }}"
     >
       <div class="flex flex-col">
@@ -187,16 +153,16 @@ new class extends Component {
           @else
             <x-icons.question-circle-fill class="size-10 text-zinc-300 dark:text-zinc-500" />
 
-            <span class="dark:text-zinc-50">{{ __('Guest Comments') }}</span>
+            <span class="dark:text-zinc-50">訪客</span>
           @endif
 
           <time
             class="hidden text-zinc-400 md:block"
             datetime="{{ date('d-m-Y', strtotime($comment['created_at'])) }}"
-          >{{ date(__('Y year m month d day'), strtotime($comment['created_at'])) }}</time>
+          >{{ date('Y 年 m 月 d 日', strtotime($comment['created_at'])) }}</time>
 
           @if ($comment['created_at'] !== $comment['updated_at'])
-            <span class="text-zinc-400">{{ __('(Edited)') }}</span>
+            <span class="text-zinc-400">(已編輯)</span>
           @endif
         </div>
 
@@ -212,13 +178,13 @@ new class extends Component {
                 data-test-id="comments.card.edit"
                 type="button"
                 x-on:click="$dispatch('open-edit-comment-modal', {
-                  listName: 'root-list',
+                  listName: @js('comment-' . $parentId . '-children-list'),
                   id: @js($comment['id']),
                   body: @js($comment['body'])
                 })"
               >
                 <x-icons.pencil class="w-4" />
-                <span class="ml-2">{{ __('(Edited)') }}</span>
+                <span class="ml-2">編輯</span>
               </button>
             @endif
 
@@ -228,49 +194,27 @@ new class extends Component {
                 data-test-id="comments.card.delete"
                 type="button"
                 wire:click="destroyComment({{ $comment['id'] }})"
-                wire:confirm="{{ __('Are you sure you want to delete this comment?') }}"
+                wire:confirm="你確定要刪除該留言？"
               >
                 <x-icons.trash class="w-4" />
-                <span class="ml-2">{{ __('Delete') }}</span>
+                <span class="ml-2">刪除</span>
               </button>
             @endif
           @endauth
-
-          <button
-            class="flex cursor-pointer items-center hover:text-zinc-500 dark:hover:text-zinc-300"
-            data-test-id="comments.card.reply"
-            type="button"
-            x-on:click="$dispatch('open-create-comment-modal', {
-              parentId: @js($comment['id']),
-              replyTo: @js($comment['user_name'] === null ? __('Visitor') : $comment['user_name'])
-            })"
-          >
-            <x-icons.reply-fill class="w-4" />
-            <span class="ml-2">{{ __('Reply') }}</span>
-          </button>
         </div>
       </div>
     </x-dashed-card>
-
-    <livewire:comments.children-list
-      :parent-id="$comment['id']"
-      :post-user-id="$postUserId"
-      :children-count="$comment['children_count']"
-      :key="$comment['id'] . '-comment-children'"
-    />
   @endforeach
 
-  <div
-    class="mt-6 flex w-full items-center justify-center"
-    wire:show="loadingLabel['is_visible']"
+  <button
+    class="dark:hover:bg-zinc mt-6 flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-base hover:bg-zinc-300/80 dark:text-zinc-50 dark:hover:bg-zinc-800"
+    data-test-id="comments.children.load-more"
+    wire:show="loadMoreButton['is_active']"
+    wire:click="loadMoreChildren"
   >
-    <span
-      class="flex gap-2 text-sm text-emerald-600 dark:text-zinc-50"
-      type="button"
-      x-intersect="loadMoreComments"
-    >
-      <x-icons.animate-spin class="size-5" />
-      <span>{{ __('Show more comments') }}</span>
-    </span>
-  </div>
+    <span wire:text="loadMoreButton['label']"></span>
+
+    <x-icons.caret-down-fill class="in-data-loading:hidden size-4" />
+    <x-icons.animate-spin class="in-data-loading:inline-block hidden size-5" />
+  </button>
 </div>

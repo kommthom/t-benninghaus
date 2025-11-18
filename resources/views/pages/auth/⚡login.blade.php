@@ -173,7 +173,7 @@ new #[Title('Login')] class extends Component {
       browserSupportsWebAuthn,
       async loginWithPasskey() {
         if (!this.browserSupportsWebAuthn()) {
-          $wire.dispatch('toast', {
+          this.$wire.$dispatch('toast', {
             status: 'danger',
             message: '不支援 WebAuthn'
           });
@@ -185,11 +185,11 @@ new #[Title('Login')] class extends Component {
         const optionsJSON = await response.json();
 
         try {
-          $wire.answer = JSON.stringify(await startAuthentication({
+          this.$wire.answer = JSON.stringify(await startAuthentication({
             optionsJSON
           }))
         } catch (error) {
-          $wire.dispatch('toast', {
+          this.$wire.$dispatch('toast', {
             status: 'danger',
             message: __('Login failed, please try again later')
           });
@@ -197,7 +197,7 @@ new #[Title('Login')] class extends Component {
           return;
         }
 
-        $wire.loginWithPasskey()
+        this.$wire.loginWithPasskey()
       }
     }));
   </script>

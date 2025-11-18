@@ -15,7 +15,7 @@ test('edit comment modal part can be rendered by logged in users', function () {
 
 test('logged-in users can update their comments', function () {
     $oldBody = 'old comment';
-    $commentGroupName = '1-comment-group';
+    $commentListName = 'root-list';
 
     $comment = Comment::factory()->create(['body' => $oldBody]);
 
@@ -26,17 +26,18 @@ test('logged-in users can update their comments', function () {
     $body = 'new comment';
 
     Livewire::test('comments.edit-modal')
+        ->set('comment.id', $comment->id)
+        ->set('comment.list_name', $commentListName)
         ->set('form.body', $body)
-        ->call('save', $comment->id, $commentGroupName)
-        ->assertDispatched('close-edit-comment-modal')
-        ->assertDispatched('update-comment-in-'.$commentGroupName);
+        ->call('save')
+        ->assertDispatched('update-comment-in-'.$commentListName);
 
     $this->assertDatabaseHas('comments', ['body' => $body]);
 });
 
 test('the updated message must be at least 5 characters long', function () {
     $oldBody = 'old comment';
-    $commentGroupName = '1-comment-group';
+    $commentListName = 'comment-1-children-list';
 
     $comment = Comment::factory()->create(['body' => $oldBody]);
 
@@ -47,8 +48,10 @@ test('the updated message must be at least 5 characters long', function () {
     $body = str()->random(4);
 
     Livewire::test('comments.edit-modal')
+        ->set('comment.id', $comment->id)
+        ->set('comment.list_name', $commentListName)
         ->set('form.body', $body)
-        ->call('save', $comment->id, $commentGroupName)
+        ->call('save')
         ->assertHasErrors(['form.body' => 'min:5'])
         ->assertSeeText('The message must be at least 5 characters long');
 
@@ -57,7 +60,7 @@ test('the updated message must be at least 5 characters long', function () {
 
 test('the updated message must be less than 2000 characters', function () {
     $oldBody = 'old comment';
-    $commentGroupName = '1-comment-group';
+    $commentListName = 'comment-1-children-list';
 
     $comment = Comment::factory()->create(['body' => $oldBody]);
 
@@ -68,8 +71,10 @@ test('the updated message must be less than 2000 characters', function () {
     $body = str()->random(2001);
 
     Livewire::test('comments.edit-modal')
+        ->set('comment.id', $comment->id)
+        ->set('comment.list_name', $commentListName)
         ->set('form.body', $body)
-        ->call('save', $comment->id, $commentGroupName)
+        ->call('save')
         ->assertHasErrors(['form.body' => 'max:2000'])
         ->assertSeeText('Message content up to 2000 characters');
 
@@ -78,15 +83,17 @@ test('the updated message must be less than 2000 characters', function () {
 
 test('users can\'t update others\' comments', function () {
     $comment = Comment::factory()->create();
-    $commentGroupName = '1-comment-group';
+    $commentListName = 'comment-1-children-list';
 
     loginAsUser();
 
     $body = 'new comment';
 
     Livewire::test('comments.edit-modal')
+        ->set('comment.id', $comment->id)
+        ->set('comment.list_name', $commentListName)
         ->set('form.body', $body)
-        ->call('save', $comment->id, $commentGroupName)
+        ->call('save')
         ->assertForbidden();
 
     expect(Comment::find($comment->id, ['body']))

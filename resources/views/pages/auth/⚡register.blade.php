@@ -66,7 +66,7 @@ new #[Title('Register')] class extends Component {
           turnstile.render(this.$refs.turnstileBlock, {
             sitekey: this.captchaSiteKey,
             callback: (token) => {
-              $wire.set('captchaToken', token);
+              this.$wire.$set('captchaToken', token);
               this.submitIsEnabled = true;
             }
           });

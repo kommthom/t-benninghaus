@@ -13,6 +13,13 @@ new class extends Component {
 
     public CommentForm $form;
 
+    public array $comment = [
+        'id' => null,
+        'list_name' => '',
+    ];
+
+    public bool $previewIsEnable = false;
+
     public function mount(): void
     {
         if (!auth()->check()) {
@@ -20,15 +27,15 @@ new class extends Component {
         }
     }
 
-    public function save(Comment $comment, string $groupName): void
+    public function save(): void
     {
+        $comment = Comment::findOrFail($this->comment['id']);
+
         $this->authorize('update', $comment);
 
         $this->form->update($comment);
 
-        $this->dispatch(event: 'close-edit-comment-modal');
-
-        $this->dispatch(event: 'update-comment-in-' . $groupName, id: $comment->id, body: $comment->body, updatedAt: $comment->updated_at);
+        $this->dispatch(event: 'update-comment-in-' . $this->comment['list_name'], id: $comment->id, body: $comment->body, updatedAt: $comment->updated_at);
     }
 };
 ?>
@@ -40,46 +47,22 @@ new class extends Component {
 @script
   <script>
     Alpine.data('commentsEditModalPart', () => ({
-      observers: [],
       modal: {
         isOpen: false
       },
-      comment: {
-        id: null,
-        body: ''
-      },
-      groupName: null,
-      previewIsEnable: false,
       openModal(event) {
-        this.groupName = event.detail.groupName;
-        this.comment = event.detail.comment;
+        this.$wire.$set('comment.list_name', event.detail.listName);
+        this.$wire.$set('comment.id', event.detail.id);
+        this.$wire.$set('form.body', event.detail.body);
+
         this.modal.isOpen = true;
 
         this.$nextTick(() => this.$refs.editCommentTextarea?.focus());
       },
-      closeModal() {
-        this.modal.isOpen = false;
-        this.previewIsEnable = false;
-      },
-      submit() {
-        $wire.form.body = this.comment.body;
-        $wire.save(this.comment.id, this.groupName);
-      },
       tabToFourSpaces,
-      previewChanged(event) {
-        if (event.target.checked) {
-          $wire.$set('form.body', this.comment.body, true);
-        } else {
-          this.$refs.convertedBody.innerHTML = '';
-        }
-      },
-      init() {
-        let previewObserver = highlightObserver(this.$refs.editCommentModal)
-        this.observers.push(previewObserver);
-      },
-      destroy() {
-        this.observers.forEach((observer) => {
-          observer.disconnect();
+      submit() {
+        this.$wire.save().then(() => {
+          this.modal.isOpen = false;
         });
       }
     }));
@@ -88,13 +71,11 @@ new class extends Component {
 
 <div
   class="fixed inset-0 z-30 flex min-h-screen items-end justify-center"
-  x-cloak
   x-data="commentsEditModalPart"
-  x-ref="editCommentModal"
+  x-cloak
   x-show="modal.isOpen"
   x-on:open-edit-comment-modal.window="openModal"
-  x-on:close-edit-comment-modal.window="closeModal"
-  x-on:keydown.escape.window="closeModal"
+  x-on:keydown.escape.window="modal.isOpen = false"
 >
   {{-- gray background --}}
   <div
@@ -114,7 +95,7 @@ new class extends Component {
       <button
         class="cursor-pointer text-zinc-400 hover:text-zinc-500 dark:hover:text-zinc-300"
         type="button"
-        x-on:click="closeModal"
+        x-on:click="modal.isOpen = false"
       >
         <x-icons.x class="size-8" />
       </button>
@@ -134,18 +115,14 @@ new class extends Component {
 
         <div
           class="relative space-y-2"
-          x-cloak
-          x-show="previewIsEnable"
+          wire:show="previewIsEnable"
         >
           <div class="space-x-4">
             <span class="font-semibold dark:text-zinc-50"> {{ auth()->user()->name }}</span>
             <span class="text-zinc-400">{{ now()->format(__('Y year m month d day')) }}</span>
           </div>
 
-          <div
-            class="rich-text h-80 overflow-auto"
-            x-ref="convertedBody"
-          >
+          <div class="rich-text h-80 overflow-auto">
             {!! $this->convertToHtml($this->form->body) !!}
           </div>
 
@@ -156,16 +133,13 @@ new class extends Component {
           />
         </div>
 
-        <div
-          x-cloak
-          x-show="!previewIsEnable"
-        >
+        <div wire:show="!previewIsEnable">
           <x-floating-label-textarea
             class="font-jetbrains-mono"
             id="edit-comment-body"
             x-ref="editCommentTextarea"
             x-on:keydown.tab.prevent="tabToFourSpaces"
-            x-model="comment.body"
+            wire:model="form.body"
             rows="12"
             placeholder="{{ __('Write your message here! **Supports Markdown**') }}"
             required
@@ -175,9 +149,8 @@ new class extends Component {
         <div class="flex items-center justify-between space-x-3">
           <x-toggle-switch
             id="edit-comment-modal-preview"
-            x-model="previewIsEnable"
-            x-on:change="previewChanged"
-            x-bind:disabled="comment.body === ''"
+            wire:model.live="previewIsEnable"
+            x-bind:disabled="$wire.form.body === ''"
           >
             {{ __('Preview') }}
           </x-toggle-switch>
