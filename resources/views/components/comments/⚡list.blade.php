@@ -156,7 +156,7 @@ new class extends Component {
   </script>
 @endscript
 
-{{-- 留言列表 --}}
+{{-- Message list --}}
 <div
   class="w-full"
   id="root-comment-list"

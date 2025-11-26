@@ -14,7 +14,7 @@ class Tag extends Model
 
     protected $fillable = ['name'];
 
-    // 定義與文章的關聯
+    // Definition der Beziehung zum Artikel
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'post_tag', 'tag_id', 'post_id');

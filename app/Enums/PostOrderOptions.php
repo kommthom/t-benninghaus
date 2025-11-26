@@ -15,9 +15,9 @@ enum PostOrderOptions: string implements OptionsInterface
     public function label(): string
     {
         return match ($this) {
-            self::LATEST => '最新文章',
-            self::RECENT => '最近更新',
-            self::COMMENT => '最多留言',
+            self::LATEST => __('Latest Articles'),
+            self::RECENT => __('Recently Updated'),
+            self::COMMENT => __('Most Commented'),
         };
     }
 

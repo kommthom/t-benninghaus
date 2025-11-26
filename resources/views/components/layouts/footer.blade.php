@@ -8,7 +8,7 @@
     <div class="w-1/2 p-5 sm:w-1/3">
       {{-- Title --}}
       <div class="mb-6 text-lg font-semibold uppercase text-zinc-50">
-        About
+        {{ __('About') }}
       </div>
       {{-- Links --}}
       <a
@@ -17,7 +17,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Website Source Code
+        {{ __('Website Source Code') }}
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
@@ -25,7 +25,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Author
+        {{ __('Author') }}
       </a>
     </div>
 
@@ -33,7 +33,7 @@
     <div class="w-1/2 p-5 sm:w-1/3">
       {{-- Title --}}
       <div class="mb-6 text-lg font-semibold uppercase text-zinc-50">
-        Learning
+        {{ __('Learning') }}
       </div>
 
       {{-- Links --}}
@@ -43,7 +43,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        freeCodeCamp
+        {{ __('freeCodeCamp') }}
       </a>
 
       <a
@@ -52,7 +52,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Laracasts
+        {{ __('Laracasts') }}
       </a>
 
       <a
@@ -61,7 +61,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        JetBrains Academy
+        {{ __('JetBrains Academy') }}
       </a>
     </div>
 
@@ -69,7 +69,7 @@
     <div class="w-1/2 p-5 sm:w-1/3">
       {{-- Title --}}
       <div class="mb-6 text-lg font-semibold uppercase text-zinc-50">
-        Special Thanks
+        {{ __('Special Thanks') }}
       </div>
 
       {{-- Links --}}
@@ -79,7 +79,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Laravel
+        {{ __('Laravel') }}
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
@@ -87,7 +87,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Laravel China
+        {{ __('Laravel China') }}
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
@@ -95,7 +95,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Laravel Taiwan
+        {{ __('Laravel Taiwan') }}
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
@@ -103,7 +103,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Laravel Livewire
+        {{ __('Laravel Livewire') }}
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
@@ -111,7 +111,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Tailwind CSS
+        {{ __('Tailwind CSS') }}
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
@@ -119,7 +119,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Bootstrap
+        {{ __('Bootstrap') }}
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
@@ -127,7 +127,7 @@
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        Alpine.js
+        {{ __('Alpine.js') }}
       </a>
     </div>
   </div>
@@ -136,13 +136,13 @@
   <div class="pt-2">
     <div class="m-auto flex max-w-6xl flex-col border-t border-zinc-500 px-3 pb-5 pt-5 md:flex-row">
       <div class="mb-2 flex items-center justify-center text-sm text-zinc-400 md:mb-0">
-        © Copyright 2020-{{ date('Y') }}. All Rights Reserved.
+        © Copyright 2020-{{ date('Y') . __('. All Rights Reserved.') }}
       </div>
 
       <div class="flex flex-row items-center justify-center space-x-4 md:flex-auto md:justify-end">
         <a
           class="text-2xl text-zinc-400 duration-300 hover:text-zinc-50"
-          href="https://github.com/yilanboy/"
+          href="https://github.com/kommthom/"
           aria-label="GitHub"
           target="_blank"
           rel="nofollow noopener noreferrer"

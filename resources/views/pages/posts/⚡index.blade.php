@@ -15,16 +15,16 @@ new class extends Component {
 ?>
 
 <x-layouts.main>
-  {{-- 文章列表 --}}
+  {{-- List of articles --}}
   <div class="container mx-auto grow">
     <div class="mx-auto grid max-w-3xl grid-cols-3 gap-6 px-2 lg:px-0 xl:max-w-5xl">
       <div class="col-span-3 xl:col-span-2">
-        {{-- 文章列表 --}}
+        {{-- List of articles --}}
         <livewire:posts.list />
       </div>
 
       <div class="hidden xl:col-span-1 xl:block">
-        {{-- 文章列表側邊欄 --}}
+        {{-- article list sidebar --}}
         <livewire:posts.home-sidebar />
       </div>
     </div>

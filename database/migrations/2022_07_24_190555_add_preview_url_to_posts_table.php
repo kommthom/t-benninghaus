@@ -12,7 +12,7 @@ return new class extends Migration
             $table->string('preview_url', 2048)
                 ->after('slug')
                 ->nullable()
-                ->comment('文章預覽圖');
+                ->comment('Article preview image');
         });
     }
 

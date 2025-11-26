@@ -13,13 +13,13 @@ use Illuminate\Support\Facades\Auth;
 class DestroyUserController extends Controller
 {
     /**
-     * 刪除用戶帳號
+     * Benutzerkonto l�schen
      *
      * @return RedirectResponse
      */
     public function __invoke(Request $request, User $user)
     {
-        // 確認網址是否有效
+        // URL auf G�ltigkeit pr�fen
         abort_if(! $request->hasValidSignature(), 401);
 
         Auth::guard('web')->logout();

@@ -175,7 +175,7 @@ new class extends Component {
           <hr class="h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
         </div>
 
-        {{-- 驗證錯誤訊息 --}}
+        {{-- validate error message --}}
         <x-auth-validation-errors :errors="$errors" />
 
         <x-quotes.success>
@@ -235,7 +235,7 @@ new class extends Component {
                   class="-m-2.5 block cursor-pointer p-2.5 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
                   type="button"
                   wire:click="destroy({{ $passkey->id }})"
-                  wire:confirm="{{ __('Are you sure you want to delete this passkey?') }}"
+                  wire:confirm="{{ __('Are you sure you want to delete this Passkey?') }}"
                 >
                   <span class="sr-only">{{ __('Open Edit Menu') }}</span>
                   <x-icons.x class="size-6" />

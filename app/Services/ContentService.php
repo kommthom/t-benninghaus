@@ -11,25 +11,25 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 class ContentService
 {
     /**
-     * 生成用來優化 SEO 的 slug
+     * Generate slug titles for SEO optimization
      *
      * @param  string  $title  標題
      */
     public static function getSlug(string $title): string
     {
-        // 去掉特殊字元，只留中文與英文
+        // Remove special characters and leave only Chinese and English
         $title = preg_replace('/[^A-Za-z0-9 \p{Han}]+/u', '', $title);
-        // 將空白替換成 '-'
+         // Replace spaces with '-'
         $title = preg_replace('/\s+/u', '-', $title);
-        // 英文全部改為小寫
+        // Change all English to lowercase
         $title = strtolower($title);
 
-        // 後面加個 '-post' 是為了避免 slug 只有 'edit' 時，會與編輯頁面的路由發生衝突
+        // Add a '-post' after the slug to avoid conflicts with the route of the editing page
         return $title.'-post';
     }
 
     /**
-     * 過濾 html 格式的文章內容，避免 XSS 攻擊
+     * Filter the content of the article in html format to avoid XSS attacks
      */
     public static function getPurifiedBody(string $html): string
     {
@@ -49,7 +49,7 @@ class ContentService
     }
 
     /**
-     * 生成文章內容的摘錄
+     * Generate excerpts of the article content
      */
     public static function getExcerpt(string $body, int $length = 200): string
     {
@@ -57,7 +57,7 @@ class ContentService
     }
 
     /**
-     * 取得文章中的圖片連結
+     * Get the link to the image in the article
      */
     public static function getImagesInContent(string $body): array
     {

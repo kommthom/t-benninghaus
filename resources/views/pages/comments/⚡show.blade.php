@@ -97,7 +97,7 @@ new class extends Component {
   </script>
 @endscript
 
-{{-- 文章列表 --}}
+{{-- List of articles --}}
 <x-layouts.main>
   <div
     class="container mx-auto grow"

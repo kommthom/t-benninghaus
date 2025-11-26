@@ -17,9 +17,9 @@ enum CommentOrderOptions: string implements OptionsInterface
     public function label(): string
     {
         return match ($this) {
-            self::POPULAR => '熱門留言',
-            self::LATEST => '由新到舊',
-            self::OLDEST => '由舊到新',
+            self::POPULAR => __('Popular Comments'),
+            self::LATEST => __('Newest to Oldest'),
+            self::OLDEST => __('Oldest to Newest'),
         };
     }
 }

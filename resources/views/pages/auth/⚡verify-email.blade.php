@@ -47,7 +47,7 @@ new #[Title('Verify Email')] class extends Component {
 
   <div class="container mx-auto">
     <div class="flex min-h-screen flex-col items-center justify-center px-4">
-      {{-- 頁面標題 --}}
+      {-- page title --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.person-check class="w-6" />
         <span class="ml-4">{{ __('Verify Email') }}</span>

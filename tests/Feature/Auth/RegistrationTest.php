@@ -223,5 +223,5 @@ test('guests cannot see the register button', function () {
         ->firstOrFail()
         ->update(['value' => false]);
 
-    Livewire::test('layouts.header')->assertDontSeeText('註冊');
+    Livewire::test('layouts.header')->assertDontSeeText('Registration');
 });

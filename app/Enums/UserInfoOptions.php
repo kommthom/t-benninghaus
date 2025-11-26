@@ -15,9 +15,9 @@ enum UserInfoOptions: string implements OptionsInterface
     public function label(): string
     {
         return match ($this) {
-            self::INFORMATION => '個人資訊',
-            self::POSTS => '發布文章',
-            self::COMMENTS => '留言紀錄',
+            self::INFORMATION => __('Personal Information'),
+            self::POSTS => __('Published Articles'),
+            self::COMMENTS => __('Comment History'),
         };
     }
 

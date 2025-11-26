@@ -17,9 +17,9 @@ new class extends Component {
         Validate(
             ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:1024'],
             message: [
-                'image' => __('Must be an image'),
-                'mimes' => __('Image format must be jpeg, png, jpg'),
-                'max' => __('Image size cannot exceed 1024 KB'),
+                'image' => 'Must be an image',
+                'mimes' => 'Image format must be jpeg, png, jpg',
+                'max' => 'Image size cannot exceed 1024 KB',
             ],
         ),
     ]

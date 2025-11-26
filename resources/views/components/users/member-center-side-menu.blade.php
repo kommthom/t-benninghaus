@@ -8,7 +8,7 @@
       wire:navigate
     >
       <x-icons.person-lines class="w-5" />
-      <span class="ml-2">編輯個人資料</span>
+      <span class="ml-2">{{ __('Edit Profile') }}</span>
     </a>
 
     <a
@@ -18,7 +18,7 @@
       wire:navigate
     >
       <x-icons.file-earmark-lock class="w-5" />
-      <span class="ml-2">修改密碼</span>
+      <span class="ml-2">{{ __('Change Password') }}</span>
     </a>
 
     <a
@@ -28,7 +28,7 @@
       wire:navigate
     >
       <x-icons.fingerprint class="w-5" />
-      <span class="ml-2">密碼金鑰</span>
+      <span class="ml-2">{{ __('Passkey') }}</span>
     </a>
 
     <a
@@ -38,7 +38,7 @@
       wire:navigate
     >
       <x-icons.person-x class="w-5" />
-      <span class="ml-2">刪除帳號</span>
+      <span class="ml-2">{{ __('Delete Account') }}</span>
     </a>
   </div>
 </x-card>

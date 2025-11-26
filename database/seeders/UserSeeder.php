@@ -14,11 +14,11 @@ class UserSeeder extends Seeder
             ->count(10)
             ->create();
 
-        // 單獨處理第一個會員的數據
+        // The data of the first member is processed separately
         $user = User::query()->find(1);
         $user->update([
-            'name' => 'Allen',
-            'email' => 'allen@email.com',
+            'name' => 'Thomas',
+            'email' => 'tbenninghaus@web.de',
         ]);
     }
 }

@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-// 首頁
+// Home
 Route::livewire('/', 'pages::posts.index')->name('root');
 
 require __DIR__.'/auth.php';
 
-// 會員相關頁面
+// Member-related pages
 Route::middleware('auth')->prefix('/users')->group(function () {
     Route::livewire('/{id}', 'pages::users.show')
         ->name('users.show')
@@ -41,7 +41,7 @@ Route::middleware('auth')->prefix('/settings/users')->group(function () {
         ->name('settings.users.passkeys.edit');
 });
 
-// 文章列表與內容
+// Article list and content
 Route::prefix('/posts')->group(function () {
     Route::livewire('/', 'pages::posts.index')->name('posts.index');
 
@@ -50,20 +50,20 @@ Route::prefix('/posts')->group(function () {
         Route::livewire('/{id}/edit', 'pages::posts.edit')->name('posts.edit');
     });
 
-    // {slug?} 當中的問號代表參數為選擇性
+    // The question mark in {slug?} means that the parameter is optional
     Route::livewire('/{id}/{slug?}', 'pages::posts.show')->name('posts.show');
 });
 
-// 通知列表
+// Notification list
 Route::livewire('/notifications', 'pages::notifications.index')
     ->middleware('auth')
     ->name('notifications.index');
 
-// 文章分類
+// Article category
 Route::livewire('/categories/{id}/{name?}', 'pages::categories.show')
     ->name('categories.show');
 
-// 文章標籤
+// Article tags
 Route::livewire('/tags/{id}', 'pages::tags.show')
     ->name('tags.show');
 

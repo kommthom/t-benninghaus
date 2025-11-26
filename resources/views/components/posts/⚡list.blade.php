@@ -16,7 +16,7 @@ new class extends Component {
 
     public ?int $tagId = null;
 
-    public string $badge = __('All articles');
+    // public string $badge = __('All articles');
 
     #[Url]
     public string $order = PostOrderOptions::LATEST->value;
@@ -32,7 +32,7 @@ new class extends Component {
     {
         $posts = Post::query()
             ->select(['id', 'category_id', 'user_id', 'title', 'excerpt', 'slug', 'created_at'])
-            ->withCount('tags') // 計算標籤數目
+            ->withCount('tags') // Count the number of tags
             ->when($this->categoryId, function ($query) {
                 return $query->where('category_id', $this->categoryId);
             })
@@ -43,7 +43,7 @@ new class extends Component {
             })
             ->where('is_private', false)
             ->withOrder($this->order)
-            ->with(['user:id,name', 'category:id,icon,name', 'tags:id,name']) // 預加載防止 N+1 問題
+            ->with(['user:id,name', 'category:id,icon,name', 'tags:id,name']) // Preload prevents N+1 issues
             ->paginate(10)
             ->withQueryString();
 
@@ -123,7 +123,7 @@ new class extends Component {
     {{-- Class badge --}}
     <div
       class="hidden items-center justify-center rounded-xl bg-zinc-50 px-3 py-1.5 md:flex dark:bg-zinc-800 dark:text-zinc-50"
-    >{{ $badge }}</div>
+    >{{ __('All articles') }}</div>
   </div>
 
   {{-- Post List --}}

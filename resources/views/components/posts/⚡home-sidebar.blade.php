@@ -57,7 +57,7 @@ new class extends Component {
     <hr class="my-4 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
 
     <span class="group-gradient-underline-grow leading-relaxed">
-      {{ __('This is a blog developed using the TALL Stack, used to record my learning process and the big and small things in life. ??') }}
+      {{ __('This is a blog developed using the TALL Stack, used to record my learning process and the big and small things in life.') }}
     </span>
 
     <div class="mt-8 flex items-center justify-center">

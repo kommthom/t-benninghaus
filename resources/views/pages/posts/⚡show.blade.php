@@ -223,7 +223,7 @@ new class extends Component {
               >
             </div>
             <div class="col-span-12 space-y-2 md:col-span-10">
-              <div class="uppercase text-zinc-400">written by</div>
+              <div class="uppercase text-zinc-400">{{ __('written by') }}</div>
               <a
                 class="gradient-underline-grow inline-block text-2xl dark:text-zinc-50"
                 href="{{ route('users.show', ['id' => $post->user->id]) }}"

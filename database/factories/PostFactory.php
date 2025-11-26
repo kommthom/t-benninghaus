@@ -22,7 +22,7 @@ class PostFactory extends Factory
             'excerpt' => fake()->sentence,
             'category_id' => fake()->numberBetween(1, 3),
             'user_id' => User::factory(),
-            // 隨機取一個月以內，但早於現在的時間
+            // Randomly selected within a month, but earlier than the current time
             'created_at' => fake()->dateTimeThisMonth(now()),
             'updated_at' => now(),
         ];

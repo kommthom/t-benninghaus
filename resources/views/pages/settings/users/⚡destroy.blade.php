@@ -23,7 +23,7 @@ new #[Title('Member Center - Delete Account')] class extends Component {
     {
         $this->authorize('update', $user);
 
-        // 生成一次性連結，並設定 5 分鐘後失效
+        // Generate a one-time link and set it to expire after 5 minutes
         $destroyUserLink = URL::temporarySignedRoute('users.destroy', now()->addMinutes(5), ['user' => $user->id]);
 
         Mail::to($user)->queue(new DestroyUserMail($destroyUserLink));
@@ -49,7 +49,7 @@ new #[Title('Member Center - Delete Account')] class extends Component {
           <span class="ml-2">{{ __('Please note! The articles and comments you have written will be deleted together and cannot be recovered!') }}</span>
         </x-quotes.danger>
 
-        {{-- 說明 --}}
+        {{-- description --}}
         <div class="flex flex-col items-start justify-center">
           <span class="dark:text-zinc-50">{{ __('We\'re sorry to see you go...') }}</span>
           <span class="dark:text-zinc-50">{{ __('If you are sure you want to delete your account, please click the button below and receive the email') }}</span>

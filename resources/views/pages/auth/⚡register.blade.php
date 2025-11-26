@@ -90,7 +90,7 @@ new #[Title('Register')] class extends Component {
 
   <div class="container mx-auto">
     <div class="flex min-h-screen flex-col items-center justify-center px-4">
-      {{-- 頁面標題 --}}
+      {{-- page title --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.person-plus class="w-6" />
         <span class="ml-4">{{ __('Registration') }}</span>
@@ -98,14 +98,14 @@ new #[Title('Register')] class extends Component {
 
       <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
 
-        {{-- 驗證錯誤訊息 --}}
+        {{-- validate error message --}}
         <x-auth-validation-errors :errors="$errors" />
 
         <form
           id="register"
           wire:submit="register"
         >
-          {{-- 會員名稱 --}}
+          {{-- member name --}}
           <x-floating-label-input
             id="name"
             type="text"
@@ -116,7 +116,7 @@ new #[Title('Register')] class extends Component {
             wire:model="name"
           />
 
-          {{-- 信箱 --}}
+          {{-- mailbox --}}
           <x-floating-label-input
             class="mt-6"
             id="email"

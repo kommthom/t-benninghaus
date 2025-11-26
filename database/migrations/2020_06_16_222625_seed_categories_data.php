@@ -9,19 +9,19 @@ return new class extends Migration
     {
         $categories = [
             [
-                'name' => '日常分享',
-                'icon' => 'bi bi-chat-dots-fill',
-                'description' => '想聊啥就聊啥',
+                'name' => 'daily sharing',
+                'icon' => 'bi-chat-dots-fill',
+                'description' => 'talk about whatever you want',
             ],
             [
-                'name' => '程式技術',
-                'icon' => 'bi bi-terminal-fill',
-                'description' => '程式技術交流與分享',
+                'name' => 'programming technology',
+                'icon' => 'bi-terminal-fill',
+                'description' => 'programming technology exchange and sharing',
             ],
             [
-                'name' => '電玩遊戲',
-                'icon' => 'bi bi-dpad-fill',
-                'description' => '電玩遊戲話題與心得',
+                'name' => 'video game',
+                ' icon' => 'bi bi-dpad-fill',
+                'description' => 'video game topics and experiences',
             ],
         ];
 

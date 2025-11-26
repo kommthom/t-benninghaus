@@ -17,7 +17,7 @@ new #[Title('Member Center - Edit Profile')] class extends Component {
     {
         $this->user = User::findOrFail($id);
 
-        // 會員只能進入自己的頁面，規則寫在 UserPolicy
+        // Members can only enter their own page, and the rules are written in UserPolic
         $this->authorize('update', $this->user);
 
         $this->name = $this->user->name;
@@ -50,7 +50,7 @@ new #[Title('Member Center - Edit Profile')] class extends Component {
 
         $this->validate();
 
-        // 更新會員資料
+        // Update member information
         $user->update([
             'name' => $this->name,
             'introduction' => $this->introduction,
@@ -73,7 +73,7 @@ new #[Title('Member Center - Edit Profile')] class extends Component {
         </div>
 
         <div class="flex flex-col items-center justify-center gap-4">
-          {{-- 大頭貼照片 --}}
+          {{-- profile picture --}}
           <img
             class="size-48 rounded-full"
             src="{{ $user->gravatar_url }}"
@@ -92,7 +92,7 @@ new #[Title('Member Center - Edit Profile')] class extends Component {
           </div>
         </div>
 
-        {{-- 驗證錯誤訊息 --}}
+        {{-- Verification error message --}}
         <x-auth-validation-errors :errors="$errors" />
 
         <form

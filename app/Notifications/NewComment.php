@@ -17,7 +17,7 @@ class NewComment extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        // 開啟通知的頻道
+        // Benachrichtigungskanal �ffnen
         return ['database'];
     }
 
@@ -26,7 +26,7 @@ class NewComment extends Notification implements ShouldQueue
         $post = $this->comment->post;
         $link = route('comments.show', ['id' => $this->comment->id]);
 
-        // 存入資料庫裡的數據
+        // In der Datenbank gespeicherte Daten
         return [
             'comment_id' => $this->comment->id,
             'post_link' => $link,

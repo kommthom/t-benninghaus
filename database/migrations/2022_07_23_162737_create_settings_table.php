@@ -10,9 +10,8 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->comment('設定名稱');
-            $table->string('key')->unique()->comment('設定鍵值');
-            $table->json('value')->comment('設定值');
+            $table->string('name')->comment('Set name'); 
+            $table->string('key')->unique()->comment('Set key value'); $table->json('value')->comment('set-value');
             $table->timestamps();
         });
     }

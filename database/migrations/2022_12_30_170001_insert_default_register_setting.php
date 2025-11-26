@@ -8,7 +8,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::table('settings')->insert([
-            'name' => '開放註冊',
+            'name' => 'Registration is open',
             'key' => 'allow_register',
             'value' => 'false',
             'created_at' => now(),

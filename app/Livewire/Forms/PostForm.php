@@ -47,7 +47,7 @@ class PostForm extends Form
                 'user_id'     => ['required', 'numeric'],
                 'title'       => ['required', 'min:4', 'max:50'],
                 'category_id' => ['required', 'numeric', 'exists:categories,id'],
-                'body'        => ['required', 'min:500', 'max:'.self::BODY_MAX_CHARACTER],
+                'body'        => ['required', 'min:5', 'max:'.self::BODY_MAX_CHARACTER],
             ],
             [
                 'user_id.required'     => __('Please log in before posting an article.'),
@@ -59,7 +59,7 @@ class PostForm extends Form
                 'category_id.numeric'  => __('Category data error'),
                 'category_id.exists'   => __('Category does not exist'),
                 'body.required'        => __('Please fill in the article content'),
-                'body.min'             => __('Article content must be at least 500 characters'),
+                'body.min'             => __('Article content must be at least 5 characters'),
                 'body.max'             => __('Article content exceeds '.self::BODY_MAX_CHARACTER.' characters'),
             ]
         )->validate();

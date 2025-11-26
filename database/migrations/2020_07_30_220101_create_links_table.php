@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('links', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->comment('資源的描述')->index();
-            $table->string('link')->comment('資源的連結')->index();
+            $table->string('title')->comment('Description of Resource')->index();
+            $table->string('link')->comment('A link to the resource')->index();
             $table->timestamps();
         });
     }

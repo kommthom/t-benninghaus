@@ -86,7 +86,7 @@ new #[Title('Login')] class extends Component {
         $publicKeyCredential = $serializer->fromJson($data['answer'], PublicKeyCredential::class);
 
         if (!$publicKeyCredential->response instanceof AuthenticatorAssertionResponse) {
-            $this->dispatch('toast', status: 'danger', message: __('Invalid password key'));
+            $this->dispatch('toast', status: 'danger', message: __('Invalid Passkey'));
 
             return;
         }
@@ -96,7 +96,7 @@ new #[Title('Login')] class extends Component {
         $passkey = Passkey::query()->where('credential_id', $rawId)->where('owner_type', User::class)->first();
 
         if (!$passkey) {
-            $this->dispatch('toast', status: 'danger', message: __('Invalid password key'));
+            $this->dispatch('toast', status: 'danger', message: __('Invalid Passkey'));
 
             return;
         }
@@ -106,7 +106,7 @@ new #[Title('Login')] class extends Component {
         $options = Session::get('passkey-authentication-options');
 
         if (!$options) {
-            $this->dispatch('toast', status: 'danger', message: __('Invalid password key'));
+            $this->dispatch('toast', status: 'danger', message: __('Invalid Passkey'));
 
             return;
         }
@@ -116,7 +116,7 @@ new #[Title('Login')] class extends Component {
         try {
             AuthenticatorAssertionResponseValidator::create(new CeremonyStepManagerFactory()->requestCeremony())->check(publicKeyCredentialSource: $publicKeyCredentialSource, authenticatorAssertionResponse: $publicKeyCredential->response, publicKeyCredentialRequestOptions: $publicKeyCredentialRequestOptions, host: request()->getHost(), userHandle: null);
         } catch (AuthenticatorResponseVerificationException) {
-            $this->dispatch('toast', status: 'danger', message: __('Invalid password key'));
+            $this->dispatch('toast', status: 'danger', message: __('Invalid Passkey'));
 
             return;
         }
@@ -175,7 +175,7 @@ new #[Title('Login')] class extends Component {
         if (!this.browserSupportsWebAuthn()) {
           this.$wire.$dispatch('toast', {
             status: 'danger',
-            message: '不支援 WebAuthn'
+            message: 'WebAuthn not supported'
           });
 
           return;
@@ -191,7 +191,7 @@ new #[Title('Login')] class extends Component {
         } catch (error) {
           this.$wire.$dispatch('toast', {
             status: 'danger',
-            message: __('Login failed, please try again later')
+            message: 'Login failed, please try again later'
           });
 
           return;
@@ -217,21 +217,21 @@ new #[Title('Login')] class extends Component {
 
   <div class="container mx-auto">
     <div class="flex min-h-screen flex-col items-center justify-center px-4">
-      {{-- 頁面標題 --}}
+      {{-- page title --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.door-open class="w-6" />
         <span class="ml-4">{{ __('Login') }}</span>
       </div>
 
-      {{-- 登入表單 --}}
+      {{-- Login form --}}
       <x-card class="mt-4 w-full overflow-hidden sm:max-w-md">
-        {{-- Session 狀態訊息 --}}
+        {{-- Session status message --}}
         <x-auth-session-status
           class="mb-6"
           :status="session('status')"
         />
 
-        {{-- 驗證錯誤訊息 --}}
+        {{-- validate error message --}}}
         <x-auth-validation-errors
           class="mb-6"
           :errors="$errors"
@@ -241,7 +241,7 @@ new #[Title('Login')] class extends Component {
           id="login"
           wire:submit="login"
         >
-          {{-- 信箱 --}}
+          {{-- mailbox --}}}
           <x-floating-label-input
             id="email"
             type="text"
@@ -293,7 +293,7 @@ new #[Title('Login')] class extends Component {
             <div class="w-full border-t border-zinc-200 dark:border-zinc-500"></div>
           </div>
           <div class="relative flex justify-center text-base font-medium">
-            <span class="bg-zinc-50 px-6 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50">或者</span>
+            <span class="bg-zinc-50 px-6 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50">{{ __('Or') }}</span>
           </div>
         </div>
 

@@ -25,33 +25,33 @@ class GeneratePasskeyRegisterOptionsController extends Controller
      */
     public function __invoke(Request $request): string
     {
-        // 建立一個信賴方實體
-        // id 是網站的網域名稱
+        // Erstellen einer Relying Party Entit�t 
+        // Die ID ist der Domainname der Website
         $relatedPartyEntity = new PublicKeyCredentialRpEntity(
             name: config('app.name'),
             id: Uri::of(config('app.url'))->host()
         );
 
-        // 建立一個用戶實體
-        // id 必須是唯一的，通常是用戶的 ID 或 UUID
-        // 需要注意的是，name 不可以使用用戶的敏感資訊，例如 email 或電話號碼
+        // Erstellen einer Benutzerentit�t
+        // Die ID muss eindeutig sein, normalerweise die Benutzer-ID oder UUID
+        // Bitte beachten Sie, dass der Name keine sensiblen Benutzerinformationen wie E-Mail oder Telefonnummer enthalten darf
         $userEntity = new PublicKeyCredentialUserEntity(
             name: $request->user()->name,
             id: (string) $request->user()->id,
             displayName: $request->user()->name
         );
 
-        // 驗證裝置的設定
-        // 沒有偏好任何平台，並且要求使用者的金鑰必須支援可探索的憑證
-        // 目前可探索的憑證已經是主流，如果這裡沒有強制要求，你的 YubiKey 會無法使用
+        // Konfiguration zur Ger�tevalidierung
+        // Keine Pr�ferenz f�r eine Plattform, und es wird vorausgesetzt, dass der Schl�ssel des Benutzers auffindbare Anmeldeinformationen unterst�tzt
+        // Derzeit sind auffindbare Anmeldeinformationen Mainstream. Wenn dies hier nicht erzwungen wird, kann Ihr YubiKey nicht verwendet werden
         $authenticatorSelectionCriteria = AuthenticatorSelectionCriteria::create(
             authenticatorAttachment: AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_NO_PREFERENCE,
             userVerification: AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_REQUIRED,
             residentKey: AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_REQUIRED,
         );
 
-        // 註冊金鑰的選項，前端會使用這些選項來顯示註冊金鑰的 UI
-        // challenge 是一個隨機的字串，用來防止重送攻擊
+        // Optionen f�r die Registrierung des Schl�ssels. Das Frontend verwendet diese Optionen, um die UI f�r die Registrierung des Schl�ssels anzuzeigen
+        // Challenge ist eine zuf�llige Zeichenkette, die verwendet wird, um Replay-Angriffe zu verhindern
         $options = new PublicKeyCredentialCreationOptions(
             rp: $relatedPartyEntity,
             user: $userEntity,
@@ -59,11 +59,11 @@ class GeneratePasskeyRegisterOptionsController extends Controller
             authenticatorSelection: $authenticatorSelectionCriteria
         );
 
-        // 將 $options 物件進行序列化，轉換為 JSON 字串
+        // Serialisierung des $options-Objekts und Umwandlung in eine JSON-Zeichenkette
         $options = Serializer::make()->toJson($options);
 
-        // 將 $options 儲存在 Flash Session 中，好讓我們在下一步驟中使用
-        // 當用戶傳回公開金鑰憑證後，我們需要將 $options 從 Session 取出，用來驗證用戶的憑證
+        // Speichern von $options in der Flash-Session, damit wir es im n�chsten Schritt verwenden k�nnen
+        // Wenn der Benutzer ein Public-Key-Zertifikat zur�ckgibt, m�ssen wir $options aus der Session abrufen, um das Zertifikat des Benutzers zu validieren
         Session::flash('passkey-registration-options', $options);
 
         return $options;

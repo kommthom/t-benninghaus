@@ -52,7 +52,7 @@ new class extends Component {
 @endscript
 
 <search x-data="globalSearchPart">
-  {{-- 搜尋按鈕 --}}
+  {{-- search button --}}
   <button
     class="group hidden cursor-pointer items-center justify-between gap-2 rounded-lg bg-zinc-200 p-2 text-sm text-zinc-500 xl:flex dark:bg-zinc-600 dark:text-zinc-400"
     type="button"
@@ -139,7 +139,7 @@ new class extends Component {
               />
             </div>
 
-            {{-- 搜尋結果列表 --}}
+            {{-- List of search results --}}
             @if (strlen($search) >= 2)
               <div
                 class="mt-4 w-full rounded-xl bg-zinc-50 p-2 dark:bg-zinc-800 dark:text-zinc-50"

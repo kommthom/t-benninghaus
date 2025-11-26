@@ -69,7 +69,7 @@ new #[Title('Member Center - Change Password')] class extends Component {
           <hr class="h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
         </div>
 
-        {{-- 驗證錯誤訊息 --}}
+        {{-- validate error message --}}
         <x-auth-validation-errors :errors="$errors" />
 
         <form
@@ -85,7 +85,7 @@ new #[Title('Member Center - Change Password')] class extends Component {
             required
           />
 
-          {{-- 新密碼 --}}
+           {{-- new password --}}
           <x-floating-label-input
             id="new_password"
             type="password"
@@ -104,7 +104,7 @@ new #[Title('Member Center - Change Password')] class extends Component {
           />
 
           <div class="flex items-center justify-end">
-            {{-- 儲存按鈕 --}}
+            {{-- save button --}}
             <x-button>
               <x-icons.save class="w-5" />
               <span class="ml-2">{{ __('Change Password') }}</span>

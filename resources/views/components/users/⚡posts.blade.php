@@ -87,7 +87,7 @@ new class extends Component {
 
 <div x-data="usersPostsPart">
   @if (!empty($this->groupPostsByYear))
-    {{-- 會員文章 --}}
+    {{-- Member article --}}
     <x-card class="relative w-full text-lg">
       <div class="relative mb-6 flex justify-end">
         <button
@@ -140,7 +140,7 @@ new class extends Component {
   @else
     <x-card class="flex h-32 items-center justify-center text-zinc-400 dark:text-zinc-600">
       <x-icons.exclamation-circle class="w-6" />
-      <span class="ml-2">目前還沒有發佈任何文章喔！</span>
+      <span class="ml-2">{{ __('No articles have been published yet!') }}</span>
     </x-card>
   @endif
 </div>

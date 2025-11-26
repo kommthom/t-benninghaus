@@ -63,7 +63,7 @@ test('after the user clicks the load more button, they can see more replies', fu
     $page = $this->visit($post->link_with_slug);
 
     $page
-        ->click($comment->children()->count().' 則回覆')
+        ->click($comment->children()->count().' Reply')
         ->assertSee($bodyOne)
         ->assertSee($bodyTwo)
         ->assertSee($bodyThree);
@@ -150,16 +150,16 @@ test('children replies load in pages and the load more button hides when finishe
     $page = $this->visit($post->link_with_slug);
 
     // Open children list
-    $page->click('15 則回覆');
+    $page->click('15 Replies');
 
-    // After first open (loads 10), the "顯示更多回覆" button should be visible
-    $page->assertSee('顯示更多回覆');
+    // After first open (loads 10), the "Show more replies" button should be visible
+    $page->assertSee('Show more replies');
 
     // Load remaining children
     $page->click('[data-test-id="comments.children.load-more"]');
 
     // Button hides when no more
-    $page->assertDontSee('顯示更多回覆');
+    $page->assertDontSee('Show more replies');
 
     // Spot-check that both early and late children are visible
     $page->assertSee('Child #1')
@@ -171,21 +171,21 @@ test('replying to a root comment shows reply-to label and renders under that par
     $post = Post::factory()->create(['user_id' => $author->id]);
 
     // Create a root comment by another user with a known name
-    $targetUser = User::factory()->create(['name' => '小明']);
+    $targetUser = User::factory()->create(['name' => 'Xiao Ming']);
     Comment::factory()->create([
         'post_id' => $post->id,
         'user_id' => $targetUser->id,
-        'body'    => 'Root from 小明',
+        'body'    => 'Root from Xiao Ming',
     ]);
 
     $page = $this->visit($post->link_with_slug);
 
-    // Open reply modal via the parent's 回覆 button
-    $page->click('回覆')
-        ->assertSee('回覆 小明 的留言')
-        ->fill('create-comment-body', 'Hi 小明，我來回覆你了')
+    // Open reply modal via the parent's Reply button
+    $page->click('Reply')
+        ->assertSee('reply to Xiao Ming\'s message')
+        ->fill('create-comment-body', 'Hi Xiao Ming, I\'m here to reply to you')
         ->click('#create-comment-submit-button')
-        ->assertSee('Hi 小明，我來回覆你了');
+        ->assertSee('Hi Xiao Ming, I\'m here to reply to you');
 });
 
 test('editing own comment updates content and shows edited flag', function () {
@@ -202,7 +202,7 @@ test('editing own comment updates content and shows edited flag', function () {
 
     $page->click('[data-test-id="comments.card.edit"]')
         ->fill('edit-comment-body', 'Updated content')
-        ->click('更新')
+        ->click('Updated')
         ->assertSee('Updated content')
-        ->assertSee('(已編輯)');
+        ->assertSee('(Edited)');
 });

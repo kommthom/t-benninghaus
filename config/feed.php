@@ -19,8 +19,8 @@ return [
             'url' => '/post/feed',
 
             'title' => 'DocFunc',
-            'description' => __("Record life's big and small events!"),
-            'language' => 'zh-TW',
+            'description' => 'Record the big and small things in life! ',
+            'language' => 'en',
 
             /*
              * The image to display for the feed.  For Atom feeds, this is displayed as

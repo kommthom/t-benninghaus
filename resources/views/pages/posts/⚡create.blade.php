@@ -95,7 +95,7 @@ new class extends Component {
 @script
   <script>
     Alpine.data('postsCreatePage', () => ({
-      showPage: false,
+      showPage: true,
       csrfToken: @js(csrf_token()),
       imageUploadUrl: @js(route('images.store')),
       tagsListUrl: @js(route('api.tags')),

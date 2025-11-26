@@ -74,18 +74,18 @@ new #[Title('Reset Password')] class extends Component {
 <x-layouts.auth>
   <div class="container mx-auto">
     <div class="flex min-h-screen flex-col items-center justify-center px-4">
-      {{-- 頁面標題 --}}
+      {{-- page title --}}
       <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
         <x-icons.question-circle class="w-6" />
         <span class="ml-4">{{ __('Reset Password') }}</span>
       </div>
 
       <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
-        {{-- 驗證錯誤訊息 --}}
+        {{-- validate error message --}}
         <x-auth-validation-errors :errors="$errors" />
 
         <form wire:submit="resetPassword">
-          {{-- 信箱 --}}
+          {{-- mailbox --}}
           <x-floating-label-input
             id="email"
             type="text"
@@ -95,7 +95,7 @@ new #[Title('Reset Password')] class extends Component {
             wire:model="email"
           />
 
-          {{-- 密碼 --}}
+          {{-- password --}}
           <x-floating-label-input
             class="mt-6"
             id="password"
@@ -106,7 +106,7 @@ new #[Title('Reset Password')] class extends Component {
             wire:model="password"
           />
 
-          {{-- 確認密碼 --}}
+          {{-- confirm password --}}
           <x-floating-label-input
             class="mt-6"
             id="password_confirmation"

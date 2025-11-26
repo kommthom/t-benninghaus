@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Http;
 class TwitterOembedController extends Controller
 {
     /**
-     * 取得 Twitter Oembed 資訊
+     * Twitter Oembed-Informationen abrufen
      */
     public function __invoke(Request $request): Response|JsonResponse
     {
@@ -25,6 +25,6 @@ class TwitterOembedController extends Controller
 
         return $response->successful()
             ? $response
-            : response()->json(['html' => '<p style="font-size:1.5em;">{{ __("Twitter link encountered an error... ??") }}</p>'], 400);
+            : response()->json(['html' => '<p style="font-size:1.5em;">' . __('Twitter link encountered an error...'). ' ??' . '</p>'], 400);
     }
 }

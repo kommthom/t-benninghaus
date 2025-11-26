@@ -20,27 +20,27 @@ new class extends Component {
 };
 ?>
 
-{{-- 通知列表 --}}
+{{-- Notification list --}}
 <x-layouts.main>
   <div class="container mx-auto grow">
     <div class="flex items-start justify-center px-4 xl:px-0">
 
       <div class="flex w-full flex-col items-center justify-center space-y-6 md:w-[700px]">
-        {{-- 頁面標題 --}}
+        {{-- page title --}}
         <div class="flex items-center justify-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
           <x-icons.bell class="w-6" />
           <span class="ml-4">{{ __('My Notifications') }}</span>
         </div>
 
-        {{-- 通知列表 --}}
+        {{-- Notification list --}}
         @forelse ($notifications as $notification)
           <x-card
             class="flex w-full cursor-pointer flex-col justify-between md:flex-row"
             wire:key="notification-{{ $notification->id }}"
           >
-            {{-- 通知內容 --}}
+            {{-- Notification content --}}
             <div class="flex w-full flex-col justify-between">
-              {{-- 文章標題 --}}
+              {{-- Article title --}}
               <div class="mt-2 space-x-2 md:mt-0">
 
                 <span class="dark:text-zinc-50">{{ __('In your article') }}</span>
@@ -54,7 +54,7 @@ new class extends Component {
                 <span class="dark:text-zinc-50">{{ __('Having new words') }}</span>
               </div>
 
-              {{-- 通知時間 --}}
+              {{-- Notification time --}}
               <div class="mt-4 flex items-center text-sm text-zinc-400">
                 <x-icons.clock class="w-4" />
                 <span

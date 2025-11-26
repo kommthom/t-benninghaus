@@ -227,7 +227,7 @@ new class extends Component {
               x-on:click="profileMenuIsOpen = !profileMenuIsOpen"
               x-on:keydown.escape.window="profileMenuIsOpen = false"
             >
-              <span class="sr-only">Open user menu</span>
+              <span class="sr-only">{{ __('Open user menu') }}</span>
               <img
                 class="size-12 rounded-full"
                 src="{{ auth()->user()->gravatar_url }}"

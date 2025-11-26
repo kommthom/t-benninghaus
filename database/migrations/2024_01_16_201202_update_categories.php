@@ -13,7 +13,7 @@ return new class extends Migration
         });
 
         DB::table('categories')
-            ->where('name', '日常分享')
+            ->where('name', 'Daily Sharing')
             ->update([
                 'icon' => <<<'HTML'
                 <!-- Bootstrap Icon - Chat dots fill -->
@@ -24,7 +24,7 @@ return new class extends Migration
             ]);
 
         DB::table('categories')
-            ->where('name', '程式技術')
+            ->where('name', 'Programming Techniques')
             ->update([
                 'icon' => <<<'HTML'
                 <!-- Bootstrap Icon - Terminal fill -->
@@ -35,7 +35,7 @@ return new class extends Migration
             ]);
 
         DB::table('categories')
-            ->where('name', '電玩遊戲')
+            ->where('name', 'Video Games')
             ->update([
                 'icon' => <<<'HTML'
                 <!-- Bootstrap Icon - Dpad fill -->
@@ -49,15 +49,15 @@ return new class extends Migration
     public function down(): void
     {
         DB::table('categories')
-            ->where('name', '日常分享')
+            ->where('name', 'Daily Sharing')
             ->update(['icon' => 'bi bi-chat-dots-fill']);
 
         DB::table('categories')
-            ->where('name', '程式技術')
+            ->where('name', 'Programming Techniques')
             ->update(['icon' => 'bi bi-terminal-fill']);
 
         DB::table('categories')
-            ->where('name', '電玩遊戲')
+            ->where('name', 'Video Games')
             ->update(['icon' => 'bi bi-dpad-fill']);
 
         Schema::table('categories', function ($table) {
