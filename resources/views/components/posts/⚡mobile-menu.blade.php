@@ -41,7 +41,7 @@ new class extends Component {
   <button
     class="relative -ml-px inline-flex cursor-pointer items-center rounded-r-xl bg-zinc-50 px-4 py-2 text-zinc-400 hover:bg-zinc-100 focus:z-10 dark:bg-zinc-800 dark:hover:bg-zinc-700"
     type="button"
-    wire:confirm="{{ _('Are you sure you want to delete the article? (It can be restored within 7 days)') }}"
+    wire:confirm="{{ __('Are you sure you want to delete the article? (It can be restored within 7 days)') }}"
     wire:click="destroy({{ $postId }})"
   >
     <x-icons.trash class="w-4" />

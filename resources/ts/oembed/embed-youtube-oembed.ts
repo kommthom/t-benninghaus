@@ -4,7 +4,7 @@ declare global {
     }
 }
 
-// 定義一個函式來處理 oembed 轉換
+// Define a function to handle oembed conversion
 async function convertOembedToIframe(oembedElement: HTMLElement) {
     const screenWidth: number = window.screen.width;
 
@@ -32,12 +32,12 @@ async function convertOembedToIframe(oembedElement: HTMLElement) {
 
     if (data.html) {
         oembedElement.insertAdjacentHTML('afterend', data.html);
-        // 標記為已處理，在 SPA 應用中，避免重複處理
+        // Mark as processed, to avoid repeated processing in SPA applications
         oembedElement.classList.add('oembed-processed');
     }
 }
 
-// 定義一個函式來檢查是否為 YouTube 連結
+// Define a function to check if it is a YouTube link
 function isYouTubeUrl(url: string): boolean {
     return (
         /^https?:\/\/(www\.)?youtube\.com\/watch\?v=/.test(url) ||
@@ -45,7 +45,7 @@ function isYouTubeUrl(url: string): boolean {
     );
 }
 
-// 主要處理函式
+// Main processing function
 window.processYoutubeOembeds = function () {
     const oembedElements: NodeListOf<HTMLElement> = document.querySelectorAll(
         'oembed:not(.oembed-processed)',

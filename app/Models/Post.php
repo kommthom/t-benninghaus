@@ -122,7 +122,7 @@ class Post extends Model implements Feedable
      */
     public function searchableAs()
     {
-        return config('scout.prefix');
+        return config('scout.prefix') . 'posts_index';
     }
 
     public function toFeedItem(): FeedItem

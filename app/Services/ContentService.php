@@ -13,7 +13,7 @@ class ContentService
     /**
      * Generate slug titles for SEO optimization
      *
-     * @param  string  $title  標題
+     * @param  string  $title Title
      */
     public static function getSlug(string $title): string
     {

@@ -111,6 +111,15 @@ new class extends Component {
   id="header"
   x-data="layoutsHeaderPart"
 >
+  <div class="grid-child container-below-top">
+    <div class="below-top card mybanner">
+      <div class="card-body">
+        <div id="mod-custom133" class="mod-custom custom">
+          <p><img class="mybanner" src="{{ asset('images/Panorama/IMG_2094.jpeg') }}" alt="Panorama Heideblüte Lieblingsplatz" width="3451" height="746" loading="lazy" /></p>
+        </div>
+      </div>
+    </div>
+  </div>
   <div
     class="relative hidden h-20 w-full items-center justify-center bg-zinc-50 transition-all duration-300 lg:flex dark:bg-zinc-800"
     id="desktop-header"
@@ -277,7 +286,7 @@ new class extends Component {
     id="mobile-header"
   >
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-      <div class="relative flex h-[4.5rem] items-center justify-between">
+      <div class="relative flex h-18 items-center justify-between">
         <div class="absolute inset-y-0 left-0 flex items-center">
           {{-- category dropdown menu toggle --}}
           <button

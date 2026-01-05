@@ -11,7 +11,7 @@ new class extends Component {
     public function render()
     {
         $popularTags = Cache::remember('popularTags', now()->addDay(), function () {
-            // 取出標籤使用次數前 20 名
+            // Retrieve top 20 most frequent tags
             return Tag::withCount('posts')->orderByDesc('posts_count')->limit(20)->get();
         });
 
@@ -47,7 +47,7 @@ new class extends Component {
   class="space-y-6"
   x-data="postsHomeSidebarPart"
 >
-  {{-- 介紹 --}}
+  {{-- Introduction --}}
   <x-card class="group dark:text-zinc-50">
     <p
       class="bg-linear-to-r font-jetbrains-mono w-full from-green-500 via-emerald-500 to-teal-500 bg-clip-text text-center text-xl font-semibold text-transparent dark:border-white dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500">
@@ -62,7 +62,7 @@ new class extends Component {
 
     <div class="mt-8 flex items-center justify-center">
       <a
-        class="before:bg-lividus-600 dark:bg-lividus-700 group relative flex w-full items-center justify-center overflow-hidden rounded-lg bg-emerald-600 px-4 py-2 [transform:translateZ(0)] before:absolute before:left-1/2 before:top-1/2 before:size-8 before:-translate-x-1/2 before:-translate-y-1/2 before:scale-0 before:rounded-full before:opacity-0 before:transition before:duration-700 before:ease-in-out hover:before:scale-[10] hover:before:opacity-100 dark:before:bg-emerald-700"
+        class="before:bg-lividus-600 dark:bg-lividus-700 group relative flex w-full items-center justify-center overflow-hidden rounded-lg bg-emerald-600 px-4 py-2 transform-[translateZ(0)] before:absolute before:left-1/2 before:top-1/2 before:size-8 before:-translate-x-1/2 before:-translate-y-1/2 before:scale-0 before:rounded-full before:opacity-0 before:transition before:duration-700 before:ease-in-out hover:before:scale-[10] hover:before:opacity-100 dark:before:bg-emerald-700"
         href="{{ route('posts.create') }}"
         wire:navigate
       >
@@ -83,7 +83,7 @@ new class extends Component {
     <hr class="my-4 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
 
     <span class="group-gradient-underline-grow leading-relaxed">
-      {{ __('Get notified of the latest articles! ??') }}
+      {{ __('Get notified of the latest articles!') }}
     </span>
 
     <div class="mt-8 flex items-center justify-center">
@@ -93,7 +93,7 @@ new class extends Component {
         x-on:click.prevent="copyWebFeedUrl"
       >
         <span
-          class="ml-2 h-[1lh]"
+          class="ml-2 h-lh"
           x-text="rssLinkLabel"
         ></span>
       </a>
@@ -138,7 +138,7 @@ new class extends Component {
             target="_blank"
             rel="nofollow noopener noreferrer"
           >
-            <span class="mr-2 flex h-[1lh] items-center">
+            <span class="mr-2 flex h-lh items-center">
               <x-icons.link-45deg class="w-5" />
             </span>
             {{ $link->title }}

@@ -16,7 +16,7 @@ new class extends Component {
 
     public function render()
     {
-        return $this->view()->title($this->user->name . '__('Personal Information')');
+        return $this->view()->title($this->user->name . "__('Personal Information')");
     }
 };
 ?>

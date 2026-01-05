@@ -84,7 +84,7 @@ new #[Title('Member Center - Edit Profile')] class extends Component {
             <span class="mr-2">{{ __('Personal Image by') }}</span>
             <a
               class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-50"
-              href="https://zh-tw.gravatar.com/"
+              href="https://de.gravatar.com/"
               target="_blank"
               rel="nofollow noopener noreferrer"
             >Gravatar</a>

@@ -41,7 +41,7 @@ new class extends Component {
 
         $this->refreshPostsByYear();
 
-        $this->dispatch('toast', status: 'success', message: __()'Article restored'));
+        $this->dispatch('toast', status: 'success', message: __('Article restored'));
     }
 
     public function destroy(Post $post): void

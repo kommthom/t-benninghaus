@@ -30,6 +30,7 @@ new class extends Component {
 
     public function render(): View
     {
+        $userId = auth()->id();
         $posts = Post::query()
             ->select(['id', 'category_id', 'user_id', 'title', 'excerpt', 'slug', 'created_at'])
             ->withCount('tags') // Count the number of tags
@@ -41,7 +42,12 @@ new class extends Component {
                     $query->where('tag_id', $this->tagId);
                 });
             })
-            ->where('is_private', false)
+            ->when($userId, function ($query, $userId) {
+                return $query->where('user_id', $userId)
+                    ->orWhere('is_private', false);
+            }, function ($query) {
+                return $query->where('is_private', false);
+            })
             ->withOrder($this->order)
             ->with(['user:id,name', 'category:id,icon,name', 'tags:id,name']) // Preload prevents N+1 issues
             ->paginate(10)
@@ -131,7 +137,7 @@ new class extends Component {
     <x-card class="group relative isolate grid cursor-pointer grid-cols-1 gap-4 overflow-hidden">
       {{-- Category icon in background --}}
       <div
-        class="absolute -bottom-16 -right-4 z-0 size-56 rotate-12 text-zinc-200/60 transition-all duration-300 group-hover:-bottom-4 group-hover:-right-0 dark:text-zinc-700/60"
+        class="absolute -bottom-16 -right-4 z-0 size-56 rotate-12 text-zinc-200/60 transition-all duration-300 group-hover:-bottom-4 group-hover:right-0 dark:text-zinc-700/60"
       >
         {!! $post->category->icon !!}
       </div>

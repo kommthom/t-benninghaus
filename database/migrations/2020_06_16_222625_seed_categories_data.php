@@ -9,19 +9,29 @@ return new class extends Migration
     {
         $categories = [
             [
-                'name' => 'daily sharing',
+                'name' => 'Tägliches Teilen',
                 'icon' => 'bi-chat-dots-fill',
-                'description' => 'talk about whatever you want',
+                'description' => 'Erzähl von deinen Themen',
             ],
             [
-                'name' => 'programming technology',
+                'name' => 'Programmiertechniken',
                 'icon' => 'bi-terminal-fill',
-                'description' => 'programming technology exchange and sharing',
+                'description' => 'Austausch und Teilen von Programmiertechniken',
             ],
             [
-                'name' => 'video game',
-                ' icon' => 'bi bi-dpad-fill',
-                'description' => 'video game topics and experiences',
+                'name' => 'Musik',
+                'icon' => 'bi bi-megaphone',
+                'description' => 'Heavy Metal und andere Musik, die ich mag',
+            ],
+            [
+                'name' => 'Draussen',
+                'icon' => 'bi bi-cloud-check-fill',
+                'description' => 'Wandern, Radfahren, Natur bewundern',
+            ],
+            [
+                'name' => 'Privat',
+                'icon' => 'bi bi-envelope-exclamation',
+                'description' => 'Privates',
             ],
         ];
 

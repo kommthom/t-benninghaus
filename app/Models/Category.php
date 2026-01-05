@@ -27,7 +27,7 @@ class Category extends Model
         return $this->hasMany(Post::class);
     }
 
-    // FŸgt dem Link den Kategorienamen hinzu
+    // Adds category name to link
     public function linkWithName(): Attribute
     {
         return new Attribute(

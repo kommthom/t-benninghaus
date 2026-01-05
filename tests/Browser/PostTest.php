@@ -63,7 +63,7 @@ test('after the user clicks the load more button, they can see more replies', fu
     $page = $this->visit($post->link_with_slug);
 
     $page
-        ->click($comment->children()->count().' 則回覆')
+        ->click($comment->children()->count().' Then reply')
         ->assertSee($bodyOne)
         ->assertSee($bodyTwo)
         ->assertSee($bodyThree);
@@ -112,7 +112,7 @@ test('orders root comments by popular, then by latest and oldest when changed', 
         ->assertSeeIn(commentCardSelector(2), 'C1 - oldest')
         ->assertSeeIn(commentCardSelector(3), 'C3 - newest');
 
-    // Change to Latest (由新到舊)
+    // Change to Latest (From New to Old)
     $page->click('[data-test-id="comments.order.toggle"]')
         ->click('[data-test-id="comments.order.option"][ data-order-value="latest"]')
         // Presence checks
@@ -120,7 +120,7 @@ test('orders root comments by popular, then by latest and oldest when changed', 
         ->assertSeeIn(commentCardSelector(2), 'C2 - middle')
         ->assertSeeIn(commentCardSelector(3), 'C1 - oldest');
 
-    // Change to Oldest (由舊到新)
+    // Change to Oldest (From Old to New)
     $page->click('[data-test-id="comments.order.toggle"]')
         ->click('[data-test-id="comments.order.option"][data-order-value="oldest"]')
         // Presence checks

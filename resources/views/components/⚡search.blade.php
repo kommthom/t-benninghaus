@@ -158,7 +158,7 @@ new class extends Component {
                           href="{{ $result->link_with_slug }}"
                           wire:navigate
                         >
-                          <span class="mr-2 flex h-[1lh] items-center">
+                          <span class="mr-2 flex h-lh items-center">
                             <x-icons.caret-right class="w-4" />
                           </span>
                           {{ $result->title }}

@@ -5,7 +5,7 @@ declare global {
     }
 }
 
-// 定義一個函式來處理 X (舊稱 Twitter) oembed 轉換
+// Defines a function to handle X (formerly Twitter) oembed conversion
 async function convertTwitterOembedToIframe(
     oembedElement: HTMLElement,
 ): Promise<void> {
@@ -41,8 +41,8 @@ async function convertTwitterOembedToIframe(
     }
 }
 
-// 定義一個函式來檢查是否為 Twitter 連結
-// 目前 ckeditor 還是只支援 twitter.com 的連結，尚未支援 x.com
+// Defines a function to check if it is a Twitter link
+// Currently, ckeditor only supports links from twitter.com, not yet supporting x.comm
 function isTwitterUrl(url: string): boolean {
     return /^https?:\/\/(www\.)?(twitter|x)\.com\/[^/]+\/status\/\d+/.test(url);
 }

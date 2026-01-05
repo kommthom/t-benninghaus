@@ -72,7 +72,7 @@ new class extends Component {
       currentYear: $wire.entangle('currentPostsYear').live,
       dropdownIsOpen: false,
       showCurrentYearText() {
-        return `${this.currentYear} 年的文章`;
+        return `${this.currentYear} Year's Article`;
       },
       switchPostsByYear() {
         this.currentYear = this.$el.getAttribute('data-year');

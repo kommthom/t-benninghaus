@@ -13,7 +13,7 @@
       {{-- Links --}}
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
-        href="https://github.com/YilanBoy/docfunc/"
+        href="https://github.com/kommthom/t-benninghaus/"
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
@@ -21,7 +21,15 @@
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
-        href="https://portfolio.docfunc.com/"
+        href="https://docfunc.com/"
+        target="_blank"
+        rel="nofollow noopener noreferrer"
+      >
+        {{ __('DocFunc (Original Website)') }}
+      </a>
+      <a
+        class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
+        href="https://de.gravatar.com/blissfulc67086990b.card"
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
@@ -54,15 +62,6 @@
       >
         {{ __('Laracasts') }}
       </a>
-
-      <a
-        class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
-        href="https://www.jetbrains.com/academy/"
-        target="_blank"
-        rel="nofollow noopener noreferrer"
-      >
-        {{ __('JetBrains Academy') }}
-      </a>
     </div>
 
     {{-- Col-3 --}}
@@ -80,22 +79,6 @@
         rel="nofollow noopener noreferrer"
       >
         {{ __('Laravel') }}
-      </a>
-      <a
-        class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
-        href="https://learnku.com/laravel/"
-        target="_blank"
-        rel="nofollow noopener noreferrer"
-      >
-        {{ __('Laravel China') }}
-      </a>
-      <a
-        class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
-        href="https://www.facebook.com/groups/498481680220886/"
-        target="_blank"
-        rel="nofollow noopener noreferrer"
-      >
-        {{ __('Laravel Taiwan') }}
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
@@ -151,7 +134,7 @@
         </a>
         <a
           class="text-2xl text-zinc-400 duration-300 hover:text-zinc-50"
-          href="https://x.com/bVK1uFaMvQkDyPR/"
+          href="https://x.com/ThomasBenn99622/"
           aria-label="Twitter"
           target="_blank"
           rel="nofollow noopener noreferrer"
@@ -160,7 +143,7 @@
         </a>
         <a
           class="text-2xl text-zinc-400 duration-300 hover:text-zinc-50"
-          href="https://www.facebook.com/profile.php?id=100004204543711"
+          href="https://www.facebook.com/profile.php?id=61584721160915"
           aria-label="Facebook"
           target="_blank"
           rel="nofollow noopener noreferrer"

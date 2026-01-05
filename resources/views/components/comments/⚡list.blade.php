@@ -218,7 +218,7 @@ new class extends Component {
                 })"
               >
                 <x-icons.pencil class="w-4" />
-                <span class="ml-2">{{ __('(Edited)') }}</span>
+                <span class="ml-2">{{ __('Edit') }}</span>
               </button>
             @endif
 

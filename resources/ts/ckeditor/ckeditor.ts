@@ -39,7 +39,7 @@ import {
     WordCount,
 } from 'ckeditor5';
 
-import coreTranslations from 'ckeditor5/translations/zh.js';
+import coreTranslations from 'ckeditor5/translations/de.js';
 
 import 'ckeditor5/ckeditor5-editor.css';
 // Override the default styles.
@@ -182,7 +182,7 @@ ClassicEditor.defaultConfig = {
         indentSequence: '    ',
     },
     translations: [coreTranslations],
-    language: 'zh',
+    language: 'de',
 };
 
 declare global {
@@ -204,7 +204,7 @@ window.createClassicEditor = async function (
 ) {
     return ClassicEditor.create(element, {
         licenseKey: 'GPL',
-        placeholder: '分享使自己成長～',
+        placeholder: 'Sharing makes oneself grow~',
         // Editor configuration.
         wordCount: {
             onUpdate: (stats) => {

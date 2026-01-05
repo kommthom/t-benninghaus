@@ -3,6 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'next' => 'NŠchste Seite È',
+    'next' => 'NÃ¤chste Seite Â»',
     'previous' => '&laquo; Vorherige Seite',
 ];

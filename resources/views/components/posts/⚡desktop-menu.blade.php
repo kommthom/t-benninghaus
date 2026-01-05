@@ -40,7 +40,7 @@ new class extends Component {
 <div class="sticky top-1/2 flex -translate-y-1/2 flex-col space-y-2">
   {{-- Home --}}
   <x-tooltip
-    :tooltip-text="'{{ __('Return to homepage') }}'"
+    :tooltip-text="'Return to homepage'"
     :tooltip-position="'right'"
   >
     <a
@@ -55,8 +55,8 @@ new class extends Component {
 
   <!-- Facebook share button -->
   <x-tooltip
-    :tooltip-text="'{{ __('Share to FB') }}'"
-    :click-text="'{{ __('Yay!') }}'"
+    :tooltip-text="'Share to FB'"
+    :click-text="'Yay!'"
     :tooltip-position="'right'"
   >
     <button
@@ -73,8 +73,8 @@ new class extends Component {
 
   <!-- x share button -->
   <x-tooltip
-    :tooltip-text="'{{ __('Share to X') }}'"
-    :click-text="'{{ __('Just a moment...') }}'"
+    :tooltip-text="'Share to X'"
+    :click-text="'Just a moment...'"
     :tooltip-position="'right'"
   >
     <button
@@ -93,8 +93,8 @@ new class extends Component {
 
   <!-- Copy link button -->
   <x-tooltip
-    :tooltip-text="'{{ __('Copy link') }}'"
-    :click-text="'{{ __('Got it!') }}'"
+    :tooltip-text="'Copy link'"
+    :click-text="'Got it!'"
     :tooltip-position="'right'"
   >
     <button
@@ -110,10 +110,10 @@ new class extends Component {
 
   {{-- Edit Article --}}
   @if (auth()->id() === $authorId)
-    <div class="h-[2px] w-14 bg-zinc-300 dark:bg-zinc-600"></div>
+    <div class="h-0.5 w-14 bg-zinc-300 dark:bg-zinc-600"></div>
 
     <x-tooltip
-      :tooltip-text="'{{ __('Edit Article') }}'"
+      :tooltip-text="'Edit Article'"
       :tooltip-position="'right'"
     >
       <a
@@ -128,9 +128,9 @@ new class extends Component {
       </a>
     </x-tooltip>
 
-    {{-- 刪除 --}}
+    {{-- Delete --}}
     <x-tooltip
-      :tooltip-text="'{{ __('Delete Article') }}'"
+      :tooltip-text="'Delete Article'"
       :tooltip-position="'right'"
     >
       <button

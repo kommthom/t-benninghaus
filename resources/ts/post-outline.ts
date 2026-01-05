@@ -14,7 +14,7 @@ function createPostOutlineLinks(
     headings: NodeListOf<HTMLHeadingElement>,
 ): void {
     postOutline.innerHTML = `
-        <div class="mb-4 flex items-center justify-center dark:text-zinc-50" role="heading" aria-level="2">目錄</div>
+        <div class="mb-4 flex items-center justify-center dark:text-zinc-50" role="heading" aria-level="2">Table of Contents</div>
         <hr class="mb-1 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700" role="separator">
     `;
 

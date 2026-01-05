@@ -115,7 +115,7 @@ new class extends Component {
       },
       tabToFourSpaces,
       replyToLabel() {
-        return "Reply ${this.modal.replyTo} 's message";
+        return `Reply ${this.modal.replyTo}'s message`;
       },
       submit() {
         this.$wire.save().then(() => {
@@ -252,7 +252,7 @@ new class extends Component {
               x-cloak
               x-show="modal.isSubmitEnabled === false"
             />
-            <span x-text="modal.isSubmitEnabled ? {{ __('Reply') }} : {{ __('Verifying') }}"></span>
+            <span x-text="modal.isSubmitEnabled ? {{ '\'' . __('Reply') . '\''}} : {{ '\'' . __('Verifying') . '\'' }}"></span>
           </x-button>
         </div>
       </form>

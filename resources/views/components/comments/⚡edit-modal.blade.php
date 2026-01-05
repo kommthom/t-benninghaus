@@ -35,6 +35,8 @@ new class extends Component {
 
         $this->form->update($comment);
 
+        $this->reset('previewIsEnable');
+
         $this->dispatch(event: 'update-comment-in-' . $this->comment['list_name'], id: $comment->id, body: $comment->body, updatedAt: $comment->updated_at);
     }
 };
@@ -104,7 +106,7 @@ new class extends Component {
     <div class="flex flex-col gap-5">
       <div class="flex items-center justify-center space-x-2 text-2xl text-zinc-900 dark:text-zinc-50">
         <x-icons.chat-dots class="w-8" />
-        <span>{{Ê__('Edit Message') }}</span>
+        <span>{{ __('Edit Message') }}</span>
       </div>
 
       <form

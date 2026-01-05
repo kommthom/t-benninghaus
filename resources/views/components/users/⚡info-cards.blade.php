@@ -96,7 +96,7 @@ new class extends Component {
   </div>
 
   <x-card class="col-span-6 md:col-span-4 dark:text-zinc-50">
-    <h2 class="w-full text-2xl">{{ __('Personal Profile') }}/h2>
+    <h2 class="w-full text-2xl">{{ __('Personal Profile') }}</h2>
     <hr class="my-4 h-0.5 border-0 bg-zinc-300 dark:bg-zinc-700">
 
     @if ($user->introduction)
@@ -154,7 +154,7 @@ new class extends Component {
   </x-card>
 
   <x-card class="col-span-6 flex flex-col items-start justify-between md:col-span-2 dark:text-zinc-50">
-    <div class="w-full text-left text-2xl">文章總留言</div>
+    <div class="w-full text-left text-2xl">{{ __('Article Total Comments') }}</div>
     <div class="count-up w-full text-center text-8xl font-semibold text-teal-500 dark:text-purple-500">
       {{ $commentCountsInAllPosts }}</div>
     <div class="w-full text-right text-2xl">{{ __('Articles') }}</div>

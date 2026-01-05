@@ -4,7 +4,7 @@ declare global {
     }
 }
 
-// 滾動至網頁最頂部
+// Scroll to the top of the webpage
 function scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -17,29 +17,29 @@ window.setupScrollToTopButton = function (
     let header = <HTMLElement>document.getElementById('header');
     let footer = <HTMLElement>document.getElementById('footer');
 
-    // 根據 header 是否出現在畫面上調整按鈕的樣式
+    // Adjust the button's style based on whether the header appears on the screen
     let headerObserver = new IntersectionObserver(
         function (entries) {
             if (entries[0].isIntersecting) {
-                // header 在畫面上
+                // Header is on the screen
                 scrollToTopButton.classList.remove('xl:flex');
             } else {
-                // header 不在畫面上
+                // Header is not on the screen
                 scrollToTopButton.classList.add('xl:flex');
             }
         },
         { threshold: [0] },
     );
 
-    // 根據 footer 是否出現在畫面上調整按鈕的樣式
+    // Adjust the button's style based on whether the footer appears on the screen
     let footerObserver = new IntersectionObserver(
         function (entries) {
             if (entries[0].isIntersecting) {
-                // footer 在畫面上
+                // Footer is on the screen
                 scrollToTopButton.classList.remove('fixed', 'bottom-7');
                 scrollToTopButton.classList.add('absolute', 'bottom-1');
             } else {
-                // footer 不在畫面上
+                // Footer is not on the screen
                 scrollToTopButton.classList.add('fixed', 'bottom-7');
                 scrollToTopButton.classList.remove('absolute', 'bottom-1');
             }

@@ -102,7 +102,7 @@ describe('create post', function () {
             ->assertHasErrors(['title' => 'max:100']);
     });
 
-    test('body at least 500 characters', function () {
+    test('body at least 5 characters', function () {
         loginAsUser();
 
         Livewire::test('pages::posts.create', [
@@ -110,9 +110,9 @@ describe('create post', function () {
         ])
             ->set('form.title', str()->random(4))
             ->set('form.category_id', Category::pluck('id')->random())
-            ->set('form.body', str()->random(499))
+            ->set('form.body', str()->random(4))
             ->call('save')
-            ->assertHasErrors(['body' => 'min:500']);
+            ->assertHasErrors(['body' => 'min:5']);
     });
 
     test('body at most 20000 characters', function () {
