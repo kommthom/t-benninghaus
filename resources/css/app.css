@@ -9,7 +9,7 @@
 @source "../**/*.js";
 @source "../**/*.ts";
 
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
     /* color */
@@ -54,46 +54,46 @@
 }
 
 @utility group-gradient-underline-grow {
-    @apply bg-linear-to-r from-green-500 via-emerald-500 to-teal-500 dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500 bg-size-[0_3px] bg-bottom-left bg-no-repeat transition-all duration-200 ease-in group-hover:bg-size-[100%_3px];
+    @apply bg-linear-to-r from-green-500 via-emerald-500 to-teal-500 dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500 bg-[length:0_3px] bg-left-bottom bg-no-repeat transition-all duration-200 ease-in group-hover:bg-[length:100%_3px];
 }
 
 @utility gradient-underline-grow {
-    @apply bg-linear-to-r from-green-500 via-emerald-500 to-teal-500 dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500 bg-size-[0_3px] bg-bottom-left bg-no-repeat transition-all duration-200 ease-in hover:bg-size-[100%_3px];
+    @apply bg-linear-to-r from-green-500 via-emerald-500 to-teal-500 dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500 bg-[length:0_3px] bg-left-bottom bg-no-repeat transition-all duration-200 ease-in hover:bg-[length:100%_3px];
 }
 
 @utility rich-text {
     @apply prose text-lg max-w-none prose-slate dark:prose-invert leading-8
-    /* paragraph */
+        /* paragraph */
     prose-p:break-all lg:prose-p:break-normal
-    /*  heading  */
+        /*  heading  */
     prose-headings:font-medium prose-headings:text-emerald-600 dark:prose-headings:text-lividus-500
-     prose-h2:my-4 prose-h2:py-4 prose-h2:relative
-    /*  h2 underline  */
+    prose-h2:my-4 prose-h2:py-4 prose-h2:relative
+        /*  h2 underline  */
     prose-h2:after:absolute prose-h2:after:bottom-0 prose-h2:after:left-0 prose-h2:after:w-full prose-h2:after:h-1 prose-h2:after:bg-linear-to-r prose-h2:after:from-emerald-500 dark:prose-h2:after:from-lividus-600 prose-h2:after:to-transparent
-    /* link */
+        /* link */
     prose-a:no-underline prose-a:hover:underline prose-a:decoration-2 prose-a:underline-offset-4 prose-a:text-emerald-600 prose-a:hover:text-emerald-700
     dark:prose-a:text-lividus-400 dark:prose-a:hover:text-lividus-300
-    /* list */
+        /* list */
     prose-li:marker:text-emerald-500 dark:prose-li:marker:text-lividus-400
-    /* figure */
+        /* figure */
     prose-figure:table prose-figure:w-full prose-figure:mx-auto
-    /* figure table */
+        /* figure table */
     prose-figure:has-[table]:p-4 prose-figure:has-[table]:border prose-figure:has-[table]:border-zinc-300 dark:prose-figure:has-[table]:border-zinc-600 prose-figure:has-[table]:rounded-xl
-    /* image */
+        /* image */
     prose-img:w-full prose-img:rounded-xl
-    /* figcaption */
-    prose-figcaption:table-caption prose-figcaption:caption-bottom prose-figcaption:wrap-break-word
+        /* figcaption */
+    prose-figcaption:table-caption prose-figcaption:[caption-side:bottom] prose-figcaption:break-words
     prose-figcaption:rounded-lg prose-figcaption:p-1.5 prose-figcaption:text-center prose-figcaption:bg-zinc-200!
     dark:prose-figcaption:bg-zinc-700! dark:prose-figcaption:text-slate-100
-    /* hr */
+        /* hr */
     prose-hr:my-3 prose-hr:h-1 prose-hr:border-none prose-hr:bg-slate-300 dark:prose-hr:bg-slate-500
-    /* code */
+        /* code */
     prose-code:before:content-none prose-code:after:content-none prose-code:font-jetbrains-mono prose-code:font-medium
-    /* pre */
+        /* pre */
     prose-pre:text-[#abb2bf] prose-pre:bg-neutral-800 prose-pre:rounded-xl prose-pre:text-lg dark:prose-pre:bg-neutral-900 prose-pre:border-none
-    /* blockquote before */
+        /* blockquote before */
     prose-blockquote:relative prose-blockquote:before:absolute prose-blockquote:before:w-1.5 prose-blockquote:before:h-full prose-blockquote:before:rounded-sm prose-blockquote:before:top-0 prose-blockquote:before:-left-4 prose-blockquote:before:bg-emerald-300 dark:prose-blockquote:before:bg-lividus-700 prose-blockquote:before:contain-none prose-blockquote:ml-4
-    /* blockquote */
+        /* blockquote */
     prose-blockquote:border-none prose-blockquote:not-italic prose-blockquote:rounded-xl prose-blockquote:text-emerald-500 prose-blockquote:bg-emerald-200/20 dark:prose-blockquote:text-lividus-200 dark:prose-blockquote:bg-lividus-800/20 prose-blockquote:py-2 prose-blockquote:px-4;
 
     /* ckeditor5-font/theme/fontsize.css */
@@ -113,7 +113,7 @@
         border-radius: 0.3rem;
     }
 
-    .dark & :not(pre) > code {
+    html[data-theme='dark'] & :not(pre) > code {
         background-color: color-mix(
             in oklab,
             var(--color-lividus-700) 40%,
@@ -137,7 +137,7 @@
         background-repeat: no-repeat;
     }
 
-    .dark & blockquote {
+    html[data-theme='dark'] & blockquote {
         background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="%232a547e60" d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M7.194 6.766a1.7 1.7 0 0 0-.227-.272 1.5 1.5 0 0 0-.469-.324l-.008-.004A1.8 1.8 0 0 0 5.734 6C4.776 6 4 6.746 4 7.667c0 .92.776 1.666 1.734 1.666.343 0 .662-.095.931-.26-.137.389-.39.804-.81 1.22a.405.405 0 0 0 .011.59c.173.16.447.155.614-.01 1.334-1.329 1.37-2.758.941-3.706a2.5 2.5 0 0 0-.227-.4zM11 9.073c-.136.389-.39.804-.81 1.22a.405.405 0 0 0 .012.59c.172.16.446.155.613-.01 1.334-1.329 1.37-2.758.942-3.706a2.5 2.5 0 0 0-.228-.4 1.7 1.7 0 0 0-.227-.273 1.5 1.5 0 0 0-.469-.324l-.008-.004A1.8 1.8 0 0 0 10.07 6c-.957 0-1.734.746-1.734 1.667 0 .92.777 1.666 1.734 1.666.343 0 .662-.095.931-.26z"/></svg>');
     }
 }
@@ -152,23 +152,82 @@
     overflow-x: auto;
 }
 
-/* highlight.js */
-pre:has(code.hljs) {
+/* shiki */
+html[data-theme='dark'] pre.shiki,
+html[data-theme='dark'] pre.shiki span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+}
+
+pre.shiki {
     padding: 0 !important;
     border-radius: 0.75rem !important;
 }
 
-pre > code.hljs {
+pre.shiki code {
+    display: block !important;
+    width: fit-content !important;
+    min-width: 100% !important;
+    padding: 1rem !important;
     font-family: var(--font-jetbrains-mono), sans-serif !important;
     font-size: var(--text-lg) !important;
     line-height: var(--text-lg--line-height) !important;
     font-weight: 600 !important;
-    overflow-x: auto !important;
-    background: var(--color-neutral-800) !important;
+    /* line number */
+    counter-reset: step;
+    counter-increment: step 0;
 }
 
-.dark pre > code.hljs {
-    background: var(--color-neutral-900) !important;
+/* line number */
+pre.shiki code span.line::before {
+    content: counter(step);
+    counter-increment: step;
+    width: 1.25rem;
+    margin-right: 1.5rem;
+    display: inline-block;
+    text-align: right;
+    color: oklch(55.6% 0 0 / .5);
+}
+
+pre.shiki code :is(span.line.highlighted, span.line.diff.remove, span.line.diff.add) {
+    display: inline-block !important;
+    width: calc(100% + 2rem) !important;
+    margin: 0 -1rem !important;
+    padding: 0 1rem !important;
+}
+
+pre.shiki code span.line.highlighted {
+    background-color: oklch(70.7% 0.022 261.325 / .2) !important;
+}
+
+pre.shiki code span.line.diff.remove {
+    position: relative !important;
+    background-color: oklch(63.7% 0.237 25.331 / .2) !important;
+}
+
+pre.shiki code span.line.diff.add {
+    position: relative !important;
+    background-color: oklch(72.3% 0.219 149.579 / .2) !important;
+}
+
+pre.shiki code :is(span.line.highlighted, span.line.diff.remove, span.line.diff.add) span {
+    background-color: transparent !important;
+}
+
+pre.shiki code span.line.diff.remove::after {
+    position: absolute;
+    content: '-';
+    inset-block: 0;
+    left: 2.75rem;
+    color: oklch(70.4% 0.191 22.216);
+}
+
+pre.shiki code span.line.diff.add::after {
+    position: absolute;
+    content: '+';
+    inset-block: 0;
+    left: 2.75rem;
+    color: oklch(79.2% 0.209 151.711);
 }
 
 /* Alpine.js */

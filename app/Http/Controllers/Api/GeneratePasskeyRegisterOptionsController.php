@@ -6,11 +6,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\Serializer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Uri;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Webauthn\AuthenticatorSelectionCriteria;
 use Webauthn\Exception\InvalidDataException;
 use Webauthn\PublicKeyCredentialCreationOptions;
@@ -19,53 +21,82 @@ use Webauthn\PublicKeyCredentialUserEntity;
 
 class GeneratePasskeyRegisterOptionsController extends Controller
 {
-    /**
-     * @throws ExceptionInterface
-     * @throws InvalidDataException
-     */
-    public function __invoke(Request $request): string
+    public function __invoke(Request $request, Serializer $serializer): JsonResponse|string
     {
-        // Erstellen einer Relying Party EntitŠt 
-        // Die ID ist der Domainname der Website
+        // Create a trusted party entity
+        // id is the domain name of the website
         $relatedPartyEntity = new PublicKeyCredentialRpEntity(
             name: config('app.name'),
             id: Uri::of(config('app.url'))->host()
         );
 
-        // Erstellen einer BenutzerentitŠt
-        // Die ID muss eindeutig sein, normalerweise die Benutzer-ID oder UUID
-        // Bitte beachten Sie, dass der Name keine sensiblen Benutzerinformationen wie E-Mail oder Telefonnummer enthalten darf
-        $userEntity = new PublicKeyCredentialUserEntity(
-            name: $request->user()->name,
-            id: (string) $request->user()->id,
-            displayName: $request->user()->name
-        );
+        try {
+            // Create a user entity
+            // The id must be unique, typically the user's ID or UUID
+            // Note: The name should not include sensitive user information, such as email or phone number
+            $userEntity = new PublicKeyCredentialUserEntity(
+                name: $request->user()->name,
+                id: (string) $request->user()->id,
+                displayName: $request->user()->name
+            );
+        } catch (InvalidDataException $e) {
+            Log::error(__('Unable to create Webauthn user entity.'), [
+                'user_id'   => $request->user()->id,
+                'exception' => $e->getMessage(),
+            ]);
 
-        // Konfiguration zur GerŠtevalidierung
-        // Keine PrŠferenz fŸr eine Plattform, und es wird vorausgesetzt, dass der SchlŸssel des Benutzers auffindbare Anmeldeinformationen unterstŸtzt
-        // Derzeit sind auffindbare Anmeldeinformationen Mainstream. Wenn dies hier nicht erzwungen wird, kann Ihr YubiKey nicht verwendet werden
+            return response()->json([
+                'error' => __('Unable to create key registration options, please try again later.'),
+            ], 500);
+        }
+
+        // Verify device settings
+        // No platform preference, and user keys must support discoverable credentials
+        // Discoverable credentials are now mainstream; if not enforced here, your YubiKey will be unusable
         $authenticatorSelectionCriteria = AuthenticatorSelectionCriteria::create(
             authenticatorAttachment: AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_NO_PREFERENCE,
             userVerification: AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_REQUIRED,
             residentKey: AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_REQUIRED,
         );
 
-        // Optionen fŸr die Registrierung des SchlŸssels. Das Frontend verwendet diese Optionen, um die UI fŸr die Registrierung des SchlŸssels anzuzeigen
-        // Challenge ist eine zufŠllige Zeichenkette, die verwendet wird, um Replay-Angriffe zu verhindern
-        $options = new PublicKeyCredentialCreationOptions(
-            rp: $relatedPartyEntity,
-            user: $userEntity,
-            challenge: Str::random(),
-            authenticatorSelection: $authenticatorSelectionCriteria
-        );
+        try {
+            // Options for registration keys, the frontend will use these options to display the UI for registration keys
+            // challenge is a random string used to prevent replay attacks
+            $options = new PublicKeyCredentialCreationOptions(
+                rp: $relatedPartyEntity,
+                user: $userEntity,
+                challenge: Str::random(),
+                authenticatorSelection: $authenticatorSelectionCriteria
+            );
+        } catch (InvalidDataException $e) {
+            Log::error(__('Unable to create Webauthn registration options'), [
+                'user_id'   => $request->user()->id,
+                'exception' => $e->getMessage(),
+            ]);
 
-        // Serialisierung des $options-Objekts und Umwandlung in eine JSON-Zeichenkette
-        $options = Serializer::make()->toJson($options);
+            return response()->json([
+                'error' => __('Unable to create key registration options, please try again later.'),
+            ], 400);
+        }
 
-        // Speichern von $options in der Flash-Session, damit wir es im nŠchsten Schritt verwenden kšnnen
-        // Wenn der Benutzer ein Public-Key-Zertifikat zurŸckgibt, mŸssen wir $options aus der Session abrufen, um das Zertifikat des Benutzers zu validieren
-        Session::flash('passkey-registration-options', $options);
+        try {
+            // Serialize the $options object, converting it to a JSON string
+            $optionsJson = $serializer->toJson($options);
+        } catch (SerializerExceptionInterface  $e) {
+            Log::error(__('Webauthn registration option serialization failed.'), [
+                'user_id'   => $request->user()->id,
+                'exception' => $e->getMessage(),
+            ]);
 
-        return $options;
+            return response()->json([
+                'error' => __('Server error occurred, unable to serialize registration options.'),
+            ], 400);
+        }
+
+        // Store $options in the Flash Session so we can use it in the next step
+        // When the user returns the public key credential, we need to retrieve $options from the Session to verify the user's credential
+        Session::flash('passkey-registration-options', $optionsJson);
+
+        return $optionsJson;
     }
 }

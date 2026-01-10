@@ -49,8 +49,7 @@ new class extends Component {
 >
   {{-- Introduction --}}
   <x-card class="group dark:text-zinc-50">
-    <p
-      class="bg-linear-to-r font-jetbrains-mono w-full from-green-500 via-emerald-500 to-teal-500 bg-clip-text text-center text-xl font-semibold text-transparent dark:border-white dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500">
+    <p class="w-full text-xl font-semibold text-center text-transparent bg-clip-text from-green-500 via-emerald-500 to-teal-500 dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500 dark:border-white bg-linear-to-r font-jetbrains-mono">
       echo 'Hello World';
     </p>
 
@@ -60,16 +59,16 @@ new class extends Component {
       {{ __('This is a blog developed using the TALL Stack, used to record my learning process and the big and small things in life.') }}
     </span>
 
-    <div class="mt-8 flex items-center justify-center">
+    <div class="flex justify-center items-center mt-8">
       <a
-        class="before:bg-lividus-600 dark:bg-lividus-700 group relative flex w-full items-center justify-center overflow-hidden rounded-lg bg-emerald-600 px-4 py-2 transform-[translateZ(0)] before:absolute before:left-1/2 before:top-1/2 before:size-8 before:-translate-x-1/2 before:-translate-y-1/2 before:scale-0 before:rounded-full before:opacity-0 before:transition before:duration-700 before:ease-in-out hover:before:scale-[10] hover:before:opacity-100 dark:before:bg-emerald-700"
-        href="{{ route('posts.create') }}"
-        wire:navigate
+          class="flex overflow-hidden relative justify-center items-center py-2 px-4 w-full bg-emerald-600 rounded-lg before:bg-lividus-600 group transform-[translateZ(0)] before:absolute before:left-1/2 before:top-1/2 before:size-8 before:-translate-x-1/2 before:-translate-y-1/2 before:scale-0 before:rounded-full before:opacity-0 before:transition before:duration-700 before:ease-in-out dark:bg-lividus-700 dark:before:bg-emerald-700 hover:before:scale-[10] hover:before:opacity-100"
+          href="{{ route('posts.create') }}"
+          wire:navigate
       >
-        <div class="relative z-0 flex items-center text-zinc-200 transition duration-500 ease-in-out">
-          <x-icons.pencil class="w-5" />
-          <span class="ml-2">{{ __('Add New Article') }}</span>
-        </div>
+          <div class="flex relative z-0 items-center transition duration-500 ease-in-out text-zinc-200">
+              <x-icons.pencil class="w-5" />
+              <span class="ml-2">{{ __('Add New Article') }}</span>
+          </div>
       </a>
     </div>
   </x-card>
@@ -86,18 +85,19 @@ new class extends Component {
       {{ __('Get notified of the latest articles!') }}
     </span>
 
-    <div class="mt-8 flex items-center justify-center">
-      <a
-        class="focus:outline-hidden focus:ring-3 inline-flex w-full items-center justify-center rounded-lg border border-transparent bg-zinc-500 px-4 py-2 tracking-widest text-zinc-50 ring-zinc-300 transition duration-150 ease-in-out hover:bg-zinc-600 focus:border-zinc-700 active:bg-zinc-500 dark:bg-zinc-600 dark:ring-zinc-800 dark:hover:bg-zinc-500 dark:active:bg-zinc-600"
-        href="{{ route('feeds.main') }}"
-        x-on:click.prevent="copyWebFeedUrl"
-      >
-        <span
-          class="ml-2 h-lh"
-          x-text="rssLinkLabel"
-        ></span>
-      </a>
-    </div>
+    <div class="flex justify-center items-center mt-8">
+          <a
+              class="flex justify-center items-center py-2 px-4 w-full tracking-widest rounded-lg transition duration-150 ease-in-out bg-zinc-500 text-zinc-50 ring-zinc-300 dark:bg-zinc-600 dark:ring-zinc-800 dark:hover:bg-zinc-500 dark:active:bg-zinc-600 hover:bg-zinc-600 focus:outline-hidden focus:ring-3 active:bg-zinc-500"
+              href="{{ route('feeds.main') }}"
+              x-on:click.prevent="copyWebFeedUrl"
+          >
+              <x-icons.rss class="w-5 h-lh" />
+              <span
+                  class="ml-2"
+                  x-text="rssLinkLabel"
+              ></span>
+          </a>
+      </div>
   </x-card>
 
   {{-- Popular Tags --}}

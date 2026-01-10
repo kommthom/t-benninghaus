@@ -83,12 +83,12 @@ new class extends Component {
         root.style.setProperty('--circle-in-start-y', `${centerY}px`);
 
         const updateTheme = () => {
-          if (this.html.classList.contains('dark')) {
-            this.html.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-          } else {
-            this.html.classList.add('dark');
+          if (this.html.getAttribute('data-theme') === 'light') {
+            this.html.setAttribute('data-theme', 'dark');
             localStorage.setItem('theme', 'dark');
+          } else {
+            this.html.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
           }
         }
 
@@ -121,7 +121,7 @@ new class extends Component {
     </div>
   </div>
   <div
-    class="relative hidden h-20 w-full items-center justify-center bg-zinc-50 transition-all duration-300 lg:flex dark:bg-zinc-800"
+    class="hidden relative justify-center items-center w-full transition-all duration-300 lg:flex h-18 bg-zinc-50 dark:bg-zinc-800"
     id="desktop-header"
   >
     {{-- logo --}}
@@ -131,12 +131,12 @@ new class extends Component {
       wire:navigate
     >
       <img
-        class="block size-10 dark:hidden"
+        class="block size-8 dark:hidden"
         src="{{ asset('images/icon/logo.svg') }}"
         alt="logo"
       >
       <img
-        class="hidden size-10 dark:block"
+        class="hidden size-8 dark:block"
         src="{{ asset('images/icon/dark-logo.svg') }}"
         alt="logo"
       >

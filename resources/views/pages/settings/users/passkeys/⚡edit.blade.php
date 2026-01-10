@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 use App\Mail\CreatePasskeyMail;
 use App\Models\User;
-use App\Services\CustomCounterChecker;
 use App\Services\Serializer;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Webauthn\AuthenticatorAttestationResponse;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
@@ -35,14 +33,12 @@ new class extends Component {
         $this->authorize('update', $this->user);
     }
 
-    public function store(): void
+    public function store(Serializer $serializer): void
     {
         $data = $this->validate([
             'name' => ['required', 'string', 'min:3', 'max:255'],
             'passkey' => ['required', 'json'],
         ]);
-
-        $serializer = Serializer::make();
 
         $publicKeyCredential = $serializer->fromJson($data['passkey'], PublicKeyCredential::class);
 
@@ -63,10 +59,14 @@ new class extends Component {
         $publicKeyCredentialCreationOptions = $serializer->fromJson($options, PublicKeyCredentialCreationOptions::class);
 
         $csmFactory = new CeremonyStepManagerFactory();
-        $csmFactory->setCounterChecker(new CustomCounterChecker());
 
         try {
-            $publicKeyCredentialSource = AuthenticatorAttestationResponseValidator::create($csmFactory->requestCeremony())->check(authenticatorAttestationResponse: $publicKeyCredential->response, publicKeyCredentialCreationOptions: $publicKeyCredentialCreationOptions, host: request()->getHost());
+            $publicKeyCredentialSource = AuthenticatorAttestationResponseValidator::create($csmFactory->requestCeremony())
+                ->check(
+                    authenticatorAttestationResponse: $publicKeyCredential->response,
+                    publicKeyCredentialCreationOptions: $publicKeyCredentialCreationOptions,
+                    host: request()->getHost()
+
         } catch (Throwable) {
             $this->dispatch('toast', status: 'danger', message: __('Invalid Passkey'));
 

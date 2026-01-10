@@ -56,10 +56,8 @@ new class extends Component {
 @endif
 
 @assets
-  {{-- highlight code block style --}}
-  @vite('node_modules/highlight.js/styles/atom-one-dark.css')
   {{-- highlight code block --}}
-  @vite('resources/ts/highlight.ts')
+  @vite('resources/ts/shiki.ts')
   {{-- code block copy button --}}
   @vite('resources/ts/reader-helpers/code-block-helper.ts')
   @vite('resources/ts/reader-helpers/image-block-helper.ts')
@@ -80,9 +78,9 @@ new class extends Component {
 @script
   <script>
     Alpine.data('postsShowPage', () => ({
-      init() {
+      async init() {
         setupPostOutline(this.$refs.postOutline, this.$refs.postBody);
-        highlightAllInElement(this.$refs.postBody);
+        await highlightAllInElement(this.$refs.postBody);
         codeBlockHelper(this.$refs.postBody);
         imageBlockHelper(this.$refs.postBody);
         processYoutubeOembeds();
@@ -128,7 +126,7 @@ new class extends Component {
             <article>
               {{-- post title --}}
               <h1
-                class="dark:text-lividus-500 dark:from-lividus-800/60 bg-linear-to-r -mx-4 -mt-4 rounded-t-xl from-emerald-100/60 to-transparent px-4 py-6 text-4xl font-semibold leading-relaxed text-emerald-600"
+                class="dark:text-lividus-500 dark:from-lividus-800/60 bg-linear-to-r -mx-4 -mt-4 rounded-t-xl from-emerald-100/60 to-transparent px-4 py-6 text-2xl font-semibold leading-relaxed text-emerald-600 md:text-4xl"
               >
                 {{ $post->title }}
               </h1>

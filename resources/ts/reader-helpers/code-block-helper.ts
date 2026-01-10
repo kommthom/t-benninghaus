@@ -18,20 +18,20 @@ function createCopyCodeButton(code: string): HTMLButtonElement {
     copyButton.innerHTML = icon.CLIPBOARD;
 
     // when the copy button is clicked, copy code to the clipboard
-    copyButton.addEventListener('click', function (this: HTMLButtonElement) {
+    copyButton.addEventListener('click', function(this: HTMLButtonElement) {
         // copy code to clipboard
         navigator.clipboard.writeText(code).then(
             () => console.log('Copied to clipboard'),
-            () => console.log('Failed to copy to clipboard'),
+            () => console.log('Failed to copy to clipboard')
         );
 
         // change the button icon to "Copied!" for 2 seconds
         this.innerHTML = icon.CHECK;
         setTimeout(
-            function (this: HTMLButtonElement) {
+            function(this: HTMLButtonElement) {
                 this.innerHTML = icon.CLIPBOARD;
             }.bind(this),
-            2000,
+            2000
         );
     });
 
@@ -40,7 +40,7 @@ function createCopyCodeButton(code: string): HTMLButtonElement {
 
 function createExpandCodeButton(
     modal: Modal,
-    codeOuterHTML: string,
+    preOuterHTML: string
 ): HTMLButtonElement {
     const expandCodeButton: HTMLButtonElement =
         document.createElement('button');
@@ -48,38 +48,34 @@ function createExpandCodeButton(
     expandCodeButton.innerHTML = icon.ARROWS_ANGLE_EXPAND;
 
     const zoomInCode = document.getElementById(
-        ZOOM_IN_PRE_ID,
+        ZOOM_IN_PRE_ID
     ) as HTMLImageElement;
 
     expandCodeButton.addEventListener(
         'click',
-        function (this: HTMLButtonElement) {
-            zoomInCode.innerHTML = codeOuterHTML;
+        function(this: HTMLButtonElement) {
+            zoomInCode.innerHTML = preOuterHTML;
             modal.open();
-        },
+        }
     );
 
     return expandCodeButton;
 }
 
-function findLanguagePrefixClass(element: HTMLElement) {
-    const prefix = 'language-';
-
-    const foundClass = Array.from(element.classList).find((className) =>
-        className.startsWith(prefix),
-    );
+function getProgramLanguage(element: HTMLPreElement) {
+    const foundClass = element.getAttribute('data-program-language');
 
     if (!foundClass) {
         return 'text';
     }
 
-    return foundClass.substring(prefix.length);
+    return foundClass;
 }
 
 // create language label
 function createLanguageLabel(language: string): HTMLSpanElement {
     const labelElement: HTMLSpanElement = document.createElement('span');
-    labelElement.classList.add(...label.BASE_CLASS_NAME);
+    labelElement.classList.add('language-label', ...label.BASE_CLASS_NAME);
 
     if (languageSettings[language]) {
         labelElement.innerText = languageSettings[language].label;
@@ -93,7 +89,7 @@ function createLanguageLabel(language: string): HTMLSpanElement {
     return labelElement;
 }
 
-window.codeBlockHelper = function (element: HTMLElement): void {
+window.codeBlockHelper = function(element: HTMLElement): void {
     const preTags: HTMLCollectionOf<HTMLPreElement> =
         element.getElementsByTagName('pre');
 
@@ -101,7 +97,7 @@ window.codeBlockHelper = function (element: HTMLElement): void {
         return;
     }
 
-    const zoomInCode: HTMLPreElement = document.createElement('pre');
+    const zoomInCode: HTMLDivElement = document.createElement('div');
     zoomInCode.classList.add('lg:min-w-3xl');
     zoomInCode.id = ZOOM_IN_PRE_ID;
 
@@ -112,16 +108,32 @@ window.codeBlockHelper = function (element: HTMLElement): void {
         () => {
             modal.remove();
         },
-        { once: true },
+        { once: true }
     );
 
-    // add a copy button to all pre-tags
+    const marker = 'code-block-helper-added';
+
+    // add a code block helper to all pre-tags
     for (const preTag of preTags) {
-        if (preTag.classList.contains('code-block-helper-added')) {
+        if (preTag.classList.contains(marker)) {
             return;
         }
 
-        preTag.classList.add('code-block-helper-added', 'group', 'relative');
+        // to make the copy button fixed in the container, we wrap it in the container
+        let wrapper: HTMLDivElement = document.createElement('div');
+        // add 'relative' to make this element to become an anchor
+        wrapper.classList.add('group', 'relative');
+
+        // set the wrapper as sibling of the pre-tag
+        preTag.parentNode?.insertBefore(wrapper, preTag);
+        // set element as child of wrapper
+        wrapper.appendChild(preTag);
+
+        preTag.classList.add(marker);
+
+        // to get language from code class name, the class name is like "language-JavaScript"
+        // we need to get the last part of the class name
+        const language = getProgramLanguage(preTag);
 
         const codes = preTag.getElementsByTagName('code');
 
@@ -131,31 +143,34 @@ window.codeBlockHelper = function (element: HTMLElement): void {
 
         const code: HTMLElement = codes[0];
 
-        // to get language from code class name, the class name is like "language-JavaScript"
-        // we need to get the last part of the class name
-
-        const language = findLanguagePrefixClass(code);
-
         const languageLabelElement: HTMLSpanElement =
             createLanguageLabel(language);
 
         // start to create the copy button...
         const copyButton: HTMLButtonElement = createCopyCodeButton(
-            code.innerText,
+            code.innerText
         );
 
-        const expandCodeButton = createExpandCodeButton(modal, code.outerHTML);
+        const expandCodeButton = createExpandCodeButton(
+            modal,
+            preTag.outerHTML
+        );
 
         const codeHelperGroup: HTMLDivElement = document.createElement('div');
         codeHelperGroup.classList.add(
+            'hidden',
+            'lg:flex',
+            'gap-2',
             'absolute',
             'top-2',
             'right-2',
-            'flex',
-            'gap-2',
+            'opacity-0',
+            'group-hover:opacity-100',
+            'transition-opacity',
+            'duration-200'
         );
 
-        preTag.appendChild(codeHelperGroup);
+        wrapper.appendChild(codeHelperGroup);
 
         // append these buttons in the pre-tag
         // appended language label
@@ -172,9 +187,10 @@ window.codeBlockHelper = function (element: HTMLElement): void {
                 copyButton.remove();
                 expandCodeButton.remove();
                 codeHelperGroup.remove();
-                preTag.classList.remove('code-block-helper-added');
+                wrapper.replaceWith(preTag);
+                preTag.classList.remove(marker);
             },
-            { once: true },
+            { once: true }
         );
     }
 };

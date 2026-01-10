@@ -16,8 +16,6 @@ new class extends Component {
 
     public ?int $tagId = null;
 
-    // public string $badge = __('All articles');
-
     #[Url]
     public string $order = PostOrderOptions::LATEST->value;
 
