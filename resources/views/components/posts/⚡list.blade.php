@@ -32,6 +32,11 @@ new class extends Component {
         $posts = Post::query()
             ->select(['id', 'category_id', 'user_id', 'title', 'excerpt', 'slug', 'created_at'])
             ->withCount('tags') // Count the number of tags
+            ->when($userId, function ($query, $userId) {
+                return $query->whereRaw('IF(is_private, user_id = ?, true)', [$userId]);
+            }, function ($query) {
+                return $query->where('is_private', false);
+            })
             ->when($this->categoryId, function ($query) {
                 return $query->where('category_id', $this->categoryId);
             })
@@ -39,12 +44,6 @@ new class extends Component {
                 return $query->whereHas('tags', function ($query) {
                     $query->where('tag_id', $this->tagId);
                 });
-            })
-            ->when($userId, function ($query, $userId) {
-                return $query->where('user_id', $userId)
-                    ->orWhere('is_private', false);
-            }, function ($query) {
-                return $query->where('is_private', false);
             })
             ->withOrder($this->order)
             ->with(['user:id,name', 'category:id,icon,name', 'tags:id,name']) // Preload prevents N+1 issues

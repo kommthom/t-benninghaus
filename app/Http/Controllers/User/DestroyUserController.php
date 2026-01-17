@@ -13,13 +13,13 @@ use Illuminate\Support\Facades\Auth;
 class DestroyUserController extends Controller
 {
     /**
-     * Benutzerkonto lšschen
+     * Benutzerkonto lÃ¶schen
      *
      * @return RedirectResponse
      */
     public function __invoke(Request $request, User $user)
     {
-        // URL auf GŸltigkeit prŸfen
+        // URL auf GÃ¼ltigkeit prÃ¼fen
         abort_if(! $request->hasValidSignature(), 401);
 
         Auth::guard('web')->logout();
