@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Reset Password')] class extends Component {
+new class extends Component
+{
     // token will be passed in the URL,
     // and auto binding will take care of it
     #[Locked]
@@ -36,9 +36,9 @@ new #[Title('Reset Password')] class extends Component {
     public function resetPassword(): void
     {
         $this->validate([
-            'token' => 'required',
-            'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+            'token'    => 'required',
+            'email'    => ['required', 'email'],
+            'password' => ['required', 'confirmed', Illuminate\Validation\Rules\Password::defaults()],
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful, we
@@ -47,7 +47,7 @@ new #[Title('Reset Password')] class extends Component {
         $status = Password::reset($this->only('email', 'password', 'password_confirmation', 'token'), function ($user) {
             $user
                 ->forceFill([
-                    'password' => Hash::make($this->password),
+                    'password'       => Hash::make($this->password),
                     'remember_token' => Str::random(60),
                 ])
                 ->save();
@@ -72,57 +72,55 @@ new #[Title('Reset Password')] class extends Component {
 ?>
 
 <x-layouts.auth>
-  <div class="container mx-auto">
-    <div class="flex min-h-screen flex-col items-center justify-center px-4">
-      {{-- page title --}}
-      <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
-        <x-icons.question-circle class="w-6" />
-        <span class="ml-4">{{ __('Reset Password') }}</span>
-      </div>
+    <div class="container mx-auto">
+        <div class="flex min-h-screen flex-col items-center justify-center px-4">
+            {{-- page title --}}
+            <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
+                <x-icons.question-circle class="w-6" />
+                <span class="ml-4">{{ __('Reset Password') }}</span>
+            </div>
 
-      <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
-        {{-- validate error message --}}
-        <x-auth-validation-errors :errors="$errors" />
+            <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
+                {{-- validate error message --}}
+                <x-auth-validation-errors :errors="$errors" />
 
-        <form wire:submit="resetPassword">
-          {{-- mailbox --}}
-          <x-floating-label-input
-            id="email"
-            type="text"
-            placeholder="{{ __('Email') }}"
-            required
-            readonly
-            wire:model="email"
-          />
+                <form wire:submit="resetPassword">
+                    {{-- mailbox --}}
+                    <x-floating-label-input
+                        id="email"
+                        type="text"
+                        placeholder="{{ __('Email') }}"
+                        required
+                        readonly
+                        wire:model="email"
+                    />
 
-          {{-- password --}}
-          <x-floating-label-input
-            class="mt-6"
-            id="password"
-            type="password"
-            placeholder="{{ __('New password') }}"
-            required
-            autofocus
-            wire:model="password"
-          />
+                    {{-- password --}}
+                    <x-floating-label-input
+                        class="mt-6"
+                        id="password"
+                        type="password"
+                        placeholder="{{ __('New password') }}"
+                        required
+                        autofocus
+                        wire:model="password"
+                    />
 
-          {{-- confirm password --}}
-          <x-floating-label-input
-            class="mt-6"
-            id="password_confirmation"
-            type="password"
-            placeholder="{{ __('Confirm new password') }}"
-            required
-            wire:model="password_confirmation"
-          />
+                    {{-- confirm password --}}
+                    <x-floating-label-input
+                        class="mt-6"
+                        id="password_confirmation"
+                        type="password"
+                        placeholder="{{ __('Confirm new password') }}"
+                        required
+                        wire:model="password_confirmation"
+                    />
 
-          <div class="mt-6 flex items-center justify-end">
-            <x-button>
-              {{ __('Reset Password') }}
-            </x-button>
-          </div>
-        </form>
-      </x-card>
+                    <div class="mt-6 flex items-center justify-end">
+                        <x-button> {{ __('Reset Password') }} </x-button>
+                    </div>
+                </form>
+            </x-card>
+        </div>
     </div>
-  </div>
 </x-layouts.auth>

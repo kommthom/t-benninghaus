@@ -36,17 +36,18 @@ import {
     TextTransformation,
     Underline,
     Undo,
-    WordCount,
+    WordCount
 } from 'ckeditor5';
 
-import coreTranslations from 'ckeditor5/translations/de.js';
+import coreTranslations from 'ckeditor5/translations/zh.js';
 
 import 'ckeditor5/ckeditor5-editor.css';
 // Override the default styles.
 // import './custom.css';
 import { languageSettings } from '../config.js';
 
-class ClassicEditor extends ClassicEditorBase {}
+class ClassicEditor extends ClassicEditorBase {
+}
 
 ClassicEditor.builtinPlugins = [
     Alignment,
@@ -84,7 +85,7 @@ ClassicEditor.builtinPlugins = [
     TextTransformation,
     Underline,
     Undo,
-    WordCount,
+    WordCount
 ];
 
 ClassicEditor.defaultConfig = {
@@ -120,91 +121,98 @@ ClassicEditor.defaultConfig = {
             'undo',
             'redo',
             '|',
-            'findAndReplace',
+            'findAndReplace'
         ],
-        shouldNotGroupWhenFull: true,
+        shouldNotGroupWhenFull: true
     },
     heading: {
         options: [
             {
                 model: 'paragraph',
                 title: 'Paragraph',
-                class: 'ck-heading_paragraph',
+                class: 'ck-heading_paragraph'
             },
             {
                 model: 'heading2',
                 view: 'h2',
                 title: 'Heading 2',
-                class: 'ck-heading_heading2',
+                class: 'ck-heading_heading2'
             },
             {
                 model: 'heading3',
                 view: 'h3',
                 title: 'Heading 3',
-                class: 'ck-heading_heading3',
-            },
-        ] as HeadingOption[],
+                class: 'ck-heading_heading3'
+            }
+        ] as HeadingOption[]
     },
     fontSize: {
-        options: ['tiny', 'default', 'big'],
+        options: ['tiny', 'default', 'big']
     },
     link: {
-        addTargetToExternalLinks: true,
+        addTargetToExternalLinks: true
     },
     image: {
         resizeOptions: [
             {
                 name: 'resizeImage:original',
                 value: null,
-                icon: 'original',
+                icon: 'original'
             },
             {
                 name: 'resizeImage:50',
                 value: '50',
-                icon: 'medium',
+                icon: 'medium'
             },
             {
                 name: 'resizeImage:75',
                 value: '75',
-                icon: 'large',
-            },
+                icon: 'large'
+            }
         ],
-        toolbar: ['toggleImageCaption', 'imageTextAlternative', 'resizeImage'],
+        toolbar: ['toggleImageCaption', 'imageTextAlternative', 'resizeImage']
     },
     table: {
-        contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
+        contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
     },
     codeBlock: {
         languages: Object.keys(languageSettings).map((key) => ({
             language: key,
-            label: languageSettings[key].label,
+            label: languageSettings[key].label
         })),
-        indentSequence: '    ',
+        indentSequence: '    '
     },
     translations: [coreTranslations],
-    language: 'de',
+    language: 'zh'
 };
 
 declare global {
     interface Window {
         createClassicEditor: (
             element: HTMLElement,
+            initialData: string,
             maxCharacters: number,
             imageUploadUrl: string,
-            csrfToken: string,
+            csrfToken: string
         ) => Promise<ClassicEditor>;
     }
 }
 
-window.createClassicEditor = async function (
+window.createClassicEditor = async function(
     element: HTMLElement,
+    initialData: string,
     maxCharacters: number,
     imageUploadUrl: string,
-    csrfToken: string,
+    csrfToken: string
 ) {
-    return ClassicEditor.create(element, {
+    return ClassicEditor.create({
+        attachTo: element,
         licenseKey: 'GPL',
-        placeholder: 'Sharing makes oneself grow~',
+        root: {
+            initialData: initialData,
+            placeholder: 'Sharing helps you grow.',
+            label: 'Main content'
+        },
         // Editor configuration.
         wordCount: {
             onUpdate: (stats) => {
@@ -219,23 +227,26 @@ window.createClassicEditor = async function (
                 // update character count in HTML element
                 characterCounter.forEach((element) => {
                     element.textContent = `${stats.characters} / ${maxCharacters}`;
-                    // If the character count is approaching the limit
+                    // If the character count is approaching the limit,
                     // add the class 'text-yellow-500' to the 'wordsBox' element to turn the text yellow
                     element.classList.toggle('text-yellow-500', isCloseToLimit);
-                    // If the character count exceeds the limit
+                    // If the character count exceeds the limit,
                     // add the class 'text-red-400' to the 'wordsBox' element to turn the text red
                     element.classList.toggle('text-red-400', isLimitExceeded);
                 });
-            },
+            }
         },
         simpleUpload: {
             // The URL that the images are uploaded to.
             uploadUrl: imageUploadUrl,
 
-            // laravel sanctum need csrf token to authenticate
+            // Enable the XMLHttpRequest.withCredentials property.
+            withCredentials: true,
+
+            // laravel sanctum needs csrf token to authenticate
             headers: {
-                'X-CSRF-TOKEN': csrfToken,
-            },
-        },
+                'X-CSRF-TOKEN': csrfToken
+            }
+        }
     });
 };

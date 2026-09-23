@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\Setting;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 use function Laravel\Prompts\select;
 
@@ -28,7 +29,7 @@ class ChangeRegisterSettingCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $role = select(
             'Allow guests to register?',
@@ -42,5 +43,9 @@ class ChangeRegisterSettingCommand extends Command
             Setting::where('key', 'allow_register')->update(['value' => 'false']);
             $this->info('Guests cannot register');
         }
+
+        Cache::forget('setting:allow_register');
+
+        return self::SUCCESS;
     }
 }

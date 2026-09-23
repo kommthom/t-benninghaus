@@ -1,5 +1,10 @@
 import { createHighlighter, type Highlighter } from 'shiki';
 import { languageSettings } from './config.js';
+import {
+    transformerNotationDiff,
+    transformerNotationHighlight,
+    transformerRemoveNotationEscape
+} from '@shikijs/transformers';
 
 declare global {
     interface Window {
@@ -14,8 +19,8 @@ let template: HTMLTemplateElement | null = null;
 async function getHighlighter(): Promise<Highlighter> {
     if (!highlighter) {
         highlighter = await createHighlighter({
-            langs: Object.keys(languageSettings),
-            themes: ['one-light', 'one-dark-pro'],
+            langs: Object.keys(languageSettings).filter((lang) => lang !== 'mermaid'),
+            themes: ['one-light', 'one-dark-pro']
         });
     }
 
@@ -24,7 +29,7 @@ async function getHighlighter(): Promise<Highlighter> {
 
 async function highlightElement(
     preElement: HTMLPreElement,
-    highlighter: Highlighter,
+    highlighter: Highlighter
 ) {
     if (preElement.classList.contains('shiki-highlighted')) {
         return;
@@ -37,9 +42,14 @@ async function highlightElement(
     }
 
     const langClass = Array.from(codeElement.classList).find((c) =>
-        c.startsWith('language-'),
+        c.startsWith('language-')
     );
     const lang = langClass ? langClass.replace('language-', '') : 'text';
+
+    if (lang === 'mermaid') {
+        return;
+    }
+
     const code = codeElement.innerText;
 
     try {
@@ -47,14 +57,19 @@ async function highlightElement(
             lang,
             themes: {
                 light: 'one-light',
-                dark: 'one-dark-pro',
+                dark: 'one-dark-pro'
             },
             colorReplacements: {
                 // Change background color
                 'one-light': {
-                    '#fafafa': '#f3f4f6',
-                },
+                    '#fafafa': '#f3f4f6'
+                }
             },
+            transformers: [
+                transformerNotationDiff(),
+                transformerNotationHighlight(),
+                transformerRemoveNotationEscape()
+            ]
         });
 
         if (!template) {
@@ -77,7 +92,7 @@ async function highlightAllInElement(htmlElement: HTMLElement): Promise<void> {
     const highlighter = await getHighlighter();
 
     let preElements = htmlElement.querySelectorAll(
-        'pre:not(.shiki-highlighted)',
+        'pre:not(.shiki-highlighted)'
     ) as NodeListOf<HTMLPreElement>;
 
     for (const preElement of preElements) {
@@ -88,13 +103,13 @@ async function highlightAllInElement(htmlElement: HTMLElement): Promise<void> {
 window.highlightAllInElement = highlightAllInElement;
 
 async function highlightObserver(
-    htmlElement: HTMLElement,
+    htmlElement: HTMLElement
 ): Promise<MutationObserver> {
     const highlighter = await getHighlighter();
 
     let observer = new MutationObserver(async () => {
         let preElements = htmlElement.querySelectorAll(
-            'pre:not(.shiki-highlighted)',
+            'pre:not(.shiki-highlighted)'
         ) as NodeListOf<HTMLPreElement>;
 
         for (const preElement of preElements) {
@@ -105,8 +120,8 @@ async function highlightObserver(
     observer.observe(htmlElement, {
         childList: true,
         subtree: true,
-        attributes: true,
-        characterData: false,
+        attributes: false,
+        characterData: false
     });
 
     return observer;

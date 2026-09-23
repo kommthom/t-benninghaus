@@ -1,11 +1,12 @@
-import Tagify, { ChangeEventData } from '@yaireo/tagify';
+import Tagify from "@yaireo/tagify";
+import "@yaireo/tagify/dist/tagify.css";
+import "../css/custom-tagify.css";
 
 declare global {
     interface Window {
         createTagify: (
             element: HTMLInputElement,
             whitelist: Tagify.TagData[],
-            callbackOnChange: (event: CustomEvent<ChangeEventData>) => void,
         ) => Tagify;
     }
 }
@@ -13,7 +14,6 @@ declare global {
 window.createTagify = function (
     element: HTMLInputElement,
     whitelist: Tagify.TagData[],
-    callbackOnChange: (event: CustomEvent<ChangeEventData>) => void,
 ) {
     return new Tagify(element, {
         whitelist: whitelist,
@@ -24,14 +24,10 @@ window.createTagify = function (
             enabled: 0,
             maxItems: 5,
             // place the dropdown near the typed text
-            position: 'text',
+            position: "text",
             // keep the dropdown open after selecting a suggestion
             closeOnSelect: false,
             highlightFirst: true,
-        },
-        callbacks: {
-            // binding the value of the tag input to the livewire attribute 'tags'
-            change: callbackOnChange,
         },
     });
 };

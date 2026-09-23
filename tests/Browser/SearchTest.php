@@ -1,0 +1,39 @@
+<?php
+
+use App\Models\Post;
+
+test('user can search posts by title', function () {
+    Post::factory()->create([
+        'title'   => 'this is a news',
+        'excerpt' => 'this is a news excerpt',
+    ]);
+
+    $page = $this->visit(route('posts.index'));
+
+    $page->click('#search-button')
+        ->type('#search-box', 'news')
+        ->assertSeeIn('#search-result', 'this is a news excerpt');
+});
+
+test('user can search posts by body', function () {
+    Post::factory()->create([
+        'title' => 'post title',
+        'body'  => 'this is a post body containing keyword',
+    ]);
+
+    $page = $this->visit(route('posts.index'));
+
+    $page->click('#search-button')
+        ->type('#search-box', 'keyword')
+        ->assertSeeIn('#search-result', 'post title');
+});
+
+test('user can see no result message if there are no results for the search query', function () {
+    $page = $this->visit(route('posts.index'));
+
+    $page->click('#search-button')
+        ->type('#search-box', 'nonexistentkeyword')
+        ->assertSeeIn('#search-result', 'Sorry...no related articles found.')
+        ->assertSeeIn('#search-result', 'nonexistentkeyword')
+        ->assertSeeIn('#search-result', '" Related Articles');
+});

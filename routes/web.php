@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\User\DestroyUserController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Head\Enums\OgType;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,11 +32,17 @@ Route::middleware('auth')->prefix('/users')->group(function () {
 });
 
 Route::middleware('auth')->prefix('/settings/users')->group(function () {
-    Route::livewire('/{id}/edit', 'pages::settings.users.edit')->name('settings.users.edit');
-    Route::livewire('/{id}/destroy', 'pages::settings.users.destroy')->name('settings.users.destroy');
+    Route::livewire('/{id}/edit', 'pages::settings.users.edit')
+        ->name('settings.users.edit')
+        ->withHead(title: __('Member Center - Edit Profile'));
+
+    Route::livewire('/{id}/destroy', 'pages::settings.users.destroy')
+        ->name('settings.users.destroy')
+        ->withHead(title: __('Member Center - Delete Account'));
 
     Route::livewire('/{id}/password/edit', 'pages::settings.users.password.edit')
-        ->name('settings.users.password.edit');
+        ->name('settings.users.password.edit')
+        ->withHead(title: __('Member Center - Change Password'));
 
     Route::livewire('/{id}/passkeys/edit', 'pages::settings.users.passkeys.edit')
         ->name('settings.users.passkeys.edit');
@@ -43,21 +50,31 @@ Route::middleware('auth')->prefix('/settings/users')->group(function () {
 
 // Article list and content
 Route::prefix('/posts')->group(function () {
-    Route::livewire('/', 'pages::posts.index')->name('posts.index');
+    Route::livewire('/', 'pages::posts.index')
+        ->name('posts.index')
+        ->withHead(title: __('All articles'));
 
     Route::middleware(['auth', 'verified'])->group(function () {
-        Route::livewire('/create', 'pages::posts.create')->name('posts.create');
-        Route::livewire('/{id}/edit', 'pages::posts.edit')->name('posts.edit');
+        Route::livewire('/create', 'pages::posts.create')
+            ->name('posts.create')
+            ->withHead(title: __('Add Article'));
+
+        Route::livewire('/{id}/edit', 'pages::posts.edit')
+            ->name('posts.edit')
+            ->withHead(title: __('Edit Article'));
     });
 
     // The question mark in {slug?} means that the parameter is optional
-    Route::livewire('/{id}/{slug?}', 'pages::posts.show')->name('posts.show');
+    Route::livewire('/{id}/{slug?}', 'pages::posts.show')
+        ->name('posts.show')
+        ->withHead(og: ['type' => OgType::Article]);
 });
 
 // Notification list
 Route::livewire('/notifications', 'pages::notifications.index')
     ->middleware('auth')
-    ->name('notifications.index');
+    ->name('notifications.index')
+    ->withHead(title: __('My Notifications'));
 
 // Article category
 Route::livewire('/categories/{id}/{name?}', 'pages::categories.show')

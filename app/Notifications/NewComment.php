@@ -15,18 +15,24 @@ class NewComment extends Notification implements ShouldQueue
 
     public function __construct(protected Comment $comment) {}
 
+    /**
+     * @return array<int, string>
+     */
     public function via(object $notifiable): array
     {
-        // Benachrichtigungskanal šffnen
+        // Channels with notifications enabled
         return ['database'];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toDatabase(object $notifiable): array
     {
         $post = $this->comment->post;
         $link = route('comments.show', ['id' => $this->comment->id]);
 
-        // In der Datenbank gespeicherte Daten
+        // Data stored in the database
         return [
             'comment_id' => $this->comment->id,
             'post_link' => $link,

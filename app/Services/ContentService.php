@@ -10,10 +10,12 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 class ContentService
 {
+    private const string IMAGE_PATTERN = '/\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_[a-zA-Z0-9]+\.(jpg|jpeg|png|bmp|gif|webp)/u';
+
     /**
      * Generate slug titles for SEO optimization
      *
-     * @param  string  $title Title
+     * @param  string  $title title
      */
     public static function getSlug(string $title): string
     {
@@ -58,6 +60,8 @@ class ContentService
 
     /**
      * Get the link to the image in the article
+     *
+     * @return list<string>
      */
     public static function getImagesInContent(string $body): array
     {
@@ -66,11 +70,9 @@ class ContentService
         $imageList = [];
 
         foreach ($dom->getElementsByTagName('img') as $img) {
-            $pattern = '/\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_[a-zA-Z0-9]+\.(jpeg|png|jpg|gif|svg)/u';
-
             $imageName = basename($img->getAttribute('src'));
 
-            if (preg_match($pattern, $imageName)) {
+            if (preg_match(self::IMAGE_PATTERN, $imageName)) {
                 $imageList[] = $imageName;
             }
         }
@@ -91,7 +93,7 @@ class ContentService
      */
     public static function getReadTime(string $body): int
     {
-        if (in_array(trim($body), ['', '0'], true)) {
+        if (trim($body) === '') {
             return 1;
         }
 

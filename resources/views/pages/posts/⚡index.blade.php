@@ -4,29 +4,22 @@ declare(strict_types=1);
 
 use Livewire\Component;
 
-new class extends Component {
-    public function render()
-    {
-        $title = Route::currentRouteName() === 'root' ? config('app.name') : __('All articles');
-
-        return $this->view()->title($title);
-    }
-};
+new class extends Component {};
 ?>
 
 <x-layouts.main>
-  {{-- List of articles --}}
-  <div class="container mx-auto grow">
-    <div class="mx-auto grid max-w-3xl grid-cols-3 gap-6 px-2 lg:px-0 xl:max-w-5xl">
-      <div class="col-span-3 xl:col-span-2">
-        {{-- List of articles --}}
-        <livewire:posts.list />
-      </div>
+    {{-- List of articles --}}
+    <div class="container mx-auto grow">
+        <div class="mx-auto grid max-w-3xl grid-cols-3 gap-6 px-2 lg:px-0 xl:max-w-5xl">
+            <div class="col-span-3 xl:col-span-2">
+                {{-- List of articles --}}
+                <livewire:posts.list />
+            </div>
 
-      <div class="hidden xl:col-span-1 xl:block">
-        {{-- article list sidebar --}}
-        <livewire:posts.home-sidebar />
-      </div>
+            <div class="hidden xl:col-span-1 xl:block">
+                {{-- article list sidebar --}}
+                <livewire:posts.home-sidebar />
+            </div>
+        </div>
     </div>
-  </div>
 </x-layouts.main>

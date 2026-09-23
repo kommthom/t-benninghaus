@@ -5,7 +5,6 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Services\ContentService;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 
 use function Pest\Laravel\get;
@@ -56,7 +55,7 @@ describe('create post', function () {
                 'id'   => 1,
                 'slug' => $contentService->getSlug($title),
             ]))
-            ->assertDispatched('toast', status: 'success', message: 'Successfully added article!');
+            ->assertDispatched('toast', status: 'success', message: 'Successfully added article! ');
 
         $post = Post::latest()->first();
 
@@ -102,7 +101,7 @@ describe('create post', function () {
             ->assertHasErrors(['title' => 'max:100']);
     });
 
-    test('body at least 5 characters', function () {
+    test('body at least 500 characters', function () {
         loginAsUser();
 
         Livewire::test('pages::posts.create', [
@@ -110,9 +109,9 @@ describe('create post', function () {
         ])
             ->set('form.title', str()->random(4))
             ->set('form.category_id', Category::pluck('id')->random())
-            ->set('form.body', str()->random(4))
+            ->set('form.body', str()->random(499))
             ->call('save')
-            ->assertHasErrors(['body' => 'min:5']);
+            ->assertHasErrors(['body' => 'min:500']);
     });
 
     test('body at most 20000 characters', function () {
@@ -126,46 +125,6 @@ describe('create post', function () {
             ->set('form.body', str()->random(20001))
             ->call('save')
             ->assertHasErrors(['body' => 'max:20000']);
-    });
-
-    it('can check image type', function () {
-        $file = UploadedFile::fake()->create('document.pdf', 512);
-
-        Livewire::test('posts.upload-preview-image')
-            ->set('image', $file)
-            ->assertHasErrors('image');
-    });
-
-    it('can check image size', function () {
-        $file = UploadedFile::fake()->image('image.jpg')->size(1025);
-
-        Livewire::test('posts.upload-preview-image')
-            ->set('image', $file)
-            ->assertHasErrors('image');
-    });
-
-    it('can upload image', function () {
-        Storage::fake();
-
-        $image = UploadedFile::fake()->image('fake_image.jpg');
-
-        Livewire::test('posts.upload-preview-image')
-            ->set('image', $image)
-            ->assertHasNoErrors()
-            ->assertSeeHtml('id="image-url"');
-
-        expect(Storage::disk()->allFiles())->not->toBeEmpty();
-    });
-
-    it('can\'t upload a non-image', function () {
-        Storage::fake();
-
-        $file = UploadedFile::fake()->create('document.pdf', 512);
-
-        Livewire::test('posts.upload-preview-image')
-            ->set('image', $file)
-            ->assertHasErrors('image')
-            ->assertDontSeeHtml('id="upload-image"');
     });
 
     it('can get auto save key property', function () {
@@ -214,12 +173,13 @@ describe('create post', function () {
             ->toBe([
                 'category_id' => $categoryId,
                 'is_private'  => false, // default value
-                'preview_url' => null,
+                'cover_image_url' => null,
                 'title'       => $title,
                 'tags'        => $tags,
                 'body'        => $body,
             ]);
     });
+
 
     it('can get data from cache', function () {
         $user = loginAsUser();
@@ -247,12 +207,12 @@ describe('create post', function () {
             json_encode([
                 'category_id' => $categoryId,
                 'is_private'  => false,
-                'preview_url' => null,
+                'cover_image_url' => null,
                 'title'       => $title,
                 'tags'        => $tags,
                 'body'        => $body,
             ], JSON_UNESCAPED_UNICODE),
-            now()->addDays(7)
+            now()->addMonth()
         );
 
         Livewire::test('pages::posts.create', [

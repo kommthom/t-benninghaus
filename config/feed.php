@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Post;
+
 return [
     'feeds' => [
         'main' => [
@@ -11,16 +13,16 @@ return [
              * You can also pass an argument to that method.  Note that their key must be the name of the parameter:
              * [App\Model::class, 'getAllFeedItems', 'parameterName' => 'argument']
              */
-            'items' => [App\Models\Post::class, 'getFeedItems'],
+            'items' => [Post::class, 'getFeedItems'],
 
             /*
              * The feed will be available on this url.
              */
             'url' => '/post/feed',
 
-            'title' => 'DocFunc',
-            'description' => 'Record the big and small things in life! ',
-            'language' => 'en',
+            'title' => 't-benninghaus.de',
+            'description' => 'Record the big and small things in life!',
+            'language' => 'en-US',
 
             /*
              * The image to display for the feed.  For Atom feeds, this is displayed as

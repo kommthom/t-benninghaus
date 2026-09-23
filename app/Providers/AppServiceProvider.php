@@ -7,8 +7,13 @@ namespace App\Providers;
 use App\Services\Serializer;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Head\Enums\OgType;
+use Laravel\Head\Enums\TwitterCard;
+use Laravel\Head\Facades\Head;
+use Laravel\Head\HeadBuilder;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(Serializer::class, function () {
             return Serializer::make();
         });
+
+        DevCommands::except('server');
     }
 
     /**
@@ -29,5 +36,17 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::shouldBeStrict();
         Date::use(CarbonImmutable::class);
+
+        Head::defaults(function (HeadBuilder $head) {
+            $head
+                ->title(config('app.name'))
+                ->description(config('app.name'))
+                ->og(type: OgType::Website, image: 'https://blob.t-benninghaus.de/share.webp', siteName: config('app.name'))
+                ->twitter(card: TwitterCard::SummaryWithLargeImage);
+        });
+
+        //if($this->app->environment('production')) {
+    	//	URL::forceScheme('https');
+	    //};
     }
 }

@@ -2,83 +2,78 @@
 
 declare(strict_types=1);
 
-use Livewire\Attributes\Title;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new class extends Component {
+new class extends Component
+{
     use WithPagination;
 
-    public function render()
-    {
-        auth()->user()->unreadNotifications->markAsRead();
+    public function render(
+        #[CurrentUser]
+        User $user
+    ) {
+        $user->unreadNotifications->markAsRead();
 
         return $this->view([
-            'notifications' => auth()->user()->notifications()->paginate(20),
-        ])->title(__('My Notifications'));
+            'notifications' => $user->notifications()->paginate(20),
+        ]);
     }
 };
 ?>
 
 {{-- Notification list --}}
 <x-layouts.main>
-  <div class="container mx-auto grow">
-    <div class="flex items-start justify-center px-4 xl:px-0">
+    <div class="container mx-auto grow">
+        <div class="flex items-start justify-center px-4 xl:px-0">
+            <div class="flex w-full flex-col items-center justify-center space-y-6 md:w-175">
+                {{-- page title --}}
+                <div class="flex items-center justify-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
+                    <x-icons.bell class="w-6" />
+                    <span class="ml-4">{{ __('My Notifications') }}</span>
+                </div>
 
-      <div class="flex w-full flex-col items-center justify-center space-y-6 md:w-[700px]">
-        {{-- page title --}}
-        <div class="flex items-center justify-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
-          <x-icons.bell class="w-6" />
-          <span class="ml-4">{{ __('My Notifications') }}</span>
-        </div>
+                {{-- Notification list --}}
+                @forelse ($notifications as $notification)
+                    <x-card
+                        class="flex w-full cursor-pointer flex-col justify-between md:flex-row"
+                        wire:key="notification-{{ $notification->id }}"
+                    >
+                        {{-- Notification content --}}
+                        <div class="flex w-full flex-col justify-between">
+                            {{-- Article title --}}
+                            <div class="mt-2 space-x-2 md:mt-0">
+                                <span class="dark:text-zinc-50">{{ __('In your article') }}</span>
+                                <a
+                                    class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-50"
+                                    href="{{ $notification->data['post_link'] }}"
+                                    wire:navigate
+                                >
+                                    {{ $notification->data['post_title'] }}
+                                </a>
+                                <span class="dark:text-zinc-50">{{ __('Having new words') }}</span>
+                            </div>
 
-        {{-- Notification list --}}
-        @forelse ($notifications as $notification)
-          <x-card
-            class="flex w-full cursor-pointer flex-col justify-between md:flex-row"
-            wire:key="notification-{{ $notification->id }}"
-          >
-            {{-- Notification content --}}
-            <div class="flex w-full flex-col justify-between">
-              {{-- Article title --}}
-              <div class="mt-2 space-x-2 md:mt-0">
+                            {{-- Notification time --}}
+                            <div class="mt-4 flex items-center text-sm text-zinc-400">
+                                <x-icons.clock class="w-4" />
+                                <span class="ml-2" title="{{ $notification->created_at }}">
+                                    {{ $notification->created_at->diffForHumans() }}
+                                </span>
+                            </div>
+                        </div>
+                    </x-card>
 
-                <span class="dark:text-zinc-50">{{ __('In your article') }}</span>
-                <a
-                  class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-50"
-                  href="{{ $notification->data['post_link'] }}"
-                  wire:navigate
-                >
-                  {{ $notification->data['post_title'] }}
-                </a>
-                <span class="dark:text-zinc-50">{{ __('Having new words') }}</span>
-              </div>
+                @empty
+                    <x-card class="flex h-24 w-full items-center justify-center dark:text-zinc-50">
+                        <span>{{ __('No notifications!') }}</span>
+                    </x-card>
+                @endforelse
 
-              {{-- Notification time --}}
-              <div class="mt-4 flex items-center text-sm text-zinc-400">
-                <x-icons.clock class="w-4" />
-                <span
-                  class="ml-2"
-                  title="{{ $notification->created_at }}"
-                >
-                  {{ $notification->created_at->diffForHumans() }}
-                </span>
-              </div>
+                <div>{{ $notifications->links() }}</div>
             </div>
-
-          </x-card>
-
-        @empty
-          <x-card class="flex h-24 w-full items-center justify-center dark:text-zinc-50">
-            <span>{{ __('No notifications!') }}</span>
-          </x-card>
-        @endforelse
-
-        <div>
-          {{ $notifications->links() }}
         </div>
-      </div>
-
     </div>
-  </div>
 </x-layouts.main>

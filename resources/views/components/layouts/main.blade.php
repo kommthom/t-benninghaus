@@ -1,14 +1,12 @@
 <div
-  class="relative selection:bg-emerald-300 selection:text-emerald-900 dark:selection:bg-indigo-300 dark:selection:text-indigo-900"
-  {{ $attributes }}
+    class="selection:bg-emerald-300 selection:text-emerald-900 dark:selection:bg-indigo-300 dark:selection:text-indigo-900"
+    {{ $attributes }}
 >
-  <x-layouts.background />
+    <div class="flex min-h-screen flex-col">
+        <livewire:layouts.header />
 
-  <div class="flex min-h-screen flex-col">
-    <livewire:layouts.header />
+        {{ $slot }}
+    </div>
 
-    {{ $slot }}
-  </div>
-
-  <x-layouts.footer />
+    <x-layouts.footer />
 </div>

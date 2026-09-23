@@ -5,13 +5,16 @@ declare(strict_types=1);
 use App\Livewire\Forms\CommentForm;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\User;
 use App\Notifications\NewComment;
 use App\Rules\Captcha;
 use App\Traits\MarkdownConverter;
+use Illuminate\Container\Attributes\CurrentUser;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
-new class extends Component {
+new class extends Component
+{
     use MarkdownConverter;
 
     public CommentForm $form;
@@ -23,17 +26,18 @@ new class extends Component {
 
     public bool $previewIsEnable = false;
 
-    public function mount(): void
+    public function mount(#[CurrentUser] ?User $user): void
     {
+        $this->currentUser = $user;
         $this->form->post_id = $this->postId;
-        $this->form->user_id = auth()->id();
+        $this->form->user_id = $user?->id;
     }
 
-    public function save(): void
+    public function save(#[CurrentUser] ?User $user): void
     {
         $this->validate(
             rules: [
-                'captchaToken' => ['required', new Captcha()],
+                'captchaToken' => ['required', new Captcha],
             ],
             messages: [
                 'captchaToken.required' => __('Incomplete verification'),
@@ -43,7 +47,7 @@ new class extends Component {
         // If the post has already been deleted.
         $post = Post::find(id: $this->postId, columns: ['id', 'user_id']);
 
-        if (!$post) {
+        if (! $post) {
             $this->dispatch(event: 'toast', status: 'danger', message: __('Unable to reply! The article has been deleted!'));
 
             $this->redirect(url: route('posts.index'), navigate: true);
@@ -55,7 +59,7 @@ new class extends Component {
         if ($this->form->parent_id) {
             $parentIsExists = Comment::query()->whereId($this->form->parent_id)->wherePostId($post->id)->exists();
 
-            if (!$parentIsExists) {
+            if (! $parentIsExists) {
                 $this->dispatch(event: 'toast', status: 'danger', message: __('Unable to reply! Message has been deleted!'));
 
                 return;
@@ -67,19 +71,19 @@ new class extends Component {
         // Notify the article author of new comments.
         $post->user->notifyNewComment(new NewComment($comment));
 
-        $listName = $comment->parent_id === null ? 'root-list' : 'comment-' . $comment->parent_id . '-children-list';
+        $listName = $comment->parent_id === null ? 'root-list' : 'comment-'.$comment->parent_id.'-children-list';
 
         $this->dispatch(
-            event: 'create-comment-in-' . $listName,
+            event: 'create-comment-in-'.$listName,
             comment: [
-                'id' => $comment->id,
-                'user_id' => $comment->user_id,
-                'body' => $comment->body,
-                'created_at' => $comment->created_at->toDateTimeString(),
-                'updated_at' => $comment->updated_at->toDateTimeString(),
-                'user_name' => auth()->check() ? auth()->user()->name : null,
-                'user_gravatar_url' => auth()->check() ? get_gravatar(auth()->user()->email) : null,
-                'children_count' => 0,
+                'id'                => $comment->id,
+                'user_id'           => $comment->user_id,
+                'body'              => $comment->body,
+                'created_at'        => $comment->created_at->toDateTimeString(),
+                'updated_at'        => $comment->updated_at->toDateTimeString(),
+                'user_name'         => $user?->name,
+                'user_gravatar_url' => $user !== null ? get_gravatar($user->email) : null,
+                'children_count'    => 0,
             ],
         );
 
@@ -91,171 +95,153 @@ new class extends Component {
 ?>
 
 @assets
-  @vite('resources/ts/markdown-helper.ts')
+    @vite('resources/ts/markdown-helper.ts')
 @endassets
 
-@script
-  <script>
+<script>
     Alpine.data('commentsCreateModalPart', () => ({
-      modal: {
-        isOpen: false,
-        isSubmitEnabled: false,
-        replyTo: '',
-      },
-      captcha: {
-        siteKey: @js(config('services.captcha.site_key')),
-      },
-      openModal(event) {
-        this.$wire.$set('form.parent_id', event.detail.parentId);
+        modal: {
+            isOpen: false,
+            isSubmitEnabled: false,
+            replyTo: '',
+        },
+        openModal(event) {
+            this.$wire.$set('form.parent_id', event.detail.parentId);
 
-        this.modal.replyTo = event.detail.replyTo;
-        this.modal.isOpen = true;
+            this.modal.replyTo = event.detail.replyTo;
+            this.modal.isOpen = true;
 
-        this.$nextTick(() => this.$refs.createCommentTextarea?.focus());
-      },
-      tabToFourSpaces,
-      replyToLabel() {
-        return `Reply ${this.modal.replyTo}'s message`;
-      },
-      submit() {
-        this.$wire.save().then(() => {
-          this.modal.isOpen = false;
-        });
-      },
-      init() {
-        turnstile.ready(() => {
-          turnstile.render(this.$refs.turnstileBlock, {
-            sitekey: this.captcha.siteKey,
-            callback: (token) => {
-              this.$wire.captchaToken = token;
-              this.modal.isSubmitEnabled = true;
-            }
-          });
-        });
-      }
+            this.$nextTick(() => this.$refs.createCommentTextarea?.focus());
+        },
+        tabToFourSpaces(event) {
+            window.tabToFourSpaces?.(event);
+        },
+        replyToLabel() {
+            return `Reply ${this.modal.replyTo}'s comment`;
+        },
+        submit() {
+            this.$wire.save().then(() => {
+                if (this.$wire.$errors.isEmpty()) {
+                    this.modal.isOpen = false;
+                }
+            });
+        },
+        init() {
+            turnstile.ready(() => {
+                turnstile.render(this.$refs.turnstileBlock, {
+                    sitekey: this.$refs.turnstileBlock.dataset.siteKey,
+                    callback: (token) => {
+                        this.$wire.captchaToken = token;
+                        this.modal.isSubmitEnabled = true;
+                    },
+                });
+            });
+        },
     }));
-  </script>
-@endscript
+</script>
 
 <div
-  class="fixed inset-0 z-30 flex min-h-screen items-end justify-center"
-  x-data="commentsCreateModalPart"
-  x-cloak
-  x-show="modal.isOpen"
-  x-on:open-create-comment-modal.window="openModal"
-  x-on:keydown.escape.window="modal.isOpen = false"
+    class="fixed inset-0 z-30 flex min-h-screen items-end justify-center"
+    x-data="commentsCreateModalPart"
+    x-cloak
+    x-show="modal.isOpen"
+    x-on:open-create-comment-modal.window="openModal"
+    x-on:keydown.escape.window="modal.isOpen = false"
 >
-  {{-- gray background --}}
-  <div
-    class="fixed inset-0 bg-zinc-500/75 transition-opacity"
-    x-show="modal.isOpen"
-    x-transition.opacity
-  ></div>
+    {{-- gray background --}}
+    <div class="fixed inset-0 bg-zinc-500/75 transition-opacity" x-show="modal.isOpen" x-transition.opacity></div>
 
-  {{--  modal  --}}
-  <div
-    class="relative mx-2 w-full transform overflow-auto rounded-tl-xl rounded-tr-xl bg-zinc-50 p-5 transition-all md:max-w-2xl dark:bg-zinc-800"
-    x-show="modal.isOpen"
-    x-transition.origin.bottom.duration.300ms
-  >
-    {{-- close modal button --}}
-    <div class="absolute right-5 top-5">
-      <button
-        class="cursor-pointer text-zinc-400 hover:text-zinc-500 dark:hover:text-zinc-300"
-        type="button"
-        x-on:click="modal.isOpen = false"
-      >
-        <x-icons.x class="size-8" />
-      </button>
+    {{--  modal  --}}
+    <div
+        class="relative mx-2 w-full transform overflow-auto rounded-tl-xl rounded-tr-xl bg-zinc-50 p-5 transition-all md:max-w-2xl dark:bg-zinc-800"
+        x-show="modal.isOpen"
+        x-transition.origin.bottom.duration.300ms
+    >
+        {{-- close modal button --}}
+        <div class="absolute top-5 right-5">
+            <button
+                class="cursor-pointer text-zinc-400 hover:text-zinc-500 dark:hover:text-zinc-300"
+                type="button"
+                x-on:click="modal.isOpen = false"
+            >
+                <x-icons.x class="size-8" />
+            </button>
+        </div>
+
+        <div class="flex flex-col gap-5">
+            <div class="flex items-center justify-center space-x-2 text-2xl text-zinc-900 dark:text-zinc-50">
+                <x-icons.chat-dots class="w-8" />
+                <span>{{ __('Add New Comment') }}</span>
+            </div>
+
+            <div
+                class="w-full rounded-lg bg-zinc-200/60 px-4 py-2 dark:bg-zinc-700/60 dark:text-zinc-50"
+                x-cloak
+                x-show="modal.replyTo !== ''"
+                x-text="replyToLabel"
+            ></div>
+
+            <form class="space-y-6" x-on:submit.prevent="submit">
+                <x-auth-validation-errors :errors="$errors" />
+
+                <div class="space-y-2" wire:show="previewIsEnable">
+                    <div class="relative space-x-4">
+                        <span class="font-semibold dark:text-zinc-50">
+                            {{ auth()->check() ? auth()->user()->name : __('Visitor') }}
+                        </span>
+                        <span class="text-zinc-400">{{ now()->format(__('Y year m month d day')) }}</span>
+                    </div>
+
+                    <div class="rich-text h-80 overflow-auto">{!! $this->convertToHtml($this->form->body) !!}</div>
+
+                    <x-icons.animate-spin
+                        class="absolute top-1/2 left-1/2 w-10 -translate-x-1/2 -translate-y-1/2 dark:text-zinc-50"
+                        wire:loading.delay
+                        wire:target="form.body"
+                    />
+                </div>
+
+                <div wire:show="!previewIsEnable">
+                    <x-floating-label-textarea
+                        class="font-jetbrains-mono"
+                        id="create-comment-body"
+                        x-ref="createCommentTextarea"
+                        {{-- change tab into 4 spaces --}}
+                        x-on:keydown.tab.prevent="tabToFourSpaces"
+                        wire:model="form.body"
+                        rows="12"
+                        placeholder="{{ __('Write your message here! **Supports Markdown**') }}"
+                        required
+                    />
+                </div>
+
+                <div
+                    class="hidden"
+                    data-site-key="{{ config('services.captcha.site_key') }}"
+                    wire:ignore
+                    x-ref="turnstileBlock"
+                ></div>
+
+                <div class="flex items-center justify-between space-x-3">
+                    <x-toggle-switch
+                        id="create-comment-modal-preview"
+                        wire:model.live="previewIsEnable"
+                        x-bind:disabled="$wire.form.body === ''"
+                    >
+                       {{ __('Preview') }}
+                    </x-toggle-switch>
+
+                    <x-button id="create-comment-submit-button" x-bind:disabled="modal.isSubmitEnabled === false">
+                        <x-icons.reply-fill class="mr-2 w-5" x-cloak x-show="modal.isSubmitEnabled" />
+                        <x-icons.animate-spin
+                            class="mr-2 h-5 w-5 text-zinc-50"
+                            x-cloak
+                            x-show="modal.isSubmitEnabled === false"
+                        />
+                        <span x-text="modal.isSubmitEnabled ? {{ '\'' . __('Reply') . '\''}} : {{ '\'' . __('Verifying') . '\'' }}"></span>
+                    </x-button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="flex flex-col gap-5">
-      <div class="flex items-center justify-center space-x-2 text-2xl text-zinc-900 dark:text-zinc-50">
-        <x-icons.chat-dots class="w-8" />
-        <span>{{ __('Add New Comment') }}</span>
-      </div>
-
-      <div
-        class="w-full rounded-lg bg-zinc-200/60 px-4 py-2 dark:bg-zinc-700/60 dark:text-zinc-50"
-        x-cloak
-        x-show="modal.replyTo !== ''"
-        x-text="replyToLabel"
-      ></div>
-
-      <form
-        class="space-y-6"
-        x-on:submit.prevent="submit"
-      >
-        <x-auth-validation-errors :errors="$errors" />
-
-        <div
-          class="space-y-2"
-          wire:show="previewIsEnable"
-        >
-          <div class="relative space-x-4">
-            <span class="font-semibold dark:text-zinc-50">
-              {{ auth()->check() ? auth()->user()->name : __('Visitor') }}
-            </span>
-            <span class="text-zinc-400">{{ now()->format(__('Y year m month d day')) }}</span>
-          </div>
-          <div class="rich-text h-80 overflow-auto">
-            {!! $this->convertToHtml($this->form->body) !!}
-          </div>
-
-          <x-icons.animate-spin
-            class="absolute left-1/2 top-1/2 hidden w-10 -translate-x-1/2 -translate-y-1/2 dark:text-zinc-50"
-            wire:loading.class.remove="hidden"
-            wire:target="form.body"
-          />
-        </div>
-
-        <div wire:show="!previewIsEnable">
-          <x-floating-label-textarea
-            class="font-jetbrains-mono"
-            id="create-comment-body"
-            x-ref="createCommentTextarea"
-            {{-- change tab into 4 spaces --}}
-            x-on:keydown.tab.prevent="tabToFourSpaces"
-            wire:model="form.body"
-            rows="12"
-            placeholder="{{ __('Write your message here! **Supports Markdown**') }}"
-            required
-          />
-        </div>
-
-        <div
-          class="hidden"
-          x-ref="turnstileBlock"
-          wire:ignore
-        ></div>
-
-        <div class="flex items-center justify-between space-x-3">
-          <x-toggle-switch
-            id="create-comment-modal-preview"
-            wire:model.live="previewIsEnable"
-            x-bind:disabled="$wire.form.body === ''"
-          >
-            {{ __('Preview') }}
-          </x-toggle-switch>
-
-          <x-button
-            id="create-comment-submit-button"
-            x-bind:disabled="modal.isSubmitEnabled === false"
-          >
-            <x-icons.reply-fill
-              class="mr-2 w-5"
-              x-cloak
-              x-show="modal.isSubmitEnabled"
-            />
-            <x-icons.animate-spin
-              class="mr-2 h-5 w-5 text-zinc-50"
-              x-cloak
-              x-show="modal.isSubmitEnabled === false"
-            />
-            <span x-text="modal.isSubmitEnabled ? {{ '\'' . __('Reply') . '\''}} : {{ '\'' . __('Verifying') . '\'' }}"></span>
-          </x-button>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>

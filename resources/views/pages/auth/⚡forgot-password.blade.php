@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Password;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Forgot password')] class extends Component {
+new class extends Component
+{
     public string $email = '';
 
     public function sendPasswordResetLink(): void
@@ -23,56 +23,53 @@ new #[Title('Forgot password')] class extends Component {
 ?>
 
 <x-layouts.auth>
-  <div class="fixed left-5 top-5">
-    <a
-      class="flex items-center text-2xl text-zinc-400 transition duration-150 ease-in hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-50"
-      href="{{ route('login') }}"
-      wire:navigate
-    >
-      <x-icons.arrow-left-circle class="w-6" />
-      <span class="ml-2">{{ __('Back to Login') }}</span>
-    </a>
-  </div>
-
-  <div class="container mx-auto">
-    <div class="flex min-h-screen flex-col items-center justify-center px-4">
-      {{-- page title --}}
-      <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
-        <x-icons.question-circle class="w-6" />
-        <span class="ml-4">{{ __('Forgot password') }}</span>
-      </div>
-
-      <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
-        <div class="text-zinc-600 dark:text-zinc-50">
-          {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-        </div>
-
-        {{-- Session status message --}}
-        <x-auth-session-status :status="session('status')" />
-
-        {{-- validate error message --}}
-        <x-auth-validation-errors :errors="$errors" />
-
-        <form wire:submit="sendPasswordResetLink">
-
-          {{-- mailbox --}}
-          <x-floating-label-input
-            name="email"
-            type="text"
-            :id="'email'"
-            :placeholder="'__('Email')'"
-            required
-            autofocus
-            wire:model="email"
-          />
-
-          <div class="mt-6 flex items-center justify-end">
-            <x-button>
-              {{ __('Email Password Reset Link') }}
-            </x-button>
-          </div>
-        </form>
-      </x-card>
+    <div class="fixed top-5 left-5">
+        <a
+            class="flex items-center text-2xl text-zinc-400 transition duration-150 ease-in hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-50"
+            href="{{ route('login') }}"
+            wire:navigate
+        >
+            <x-icons.arrow-left-circle class="w-6" />
+            <span class="ml-2">{{ __('Back to Login') }}</span>
+        </a>
     </div>
-  </div>
+
+    <div class="container mx-auto">
+        <div class="flex min-h-screen flex-col items-center justify-center px-4">
+            {{-- page title --}}
+            <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
+                <x-icons.question-circle class="w-6" />
+                <span class="ml-4">{{ __('Forgot password') }}</span>
+            </div>
+
+            <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
+                <div class="text-zinc-600 dark:text-zinc-50">
+                    {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+                </div>
+
+                {{-- Session status message --}}
+                <x-auth-session-status :status="session('status')" />
+
+                {{-- validate error message --}}
+                <x-auth-validation-errors :errors="$errors" />
+
+                <form wire:submit="sendPasswordResetLink">
+                    {{-- mailbox --}}
+                    <x-floating-label-input
+                        name="email"
+                        type="text"
+                        :id="'email'"
+                        :placeholder="'__('Email')'"
+                        required
+                        autofocus
+                        wire:model="email"
+                    />
+
+                    <div class="mt-6 flex items-center justify-end">
+                        <x-button> {{ __('Email Password Reset Link') }} </x-button>
+                    </div>
+                </form>
+            </x-card>
+        </div>
+    </div>
 </x-layouts.auth>

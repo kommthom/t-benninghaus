@@ -41,8 +41,8 @@ trait MarkdownConverter
             $environment->addEventListener(DocumentParsedEvent::class, function (DocumentParsedEvent $event) {
                 $walker = $event->getDocument()->walker();
 
-                while ($event = $walker->next()) {
-                    $node = $event->getNode();
+                while ($walkerEvent = $walker->next()) {
+                    $node = $walkerEvent->getNode();
 
                     if ($node instanceof Heading) {
                         $paragraph = new Paragraph;
@@ -64,7 +64,7 @@ trait MarkdownConverter
         } catch (CommonMarkException $e) {
             Log::error($e->getMessage());
 
-            return '<p class="text-red-400">Oops！Markdown 轉換錯誤</p>';
+            return '<p class="text-red-400">Oops！Markdown Conversion error</p>';
         }
     }
 }

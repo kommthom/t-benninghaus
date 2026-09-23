@@ -9,10 +9,10 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Register')] class extends Component {
+new class extends Component
+{
     public string $name = '';
 
     public string $email = '';
@@ -28,13 +28,13 @@ new #[Title('Register')] class extends Component {
      */
     public function register(): void
     {
-        abort_if(!SettingService::isRegisterAllowed(), 503);
+        abort_if(! SettingService::isRegisterAllowed(), 503);
 
         $validated = $this->validate([
-            'name' => ['required', 'string', 'regex:/^[A-Za-z0-9\-\_\s]+$/u', 'between:3,25', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()],
-            'captchaToken' => ['required', new Captcha()],
+            'name'         => ['required', 'string', 'regex:/^[A-Za-z0-9\-\_\s]+$/u', 'between:3,25', 'unique:users'],
+            'email'        => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'     => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()],
+            'captchaToken' => ['required', new Captcha],
         ]);
 
         $validated['name'] = trim($validated['name']);
@@ -50,132 +50,119 @@ new #[Title('Register')] class extends Component {
 };
 ?>
 
-@script
-  <script>
+<script>
     Alpine.data('authRegisterPage', () => ({
-      submitIsEnabled: false,
-      captchaSiteKey: @js(config('services.captcha.site_key')),
-      submitIsDisabled() {
-        return this.submitIsEnabled === false;
-      },
-      informationOnSubmitButton() {
-        return this.submitIsEnabled ? 'Register' : 'Verifying';
-      },
-      init() {
-        turnstile.ready(() => {
-          turnstile.render(this.$refs.turnstileBlock, {
-            sitekey: this.captchaSiteKey,
-            callback: (token) => {
-              this.$wire.$set('captchaToken', token);
-              this.submitIsEnabled = true;
-            }
-          });
-        });
-      }
+        submitIsEnabled: false,
+        submitIsDisabled() {
+            return this.submitIsEnabled === false;
+        },
+        informationOnSubmitButton() {
+            return this.submitIsEnabled ? 'Register' : 'Verifying';
+        },
+        init() {
+            turnstile.ready(() => {
+                turnstile.render(this.$refs.turnstileBlock, {
+                    sitekey: this.$refs.turnstileBlock.dataset.siteKey,
+                    callback: (token) => {
+                        this.$wire.$set('captchaToken', token);
+                        this.submitIsEnabled = true;
+                    },
+                });
+            });
+        },
     }));
-  </script>
-@endscript
+</script>
 
 <x-layouts.auth x-data="authRegisterPage">
-  <div class="fixed left-5 top-5">
-    <a
-      class="flex items-center text-2xl text-zinc-400 transition duration-150 ease-in hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-50"
-      href="{{ route('login') }}"
-      wire:navigate
-    >
-      <x-icons.arrow-left-circle class="w-6" />
-      <span class="ml-2">{{ __('Back to Login') }}</span>
-    </a>
-  </div>
-
-  <div class="container mx-auto">
-    <div class="flex min-h-screen flex-col items-center justify-center px-4">
-      {{-- page title --}}
-      <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
-        <x-icons.person-plus class="w-6" />
-        <span class="ml-4">{{ __('Registration') }}</span>
-      </div>
-
-      <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
-
-        {{-- validate error message --}}
-        <x-auth-validation-errors :errors="$errors" />
-
-        <form
-          id="register"
-          wire:submit="register"
+    <div class="fixed top-5 left-5">
+        <a
+            class="flex items-center text-2xl text-zinc-400 transition duration-150 ease-in hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-50"
+            href="{{ route('login') }}"
+            wire:navigate
         >
-          {{-- member name --}}
-          <x-floating-label-input
-            id="name"
-            type="text"
-            value="{{ old('name') }}"
-            placeholder="{{ __('Member Name (can only use English letters, numbers, _, or -)') }}"
-            required
-            autofocus
-            wire:model="name"
-          />
-
-          {{-- mailbox --}}
-          <x-floating-label-input
-            class="mt-6"
-            id="email"
-            type="text"
-            value="{{ old('email') }}"
-            placeholder="{{ __('Email') }}"
-            required
-            wire:model="email"
-          />
-
-          {{-- Password --}}
-          <x-floating-label-input
-            class="mt-6"
-            id="password"
-            type="password"
-            placeholder="{{ __('Password') }}"
-            required
-            wire:model="password"
-          />
-
-          {{-- Confirm Password --}}
-          <x-floating-label-input
-            class="mt-6"
-            id="password_confirmation"
-            type="password"
-            placeholder="{{ __('Confirm Password') }}"
-            required
-            wire:model="password_confirmation"
-          />
-
-          <div
-            class="hidden"
-            wire:ignore
-            x-ref="turnstileBlock"
-          ></div>
-
-          <div class="mt-6 flex items-center justify-end">
-            <a
-              class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-50"
-              href="{{ route('login') }}"
-              wire:navigate
-            >
-              {{ __('Already registered?') }}
-            </a>
-
-            <x-button
-              class="ml-4"
-              x-bind:disabled="submitIsDisabled"
-            >
-              <x-icons.animate-spin
-                class="mr-2 h-5 w-5 text-zinc-50"
-                x-cloak
-                x-show="submitIsDisabled"
-              />
-              <span x-text="informationOnSubmitButton"></span>
-            </x-button>
-          </div>
-        </form>
-      </x-card>
+            <x-icons.arrow-left-circle class="w-6" />
+            <span class="ml-2">{{ __('Back to Login') }}</span>
+        </a>
     </div>
-  </div>
+
+    <div class="container mx-auto">
+        <div class="flex min-h-screen flex-col items-center justify-center px-4">
+            {{-- page title --}}
+            <div class="flex items-center fill-current text-2xl text-zinc-700 dark:text-zinc-50">
+                <x-icons.person-plus class="w-6" />
+                <span class="ml-4">{{ __('Register') }}</span>
+            </div>
+
+            <x-card class="mt-4 w-full space-y-6 overflow-hidden sm:max-w-md">
+                {{-- validate error message --}}
+                <x-auth-validation-errors :errors="$errors" />
+
+                <form id="register" wire:submit="register">
+                    {{-- member name --}}
+                    <x-floating-label-input
+                        id="name"
+                        type="text"
+                        value="{{ old('name') }}"
+                        placeholder="{{ __('Member Name (can only use English letters, numbers, _, or -)') }}"
+                        required
+                        autofocus
+                        wire:model="name"
+                    />
+
+                    {{-- mailbox --}}
+                    <x-floating-label-input
+                        class="mt-6"
+                        id="email"
+                        type="text"
+                        value="{{ old('email') }}"
+                        placeholder="{{ __('Email') }}"
+                        required
+                        wire:model="email"
+                    />
+
+                    {{-- Password --}}
+                    <x-floating-label-input
+                        class="mt-6"
+                        id="password"
+                        type="password"
+                        placeholder="{{ __('Password') }}"
+                        required
+                        wire:model="password"
+                    />
+
+                    {{-- Confirm Password --}}
+                    <x-floating-label-input
+                        class="mt-6"
+                        id="password_confirmation"
+                        type="password"
+                        placeholder="{{ __('Confirm Password') }}"
+                        required
+                        wire:model="password_confirmation"
+                    />
+
+                    <div
+                        class="hidden"
+                        data-site-key="{{ config('services.captcha.site_key') }}"
+                        wire:ignore
+                        x-ref="turnstileBlock"
+                    ></div>
+
+                    <div class="mt-6 flex items-center justify-end">
+                        <a
+                            class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-50"
+                            href="{{ route('login') }}"
+                            wire:navigate
+                        >
+                            {{ __('Already registered?') }}
+                        </a>
+
+                        <x-button class="ml-4" x-bind:disabled="submitIsDisabled">
+                            <x-icons.animate-spin class="mr-2 h-5 w-5 text-zinc-50" x-cloak x-show="submitIsDisabled" />
+                            <span x-text="informationOnSubmitButton"></span>
+                        </x-button>
+                    </div>
+                </form>
+            </x-card>
+        </div>
+    </div>
 </x-layouts.auth>

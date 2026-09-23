@@ -1,209 +1,248 @@
 <?php
 
-use App\Models\Comment;
 use App\Models\Post;
-use App\Models\User;
+use App\Models\Tag;
 
-test('comment form can be submitted', function () {
-    $user = loginAsUser();
+test('user can see post outline', function () {
+    $body = <<<'HTML'
+    <h2>This is post-title 1</h2>
+    <p>This is post-body 1</p>
+    <h2>This is post-title 2</h2>
+    <p>This is post-body 2</p>
+    HTML;
+
+
     $post = Post::factory()->create([
-        'user_id' => $user->id,
+        'body' => $body,
     ]);
 
     $page = $this->visit($post->link_with_slug);
 
-    $message = 'Hello World! This is my first comment.';
-
-    $page->click('Add New Comment')
-        ->fill('create-comment-body', $message)
-        ->click('#create-comment-submit-button')
-        ->assertSee($message);
-
-    $message = 'Hello World! This is my second comment.';
-
-    $page->click('Add New Comment')
-        ->fill('create-comment-body', $message)
-        ->click('#create-comment-submit-button')
-        ->assertSee($message);
-
-    $message = 'Hello World! This is my third comment.';
-
-    $page->click('Add New Comment')
-        ->fill('create-comment-body', $message)
-        ->click('#create-comment-submit-button')
-        ->assertSee($message);
+    $page->assertSee('catalogue')
+        ->assertSeeLink('This is post-title 1')
+        ->assertSeeLink('This is post-title 2');
 });
 
-test('after the user clicks the load more button, they can see more replies', function () {
-    $post = Post::factory()->create();
+test('user cannot see post outline, if there is no heading', function () {
+    $body = <<<'HTML'
+    <p>This is a post-body</p>
+    HTML;
 
-    $comment = Comment::factory()->create([
-        'post_id' => $post->id,
-    ]);
-
-    $bodyOne = 'Hello World! This is my first comment.';
-    $bodyTwo = 'Hello World! This is my second comment.';
-    $bodyThree = 'Hello World! This is my third comment.';
-
-    Comment::factory()->create([
-        'body'      => $bodyOne,
-        'parent_id' => $comment->id,
-    ]);
-
-    Comment::factory()->create([
-        'body'      => $bodyTwo,
-        'parent_id' => $comment->id,
-    ]);
-
-    Comment::factory()->create([
-        'body'      => $bodyThree,
-        'parent_id' => $comment->id,
+    $post = Post::factory()->create([
+        'body' => $body,
     ]);
 
     $page = $this->visit($post->link_with_slug);
 
-    $page
-        ->click($comment->children()->count().' Then reply')
-        ->assertSee($bodyOne)
-        ->assertSee($bodyTwo)
-        ->assertSee($bodyThree);
+    $page->assertDontSee('catalogue');
 });
 
-test('orders root comments by popular, then by latest and oldest when changed', function () {
+test('right scroll indicator appears when a code block overflows horizontally', function () {
+    // a monospace line >150 chars is wider than the 768px center column
+    $longLine = str_repeat('echo("aaaaaaaaaaaaaaaa"); ', 12);
+
+    $body = <<<HTML
+    <pre><code class="language-php">{$longLine}</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+    $page->assertSee($post->title);
+
+    // Shiki highlight + fonts.ready + ResizeObserver all need to settle
+    // before the indicator opacity flips, so poll instead of guessing a wait().
+    $opacity = $page->script(<<<'JS'
+        new Promise((resolve) => {
+            const deadline = Date.now() + 5000;
+            const check = () => {
+                const el = document.querySelector('.scroll-indicator-right');
+                if (el && el.style.opacity === '1') {
+                    return resolve('1');
+                }
+                if (Date.now() > deadline) {
+                    return resolve(el ? el.style.opacity : 'missing');
+                }
+                requestAnimationFrame(check);
+            };
+            check();
+        })
+    JS
+    );
+
+    expect($opacity)->toBe('1');
+});
+
+test('scroll indicators flip as the user scrolls a code block', function () {
+    $longLine = str_repeat('echo("aaaaaaaaaaaaaaaa"); ', 12);
+
+    $body = <<<HTML
+    <pre><code class="language-php">{$longLine}</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+    $page->assertSee($post->title);
+
+    // wait for fonts AND for the right indicator to flip to '1'.
+    // Returns the indicator opacity so we can fail fast if it never settled.
+    $ready = $page->script(<<<'JS'
+        new Promise(async (resolve) => {
+            await document.fonts.ready;
+            const deadline = Date.now() + 5000;
+            const check = () => {
+                const right = document.querySelector('.scroll-indicator-right');
+                if (right && right.style.opacity === '1') return resolve('1');
+                if (Date.now() > deadline) return resolve(right ? right.style.opacity : 'missing');
+                requestAnimationFrame(check);
+            };
+            check();
+        })
+    JS
+    );
+    expect($ready)->toBe('1');
+
+    // scroll to the far right (999999 → browser clamps to true max scroll)
+    $state = $page->script(<<<'JS'
+        new Promise((resolve) => {
+            const pre = document.querySelector('pre.shiki');
+            pre.addEventListener('scroll', () => {
+                requestAnimationFrame(() => {
+                    resolve({
+                        left: document.querySelector('.scroll-indicator-left').style.opacity,
+                        right: document.querySelector('.scroll-indicator-right').style.opacity,
+                    });
+                });
+            }, { once: true });
+            pre.scrollLeft = 999999;
+        })
+    JS
+    );
+
+    // at the far right: left indicator visible, right indicator hidden
+    expect($state)->toMatchArray(['left' => '1', 'right' => '0']);
+});
+
+test('ckeditor and tagify are visible on create page after the spinner clears', function () {
+    loginAsUser();
+
+    $page = visit(route('posts.create'));
+
+    // "Article Private" sits inside x-show="isReady", which only flips on
+    // after both ckeditor-ready and tagify-ready events fire. assertSee
+    // will retry until the spinner is gone and the form is shown.
+    $page->assertSee('Article Private');
+
+    // Confirm both libraries actually mounted into the DOM.
+    $hasCkeditor = $page->script('!!document.querySelector(".ck-editor")');
+    $hasTagify = $page->script('!!document.querySelector("tags.tagify")');
+
+    expect($hasCkeditor)->toBeTrue();
+    expect($hasTagify)->toBeTrue();
+});
+
+test('ckeditor and tagify are visible on edit page after the spinner clears', function () {
     $user = loginAsUser();
-    $post = Post::factory()->create(['user_id' => $user->id]);
+    $post = Post::factory()
+        ->hasAttached(Tag::factory()->count(2))
+        ->create(['user_id' => $user->id]);
 
-    // Create three root comments with deterministic bodies
-    $c1 = Comment::factory()->create([
-        'post_id'    => $post->id,
-        'body'       => 'C1 - oldest',
-        'created_at' => now()->subMinutes(3),
-    ]);
+    $page = visit(route('posts.edit', ['id' => $post->id]));
 
-    $c2 = Comment::factory()->create([
-        'post_id'    => $post->id,
-        'body'       => 'C2 - middle',
-        'created_at' => now()->subMinutes(2),
-    ]);
+    $page->assertSee('Article Private');
 
-    $c3 = Comment::factory()->create([
-        'post_id'    => $post->id,
-        'body'       => 'C3 - newest',
-        'created_at' => now()->subMinute(),
-    ]);
+    $hasCkeditor = $page->script('!!document.querySelector(".ck-editor")');
+    $hasTagify = $page->script('!!document.querySelector("tags.tagify")');
 
-    // Popularity: C2 has 2 replies, C1 has 1 reply, C3 has 0
-    Comment::factory()->count(2)->create(['parent_id' => $c2->id, 'post_id' => $post->id]);
-    Comment::factory()->count(1)->create(['parent_id' => $c1->id, 'post_id' => $post->id]);
-
-    $page = $this->visit($post->link_with_slug);
-
-    function commentCardSelector(int $order): string
-    {
-        return 'div[data-test-id="comments.root-list"] > :nth-child('.$order.' of div[data-test-id="comments.card"])';
-    }
-
-    // Default on the board is POPULAR
-    // Maybe we can use general sibling combinator (~) to avoid position flakiness
-    // Expect: C2 before C1, and C1 before C3
-    $page
-        // Also confirm each specific card is present
-        ->assertSeeIn(commentCardSelector(1), 'C2 - middle')
-        ->assertSeeIn(commentCardSelector(2), 'C1 - oldest')
-        ->assertSeeIn(commentCardSelector(3), 'C3 - newest');
-
-    // Change to Latest (From New to Old)
-    $page->click('[data-test-id="comments.order.toggle"]')
-        ->click('[data-test-id="comments.order.option"][ data-order-value="latest"]')
-        // Presence checks
-        ->assertSeeIn(commentCardSelector(1), 'C3 - newest')
-        ->assertSeeIn(commentCardSelector(2), 'C2 - middle')
-        ->assertSeeIn(commentCardSelector(3), 'C1 - oldest');
-
-    // Change to Oldest (From Old to New)
-    $page->click('[data-test-id="comments.order.toggle"]')
-        ->click('[data-test-id="comments.order.option"][data-order-value="oldest"]')
-        // Presence checks
-        ->assertSeeIn(commentCardSelector(1), 'C1 - oldest')
-        ->assertSeeIn(commentCardSelector(2), 'C2 - middle')
-        ->assertSeeIn(commentCardSelector(3), 'C3 - newest');
+    expect($hasCkeditor)->toBeTrue();
+    expect($hasTagify)->toBeTrue();
 });
 
-test('children replies load in pages and the load more button hides when finished', function () {
-    $post = Post::factory()->create();
+test('reading progress bar starts at 0 and advances as user scrolls', function () {
+    // long body so the post is taller than the viewport
+    $body = str_repeat('<p>'.fake()->paragraph(20).'</p>', 30);
 
-    $parent = Comment::factory()->create([
-        'post_id' => $post->id,
-        'body'    => 'Parent comment for pagination',
-    ]);
-
-    // Create > PER_PAGE (10) children: 15
-    $bodies = collect(range(1, 15))->map(fn ($i) => "Child #{$i}");
-    foreach ($bodies as $body) {
-        Comment::factory()->create([
-            'post_id'   => $post->id,
-            'parent_id' => $parent->id,
-            'body'      => $body,
-        ]);
-    }
+    $post = Post::factory()->create(['body' => $body]);
 
     $page = $this->visit($post->link_with_slug);
 
-    // Open children list
-    $page->click('15 Replies');
+    // assertSee on the title naturally waits for the isReady gate to flip
+    // (title sits inside x-show="isReady"), so by the time this passes,
+    // setupProgressBar has run on a laid-out section.
+    $page->assertSee($post->title)
+        ->assertAttribute('[role=progressbar]', 'aria-valuenow', '0');
 
-    // After first open (loads 10), the "Show More Replies" button should be visible
-    $page->assertSee('Show More Replies');
+    // scroll halfway down and let the scroll handler fire
+    $page->script('window.scrollTo(0, document.documentElement.scrollHeight / 2)');
+    $page->wait(1);
 
-    // Load remaining children
-    $page->click('[data-test-id="comments.children.load-more"]');
+    $progress = (int) $page->script(
+        'document.querySelector("[role=progressbar]").getAttribute("aria-valuenow")'
+    );
 
-    // Button hides when no more
-    $page->assertDontSee('Show More Replies');
-
-    // Spot-check that both early and late children are visible
-    $page->assertSee('Child #1')
-        ->assertSee('Child #15');
+    expect($progress)->toBeGreaterThan(0);
 });
 
-test('replying to a root comment shows reply-to label and renders under that parent', function () {
-    $author = loginAsUser();
-    $post = Post::factory()->create(['user_id' => $author->id]);
+test('it renders mermaid svg diagram, provides zoom button, and opens zoom modal', function () {
+    $body = <<<'HTML'
+    <p>Diagram below:</p>
+    <pre><code class="language-mermaid">graph TD;
+        A-->B;
+        A-->C;
+        B-->D;
+        C-->D;</code></pre>
+    HTML;
 
-    // Create a root comment by another user with a known name
-    $targetUser = User::factory()->create(['name' => 'Xiao Ming']);
-    Comment::factory()->create([
-        'post_id' => $post->id,
-        'user_id' => $targetUser->id,
-        'body'    => 'Root from Xiao Ming',
-    ]);
+    $post = Post::factory()->create(['body' => $body]);
 
     $page = $this->visit($post->link_with_slug);
 
-    // Open reply modal via the parent's Reply button
-    $text = "Reply to Xiao Ming's comment";
-    $page->click('Reply')
-        ->assertSee("Reply to Xiao Ming's comment")
-        ->fill('create-comment-body', "Hi Xiao Ming, I\'m here to reply to you")
-        ->click('#create-comment-submit-button')
-        ->assertSee("Hi Xiao Ming, I\'m here to reply to you");
+    $page->assertNoJavascriptErrors()
+        ->assertSee($post->title)
+        ->assertPresent('.mermaid-diagram-container svg')
+        ->assertPresent('.mermaid-diagram-container button[aria-label="Zoom diagram"]')
+        ->assertNotPresent('pre > code.language-mermaid');
+
+    $page->click('.mermaid-diagram-container button[aria-label="Zoom diagram"]');
+
+    $page->assertPresent('#zoom-in-mermaid-modal')
+        ->assertPresent('#zoom-in-mermaid svg');
 });
 
-test('editing own comment updates content and shows edited flag', function () {
-    $user = loginAsUser();
-    $post = Post::factory()->create(['user_id' => $user->id]);
+test('it re-renders mermaid diagram when theme changes', function () {
+    $body = <<<'HTML'
+    <pre><code class="language-mermaid">graph TD;
+        A-->B;</code></pre>
+    HTML;
 
-    Comment::factory()->create([
-        'post_id' => $post->id,
-        'user_id' => $user->id,
-        'body'    => 'Original content',
-    ]);
+    $post = Post::factory()->create(['body' => $body]);
 
     $page = $this->visit($post->link_with_slug);
 
-    $page->click('[data-test-id="comments.card.edit"]')
-        ->fill('edit-comment-body', 'Updated content')
-        ->click('Update')
-        ->assertSee('Updated content')
-        ->assertSee('(Edited');
+    $page->assertSee($post->title)
+        ->assertPresent('.mermaid-diagram-container svg');
+
+    // Switch theme to dark
+    $page->script(<<<'JS'
+        document.documentElement.setAttribute('data-theme', 'dark');
+    JS);
+
+    $page->wait(1);
+
+    $page->assertPresent('.mermaid-diagram-container svg');
+});
+
+test('it renders friendly error message when mermaid syntax is invalid', function () {
+    $body = <<<'HTML'
+    <pre><code class="language-mermaid">invalid_syntax_definitely_not_mermaid</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertSee($post->title)
+        ->assertPresent('.mermaid-error')
+        ->assertSee('Error rendering diagram:');
 });

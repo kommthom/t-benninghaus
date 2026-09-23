@@ -9,19 +9,19 @@ const X_CIRCLE_FILL_ICON_SVG: string = `
 const SHOW_BACKGROUND_BACKDROP_CLASS_NAME: string[] = [
     'ease-out',
     'duration-300',
-    'opacity-100',
+    'opacity-100'
 ];
 const HIDE_BACKGROUND_BACKDROP_CLASS_NAME: string[] = [
     'ease-in',
     'duration-200',
-    'opacity-0',
+    'opacity-0'
 ];
 const SHOW_MODAL_PANEL_CLASS_NAME: string[] = [
     'ease-out',
     'duration-300',
     'opacity-100',
     'translate-y-0',
-    'sm:scale-100',
+    'sm:scale-100'
 ];
 const HIDE_MODAL_PANEL_CLASS_NAME: string[] = [
     'ease-in',
@@ -29,7 +29,7 @@ const HIDE_MODAL_PANEL_CLASS_NAME: string[] = [
     'opacity-0',
     'translate-y-4',
     'sm:translate-y-0',
-    'sm:scale-95',
+    'sm:scale-95'
 ];
 
 export class Modal {
@@ -39,33 +39,38 @@ export class Modal {
     private closeButton: HTMLButtonElement;
     private abortController: AbortController;
     private readonly scrollbarWidth: number;
+    private isOpen: boolean = false;
 
     public constructor(
         id: string,
         innerHtml: string,
-        customClassName: string[] = [],
+        customClassName: string[] = []
     ) {
-        this.element = document.createElement('div');
+        const element = document.getElementById(id);
+        if (element) {
+            this.element = element as HTMLDivElement;
+        } else {
+            this.element = document.createElement('div');
+            this.element.id = id;
+            this.element.style.display = 'none';
+            this.element.innerHTML = this.innerHtmlTemplate(
+                innerHtml,
+                customClassName
+            );
 
-        this.element.id = id;
-        this.element.style.display = 'none';
-        this.element.innerHTML = this.innerHtmlTemplate(
-            innerHtml,
-            customClassName,
-        );
-
-        document.body.appendChild(this.element);
+            document.body.appendChild(this.element);
+        }
 
         this.backgroundBackdrop = this.element.getElementsByClassName(
-            BACKGROUND_BACKDROP_CLASS_NAME,
+            BACKGROUND_BACKDROP_CLASS_NAME
         )[0] as HTMLDivElement;
 
         this.modalPanel = this.element.getElementsByClassName(
-            MODAL_PANEL_CLASS_NAME,
+            MODAL_PANEL_CLASS_NAME
         )[0] as HTMLDivElement;
 
         this.closeButton = this.element.getElementsByClassName(
-            CLOSE_MODAL_BUTTON_CLASS_NAME,
+            CLOSE_MODAL_BUTTON_CLASS_NAME
         )[0] as HTMLButtonElement;
 
         this.scrollbarWidth = window.innerWidth - document.body.clientWidth;
@@ -75,16 +80,16 @@ export class Modal {
 
     private innerHtmlTemplate(
         innerHtml: string,
-        customClassName: string[],
+        customClassName: string[]
     ): string {
-        return `<div class="relative z-30 ${customClassName.join(' ')}">
+        return `<div class="relative z-30 ${customClassName.join(' ')}" role="dialog" aria-modal="true">
             <!-- Background backdrop, show/hide based on modal state -->
             <div
                 class="${BACKGROUND_BACKDROP_CLASS_NAME} fixed inset-0 bg-zinc-500/75 backdrop-blur-md transition-opacity ${HIDE_BACKGROUND_BACKDROP_CLASS_NAME.join(' ')}"
             ></div>
 
-            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-                <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <div class="overflow-y-auto fixed inset-0 z-10 w-screen">
+                <div class="flex justify-center items-center p-4 min-h-full text-center">
                     <!-- Modal panel, show/hide based on modal state. -->
                     <div
                         class="${MODAL_PANEL_CLASS_NAME} relative transform overflow-hidden rounded-xl text-left transition-all sm:w-fit sm:max-w-6xl ${HIDE_MODAL_PANEL_CLASS_NAME.join(' ')}"
@@ -94,10 +99,12 @@ export class Modal {
                 </div>
             </div>
 
-            <div class="fixed right-10 top-10 z-10">
+            <div class="fixed top-10 right-10 z-10">
                 <button
                     type="button"
                     class="${CLOSE_MODAL_BUTTON_CLASS_NAME} text-zinc-200 transition duration-300 hover:text-zinc-50 cursor-pointer"
+                    aria-label="closure"
+                    title="closure"
                 >
                    ${X_CIRCLE_FILL_ICON_SVG}
                 </button>
@@ -110,6 +117,11 @@ export class Modal {
     }
 
     public open() {
+        if (this.isOpen) {
+            return;
+        }
+        this.isOpen = true;
+
         this.element.style.display = 'block';
         document.documentElement.style.overflow = 'hidden';
         document.documentElement.style.paddingRight = `${this.scrollbarWidth}px`;
@@ -117,10 +129,10 @@ export class Modal {
         this.triggerReflow();
 
         this.backgroundBackdrop.classList.remove(
-            ...HIDE_BACKGROUND_BACKDROP_CLASS_NAME,
+            ...HIDE_BACKGROUND_BACKDROP_CLASS_NAME
         );
         this.backgroundBackdrop.classList.add(
-            ...SHOW_BACKGROUND_BACKDROP_CLASS_NAME,
+            ...SHOW_BACKGROUND_BACKDROP_CLASS_NAME
         );
         this.modalPanel.classList.remove(...HIDE_MODAL_PANEL_CLASS_NAME);
         this.modalPanel.classList.add(...SHOW_MODAL_PANEL_CLASS_NAME);
@@ -133,7 +145,7 @@ export class Modal {
     private setupCloseHandlers() {
         // Close by clicking the backdrop
         this.element.addEventListener('click', () => this.close(), {
-            signal: this.abortController.signal,
+            signal: this.abortController.signal
         });
 
         // Prevent closing when clicking modal content
@@ -142,7 +154,7 @@ export class Modal {
             (event: Event) => {
                 event.stopPropagation();
             },
-            { signal: this.abortController.signal },
+            { signal: this.abortController.signal }
         );
 
         // Close by escape key
@@ -153,11 +165,16 @@ export class Modal {
                     this.close();
                 }
             },
-            { signal: this.abortController.signal },
+            { signal: this.abortController.signal }
         );
     }
 
     private close() {
+        if (!this.isOpen) {
+            return;
+        }
+        this.isOpen = false;
+
         // Abort all event listeners
         this.abortController.abort();
         // Create a new controller for next time
@@ -172,14 +189,14 @@ export class Modal {
                     document.documentElement.style.paddingRight = '';
                 }
             },
-            { once: true },
+            { once: true }
         );
 
         this.backgroundBackdrop.classList.remove(
-            ...SHOW_BACKGROUND_BACKDROP_CLASS_NAME,
+            ...SHOW_BACKGROUND_BACKDROP_CLASS_NAME
         );
         this.backgroundBackdrop.classList.add(
-            ...HIDE_BACKGROUND_BACKDROP_CLASS_NAME,
+            ...HIDE_BACKGROUND_BACKDROP_CLASS_NAME
         );
         this.modalPanel.classList.remove(...SHOW_MODAL_PANEL_CLASS_NAME);
         this.modalPanel.classList.add(...HIDE_MODAL_PANEL_CLASS_NAME);
@@ -188,6 +205,10 @@ export class Modal {
     }
 
     public remove() {
+        this.isOpen = false;
+        document.documentElement.style.overflow = '';
+        document.documentElement.style.paddingRight = '';
+        this.abortController.abort();
         this.element.remove();
     }
 }

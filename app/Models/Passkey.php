@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\PasskeyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Passkey extends Model
 {
-    /** @use HasFactory<\Database\Factories\PasskeyFactory> */
+    /** @use HasFactory<PasskeyFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -25,6 +26,9 @@ class Passkey extends Model
         'last_used_at' => 'datetime',
     ];
 
+    /**
+     * @return MorphTo<Model, $this>
+     */
     public function owner(): MorphTo
     {
         return $this->morphTo();

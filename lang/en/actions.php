@@ -91,7 +91,7 @@ return [
     'settings'        => 'Settings',
     'show'            => 'Show',
     'show_all'        => 'Show All',
-    'sign_in'         => 'Sign In',
+    'sign_in'         => 'Log In',
     'solve'           => 'Solve',
     'start'           => 'Start',
     'stop'            => 'Stop',

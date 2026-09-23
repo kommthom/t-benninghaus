@@ -15,23 +15,29 @@ test('comment form can be submitted', function () {
     $message = 'Hello World! This is my first comment.';
 
     $page->click('Add New Comment')
-        ->fill('create-comment-body', $message)
+        ->assertVisible('#create-comment-body')
+        ->fill('#create-comment-body', $message)
+        ->assertEnabled('#create-comment-submit-button')
         ->click('#create-comment-submit-button')
-        ->assertSee($message);
+        ->waitForText($message);
 
     $message = 'Hello World! This is my second comment.';
 
     $page->click('Add New Comment')
-        ->fill('create-comment-body', $message)
+        ->assertVisible('#create-comment-body')
+        ->fill('#create-comment-body', $message)
+        ->assertEnabled('#create-comment-submit-button')
         ->click('#create-comment-submit-button')
-        ->assertSee($message);
+        ->waitForText($message);
 
     $message = 'Hello World! This is my third comment.';
 
     $page->click('Add New Comment')
-        ->fill('create-comment-body', $message)
+        ->assertVisible('#create-comment-body')
+        ->fill('#create-comment-body', $message)
+        ->assertEnabled('#create-comment-submit-button')
         ->click('#create-comment-submit-button')
-        ->assertSee($message);
+        ->waitForText($message);
 });
 
 test('after the user clicks the load more button, they can see more replies', function () {
@@ -64,7 +70,7 @@ test('after the user clicks the load more button, they can see more replies', fu
 
     $page
         ->click($comment->children()->count().' Reply')
-        ->assertSee($bodyOne)
+        ->waitForText($bodyOne)
         ->assertSee($bodyTwo)
         ->assertSee($bodyThree);
 });
@@ -112,17 +118,24 @@ test('orders root comments by popular, then by latest and oldest when changed', 
         ->assertSeeIn(commentCardSelector(2), 'C1 - oldest')
         ->assertSeeIn(commentCardSelector(3), 'C3 - newest');
 
-    // Change to Latest (由新到舊)
+    // Change to Latest (from newest to oldest)
     $page->click('[data-test-id="comments.order.toggle"]')
+        ->assertVisible('[data-test-id="comments.order.option"][data-order-value="latest"]')
         ->click('[data-test-id="comments.order.option"][data-order-value="latest"]')
+        ->waitForText('C3 - newest')
         // Presence checks
         ->assertSeeIn(commentCardSelector(1), 'C3 - newest')
         ->assertSeeIn(commentCardSelector(2), 'C2 - middle')
         ->assertSeeIn(commentCardSelector(3), 'C1 - oldest');
 
-    // Change to Oldest (由舊到新)
+    // Wait for the page is ready
+    $page->wait(1);
+
+    // Change to Oldest (from Old to New)
     $page->click('[data-test-id="comments.order.toggle"]')
+        ->assertVisible('[data-test-id="comments.order.option"][data-order-value="oldest"]')
         ->click('[data-test-id="comments.order.option"][data-order-value="oldest"]')
+        ->waitForText('C1 - oldest')
         // Presence checks
         ->assertSeeIn(commentCardSelector(1), 'C1 - oldest')
         ->assertSeeIn(commentCardSelector(2), 'C2 - middle')
@@ -150,13 +163,15 @@ test('children replies load in pages and the load more button hides when finishe
     $page = $this->visit($post->link_with_slug);
 
     // Open children list
-    $page->click('15 Replies');
+    $page->click('15 Replies')
+        ->waitForText('Show more replies');
 
     // After first open (loads 10), the "Show more replies" button should be visible
     $page->assertSee('Show more replies');
 
     // Load remaining children
-    $page->click('[data-test-id="comments.children.load-more"]');
+    $page->click('[data-test-id="comments.children.load-more"]')
+        ->assertMissing('[data-test-id="comments.children.load-more"]');
 
     // Button hides when no more
     $page->assertDontSee('Show more replies');
@@ -182,7 +197,7 @@ test('replying to a root comment shows reply-to label and renders under that par
 
     // Open reply modal via the parent's Reply button
     $page->click('Reply')
-        ->assertSee('reply to Xiao Ming\'s message')
+        ->assertSee('reply to Xiao Ming\'s comment')
         ->fill('create-comment-body', 'Hi Xiao Ming, I\'m here to reply to you')
         ->click('#create-comment-submit-button')
         ->assertSee('Hi Xiao Ming, I\'m here to reply to you');
@@ -201,7 +216,7 @@ test('editing own comment updates content and shows edited flag', function () {
     $page = $this->visit($post->link_with_slug);
 
     $page->click('[data-test-id="comments.card.edit"]')
-        ->fill('edit-comment-body', 'Updated content')
+        ->fill('#edit-comment-body', 'Updated content')
         ->click('Updated')
         ->assertSee('Updated content')
         ->assertSee('(Edited)');

@@ -65,7 +65,7 @@ describe('home page', function () {
         $tagOneJsonString = Tag::query()
             ->where('id', 1)
             ->get()
-            ->map(fn($tag) => ['id' => $tag->id, 'value' => $tag->name])
+            ->map(fn ($tag) => ['id' => $tag->id, 'value' => $tag->name])
             ->toJson(JSON_UNESCAPED_UNICODE);
 
         $tagOnePost->tags()->attach(
@@ -217,45 +217,43 @@ describe('home page', function () {
             ->assertStatus(403);
     });
 
-    it('displays the preview image', function () {
+    it('displays the cover image', function () {
         $post = Post::factory()->create();
 
         get($post->link_with_slug)
             ->assertStatus(200)
-            ->assertSee($post->preview_url);
+            ->assertSee($post->cover_image_url);
     });
 
     it('displays the default preview, assuming the preview is not set', function () {
         $post = Post::factory()->create([
-            'preview_url' => '',
+            'cover_image_url' => '',
         ]);
-
-        $defaultPreviewUrl = 'https://blobs.docfunc.com/share.jpg';
 
         get($post->link_with_slug)
             ->assertStatus(200)
-            ->assertSee($defaultPreviewUrl);
+            ->assertSee('https://blobs.docfunc.com/share.webp');
     });
 
-    test('not showing the thumbnail on top of the post', function () {
+    test('not showing the cover image on top of the post', function () {
         $post = Post::factory()->create([
-            'preview_url' => '',
+            'cover_image_url' => '',
         ]);
 
         get($post->link_with_slug)
             ->assertOk()
-            ->assertDontSee('post-thumbnail');
+            ->assertDontSee('post-cover-image');
     });
 
-    it('displays the thumbnail on top of the post', function () {
+    it('displays the cover image on top of the post', function () {
         $post = Post::factory()->create([
-            'preview_url' => 'https://example.com/preview.jpg',
+            'cover_image_url' => 'https://example.com/preview.jpg',
         ]);
 
         get($post->link_with_slug)
             ->assertOk()
-            ->assertSee('post-thumbnail')
-            ->assertSee($post->preview_url);
+            ->assertSee('post-cover-image')
+            ->assertSee($post->cover_image_url);
     });
 
     it('reset the page if order is changed', function () {

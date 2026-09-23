@@ -8,7 +8,8 @@ use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new class extends Component {
+new class extends Component
+{
     use MarkdownConverter;
     use WithPagination;
 
@@ -42,70 +43,56 @@ new class extends Component {
 };
 ?>
 
-@script
-  <script>
+<script>
     Alpine.data('usersCommentsPart', () => ({
-      observers: [],
-      async init() {
-        await highlightAllInElement(this.$root);
+        observers: [],
+        async init() {
+            await highlightAllInElement(this.$root);
 
-        let userCommentsObserver = await highlightObserver(this.$root)
-
-        this.observers.push(userCommentsObserver);
-      },
-      destroy() {
-        this.observers.forEach((observer) => {
-          observer.disconnect();
-        });
-      }
+            let userCommentsObserver = await highlightObserver(this.$root);
+            this.observers.push(userCommentsObserver);
+        },
+        destroy() {
+            this.observers.forEach((observer) => {
+                observer.disconnect();
+            });
+        },
     }));
-  </script>
-@endscript
+</script>
 
 {{-- Member Message --}}
-<div
-  class="w-full space-y-6"
-  x-data="usersCommentsPart"
-  x-ref="userComments"
->
-  @forelse ($comments as $comment)
-    <x-dashed-card
-      class="group relative"
-      wire:key="comment-{{ $comment->id }}"
-    >
-      <a
-        class="absolute right-0 top-0 z-10 block h-full w-full bg-transparent"
-        href="{{ route('comments.show', ['id' => $comment->id]) }}"
-        wire:navigate
-      ></a>
+<div class="w-full space-y-6" x-data="usersCommentsPart" x-ref="userComments">
+    @forelse ($comments as $comment)
+        <x-dashed-card class="comment-card group relative" wire:key="comment-{{ $comment->id }}">
+            <a
+                class="absolute top-0 right-0 z-10 block h-full w-full bg-transparent"
+                href="{{ route('comments.show', ['id' => $comment->id]) }}"
+                wire:navigate
+            ></a>
 
-      <div class="mask-b-from-50% max-h-64 overflow-hidden">
-        <span class="group-gradient-underline-grow text-xl dark:text-zinc-50">
-          {{ $comment->post->title }}
-        </span>
+            <div class="max-h-64 overflow-hidden mask-b-from-50%">
+                <span class="group-gradient-underline-grow text-xl dark:text-zinc-50">
+                    {{ $comment->post->title }}
+                </span>
 
-        {{-- Leave a message --}}
-        <div class="rich-text">
-          {!! $comment->body !!}
-        </div>
-      </div>
+                {{-- Leave a message --}}
+                <div class="rich-text">{!! $comment->body !!}</div>
+            </div>
 
-      <div
-        class="absolute bottom-3 right-3 flex items-center rounded-lg bg-zinc-200/60 px-2 py-1 text-sm text-zinc-500 dark:bg-zinc-700/60 dark:text-zinc-50"
-      >
-        <x-icons.clock class="w-4" />
-        <time
-          class="ml-2"
-          datetime="{{ $comment->created_at->toDateString() }}"
-        >{{ $comment->created_at->diffForHumans() }}</time>
-      </div>
-    </x-dashed-card>
-  @empty
-    <x-card class="flex h-32 items-center justify-center text-zinc-400 dark:text-zinc-600">
-      <x-icons.exclamation-circle class="w-6" />
-      <span class="ml-2">{{ __('Leave a comment on an article!') }}</span>
-    </x-card>
-  @endforelse
+            <div class="absolute right-3 bottom-3 flex items-center rounded-lg bg-zinc-200/60 px-2 py-1 text-sm text-zinc-500 dark:bg-zinc-700/60 dark:text-zinc-50">
+                <x-icons.clock class="w-4" />
+                <time
+                    class="ml-2"
+                    datetime="{{ $comment->created_at->toDateString() }}"
+                >{{ $comment->created_at->diffForHumans() }}</time>
+            </div>
+        </x-dashed-card>
+    @empty
+        <x-card class="flex h-32 items-center justify-center text-zinc-400 dark:text-zinc-600">
+            <x-icons.exclamation-circle class="w-6" />
+            <span class="ml-2">{{ __('Leave a comment on an article!') }}</span>
+        </x-card>
+    @endforelse
 
-  {{ $comments->onEachSide(1)->links() }}
+    {{ $comments->onEachSide(1)->links() }}
 </div>

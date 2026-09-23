@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 use App\Livewire\Forms\CommentForm;
 use App\Models\Comment;
+use App\Models\User;
 use App\Traits\MarkdownConverter;
-use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Livewire\Component;
 
-new class extends Component {
+new class extends Component
+{
     use MarkdownConverter;
 
     public CommentForm $form;
 
     public array $comment = [
-        'id' => null,
+        'id'        => null,
         'list_name' => '',
     ];
 
     public bool $previewIsEnable = false;
 
-    public function mount(): void
-    {
-        if (!auth()->check()) {
+    public function mount(
+        #[CurrentUser]
+        ?User $user
+    ): void {
+        if ($user === null) {
             throw new Exception(message: 'Edit modal part component requires authentication.');
         }
     }
@@ -37,132 +41,127 @@ new class extends Component {
 
         $this->reset('previewIsEnable');
 
-        $this->dispatch(event: 'update-comment-in-' . $this->comment['list_name'], id: $comment->id, body: $comment->body, updatedAt: $comment->updated_at);
+        $this->dispatch(
+            event: 'update-comment-in-'.$this->comment['list_name'],
+            id: $comment->id,
+            body: $comment->body,
+            updatedAt: $comment->updated_at
+        );
     }
 };
 ?>
 
 @assets
-  @vite('resources/ts/markdown-helper.ts')
+    @vite('resources/ts/markdown-helper.ts')
 @endassets
 
-@script
-  <script>
+<script>
     Alpine.data('commentsEditModalPart', () => ({
-      modal: {
-        isOpen: false
-      },
-      openModal(event) {
-        this.$wire.$set('comment.list_name', event.detail.listName);
-        this.$wire.$set('comment.id', event.detail.id);
-        this.$wire.$set('form.body', event.detail.body);
+        modal: {
+            isOpen: false,
+        },
+        openModal(event) {
+            this.$wire.$set('comment.list_name', event.detail.listName);
+            this.$wire.$set('comment.id', event.detail.id);
+            this.$wire.$set('form.body', event.detail.body);
 
-        this.modal.isOpen = true;
+            this.modal.isOpen = true;
 
-        this.$nextTick(() => this.$refs.editCommentTextarea?.focus());
-      },
-      tabToFourSpaces,
-      submit() {
-        this.$wire.save().then(() => {
-          this.modal.isOpen = false;
-        });
-      }
+            this.$nextTick(() => this.$refs.editCommentTextarea?.focus());
+        },
+        tabToFourSpaces(event) {
+            window.tabToFourSpaces?.(event);
+        },
+        submit() {
+            this.$wire.save().then(() => {
+                if (this.$wire.$errors.isEmpty()) {
+                    this.modal.isOpen = false;
+                }
+            });
+        },
     }));
-  </script>
-@endscript
+</script>
 
 <div
-  class="fixed inset-0 z-30 flex min-h-screen items-end justify-center"
-  x-data="commentsEditModalPart"
-  x-cloak
-  x-show="modal.isOpen"
-  x-on:open-edit-comment-modal.window="openModal"
-  x-on:keydown.escape.window="modal.isOpen = false"
+    class="fixed inset-0 z-30 flex min-h-screen items-end justify-center"
+    x-data="commentsEditModalPart"
+    x-cloak
+    x-show="modal.isOpen"
+    x-on:open-edit-comment-modal.window="openModal"
+    x-on:keydown.escape.window="modal.isOpen = false"
 >
-  {{-- gray background --}}
-  <div
-    class="fixed inset-0 bg-zinc-500/75 transition-opacity"
-    x-show="modal.isOpen"
-    x-transition.opacity
-  ></div>
+    {{-- gray background --}}
+    <div class="fixed inset-0 bg-zinc-500/75 transition-opacity" x-show="modal.isOpen" x-transition.opacity></div>
 
-  {{--  modal  --}}
-  <div
-    class="relative mx-2 w-full transform overflow-auto rounded-tl-xl rounded-tr-xl bg-zinc-50 p-5 transition-all md:max-w-2xl dark:bg-zinc-800"
-    x-show="modal.isOpen"
-    x-transition.origin.bottom.duration.300ms
-  >
-    {{-- close modal button --}}
-    <div class="absolute right-5 top-5">
-      <button
-        class="cursor-pointer text-zinc-400 hover:text-zinc-500 dark:hover:text-zinc-300"
-        type="button"
-        x-on:click="modal.isOpen = false"
-      >
-        <x-icons.x class="size-8" />
-      </button>
+    {{--  modal  --}}
+    <div
+        class="relative mx-2 w-full transform overflow-auto rounded-tl-xl rounded-tr-xl bg-zinc-50 p-5 transition-all md:max-w-2xl dark:bg-zinc-800"
+        x-show="modal.isOpen"
+        x-transition.origin.bottom.duration.300ms
+    >
+        {{-- close modal button --}}
+        <div class="absolute top-5 right-5">
+            <button
+                class="cursor-pointer text-zinc-400 hover:text-zinc-500 dark:hover:text-zinc-300"
+                type="button"
+                x-on:click="modal.isOpen = false"
+            >
+                <x-icons.x class="size-8" />
+            </button>
+        </div>
+
+        <div class="flex flex-col gap-5">
+            <div class="flex items-center justify-center space-x-2 text-2xl text-zinc-900 dark:text-zinc-50">
+                <x-icons.chat-dots class="w-8" />
+                <span>{{ __('Edit Message') }}</span>
+            </div>
+
+            <form class="space-y-6" x-on:submit.prevent="submit">
+                <x-auth-validation-errors :errors="$errors" />
+
+                <div class="relative space-y-2" wire:show="previewIsEnable">
+                    <div class="space-x-4">
+                        <span class="font-semibold dark:text-zinc-50"> {{ auth()->user()->name }}</span>
+                        <span class="text-zinc-400">{{ now()->format(__('Y year m month d day')) }}</span>
+                    </div>
+
+                    <div class="rich-text h-80 overflow-auto">{!! $this->convertToHtml($this->form->body) !!}</div>
+
+                    <x-icons.animate-spin
+                        class="absolute top-1/2 left-1/2 w-10 -translate-x-1/2 -translate-y-1/2 dark:text-zinc-50"
+                        wire:loading.delay
+                        wire:target="form.body"
+                    />
+                </div>
+
+                <div wire:show="!previewIsEnable">
+                    <x-floating-label-textarea
+                        class="font-jetbrains-mono"
+                        id="edit-comment-body"
+                        x-ref="editCommentTextarea"
+                        x-on:keydown.tab.prevent="tabToFourSpaces"
+                        wire:model="form.body"
+                        rows="12"
+                        placeholder="{{ __('Write your message here! **Supports Markdown**') }}"
+                        required
+                    />
+                </div>
+
+                <div class="flex items-center justify-between space-x-3">
+                    <x-toggle-switch
+                        id="edit-comment-modal-preview"
+                        wire:model.live="previewIsEnable"
+                        x-bind:disabled="$wire.form.body === ''"
+                    >
+                        {{ __('Preview') }}
+                    </x-toggle-switch>
+
+                    <x-button>
+                        <x-icons.save class="w-5" />
+                        <span class="ml-2">{{ __('Update') }}</span>
+                    </x-button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="flex flex-col gap-5">
-      <div class="flex items-center justify-center space-x-2 text-2xl text-zinc-900 dark:text-zinc-50">
-        <x-icons.chat-dots class="w-8" />
-        <span>{{ __('Edit Message') }}</span>
-      </div>
-
-      <form
-        class="space-y-6"
-        x-on:submit.prevent="submit"
-      >
-        <x-auth-validation-errors :errors="$errors" />
-
-        <div
-          class="relative space-y-2"
-          wire:show="previewIsEnable"
-        >
-          <div class="space-x-4">
-            <span class="font-semibold dark:text-zinc-50"> {{ auth()->user()->name }}</span>
-            <span class="text-zinc-400">{{ now()->format(__('Y year m month d day')) }}</span>
-          </div>
-
-          <div class="rich-text h-80 overflow-auto">
-            {!! $this->convertToHtml($this->form->body) !!}
-          </div>
-
-          <x-icons.animate-spin
-            class="absolute left-1/2 top-1/2 hidden w-10 -translate-x-1/2 -translate-y-1/2 dark:text-zinc-50"
-            wire:loading.class.remove="hidden"
-            wire:target="form.body"
-          />
-        </div>
-
-        <div wire:show="!previewIsEnable">
-          <x-floating-label-textarea
-            class="font-jetbrains-mono"
-            id="edit-comment-body"
-            x-ref="editCommentTextarea"
-            x-on:keydown.tab.prevent="tabToFourSpaces"
-            wire:model="form.body"
-            rows="12"
-            placeholder="{{ __('Write your message here! **Supports Markdown**') }}"
-            required
-          />
-        </div>
-
-        <div class="flex items-center justify-between space-x-3">
-          <x-toggle-switch
-            id="edit-comment-modal-preview"
-            wire:model.live="previewIsEnable"
-            x-bind:disabled="$wire.form.body === ''"
-          >
-            {{ __('Preview') }}
-          </x-toggle-switch>
-
-          <x-button>
-            <x-icons.save class="w-5" />
-            <span class="ml-2">{{ __('Update') }}</span>
-          </x-button>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
