@@ -37,3 +37,19 @@ test('user can see no result message if there are no results for the search quer
         ->assertSeeIn('#search-result', 'nonexistentkeyword')
         ->assertSeeIn('#search-result', '" Related Articles');
 });
+
+test('user cannot search private posts', function () {
+    Post::factory()->create([
+        'title'      => 'secret private post',
+        'body'       => 'this is a secret body',
+        'is_private' => true,
+    ]);
+
+    $page = $this->visit(route('posts.index'));
+
+    $page->click('#search-button')
+        ->type('#search-box', 'secret')
+        ->assertSeeIn('#search-result', 'Sorry...no related articles found. "')
+        ->assertSeeIn('#search-result', 'secret')
+        ->assertSeeIn('#search-result', '" Related Articles');
+});

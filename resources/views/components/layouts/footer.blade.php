@@ -15,7 +15,7 @@
       </a>
       <a
         class="my-3 block font-medium text-zinc-400 duration-300 hover:text-zinc-50"
-        href="https://docfunc.com/"
+        href="https://t-benninghaus.com/"
         target="_blank"
         rel="nofollow noopener noreferrer"
       >

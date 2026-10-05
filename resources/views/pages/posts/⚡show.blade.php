@@ -81,12 +81,10 @@ new class extends Component
 
 <script>
     Alpine.data('postsShowPage', () => ({
-        isReady: false,
         async init() {
             setupPostOutline(this.$refs.postOutline, this.$refs.postBody);
             await highlightAllInElement(this.$refs.postBody);
             await renderMermaidDiagrams(this.$refs.postBody);
-            this.isReady = true;
             codeBlockHelper(this.$refs.postBody);
             imageBlockHelper(this.$refs.postBody);
             processYoutubeOembeds();
@@ -106,12 +104,7 @@ new class extends Component
         <x-posts.scroll-to-top-button x-ref="scrollToTopBtn" />
 
         <div class="container mx-auto">
-            {{-- loading spinner --}}
-            <div class="flex items-center justify-center py-20" x-show="! isReady" x-cloak>
-                <x-icons.animate-spin class="dark:text-lividus-500 size-8 text-emerald-500" />
-            </div>
-
-            <div class="animate-fade-in flex items-stretch justify-center lg:space-x-4" x-show="isReady" x-cloak>
+            <div class="flex items-stretch justify-center lg:space-x-4">
                 <div class="hidden xl:block xl:w-1/5">
                     {{-- content menu --}}
                     <div class="sticky top-1/2 flex -translate-y-1/2 flex-col" x-ref="postOutline"></div>
@@ -146,22 +139,27 @@ new class extends Component
                                     <span class="ml-2">{{ $post->category->name }}</span>
                                 </div>
 
-                                <div class="hidden md:block">&bull;</div>
+                                <div>&bull;</div>
 
                                 {{-- post created time --}}
-                                <div class="hidden items-center md:flex">
+                                <<div class="flex items-center">
                                     <x-icons.calendar-week-fill class="w-4" />
                                     <time
                                         class="ml-2"
                                         datetime="{{ $post->created_at->toDateString() }}"
                                     >{{ $post->created_at->toDateString() }}</time>
-
-                                    @if ($post->created_at->toDateString() !== $post->updated_at->toDateString())
-                                        <time datetime="{{ $post->updated_at->toDateString() }}">
-                                            {{ __('(Last updated ') . $post->updated_at->toDateString() . ')' }}
-                                        </time>
-                                    @endif
                                 </div>
+                                
+                                @if ($post->isRevised())
+                                    <div class="hidden md:block">&bull;</div>
+
+                                    {{-- post updated time --}}
+                                    <div class="hidden items-center md:flex" title="{{ __('Last Updated') }}">
+                                        <x-icons.wrench class="w-4" />
+                                        <time class="ml-2" datetime="{{ $post->updated_at->toDateString() }}"
+                                            >{{ __('Updated on') . $post->updated_at->toDateString() }}</time>
+                                    </div>
+                                @endif
 
                                 <div class="hidden md:block">&bull;</div>
 

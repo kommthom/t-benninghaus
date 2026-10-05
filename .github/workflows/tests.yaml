@@ -5,7 +5,7 @@ on:
     inputs:
       name:
         description: Who to greet
-        default: Allen
+        default: Thomas
   pull_request:
     branches:
       - main
@@ -21,34 +21,20 @@ jobs:
       matrix:
         php:
           - 8.4
+          - 8.5
     env:
-      APP_NAME: DocFunc
-      APP_URL: "https://docfunc.test"
-      DB_CONNECTION: sqlite
-      DB_DATABASE: ":memory:"
-      BROADCAST_DRIVER: log
-      CACHE_STORE: redis
-      FILESYSTEM_DISK: s3
-      QUEUE_CONNECTION: redis
-      SESSION_DRIVER: redis
-      MAIL_MAILER: log
-      MAIL_FROM_ADDRESS: hello@example.com
+      APP_NAME: t-benninghaus
+      APP_URL: "https://t-benninghaus.test"
+      FILESYSTEM_DISK: public
       SCOUT_PREFIX: dev_posts
       ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
       ALGOLIA_SECRET: ${{ secrets.ALGOLIA_SECRET }}
       CAPTCHA_SITE_KEY: 1x00000000000000000000BB
       CAPTCHA_SECRET_KEY: 1x0000000000000000000000000000000AA
 
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379/tcp
-        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Docs: https://github.com/shivammathur/setup-php
       - name: Setup php
@@ -56,20 +42,25 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           # https://laravel.com/docs/9.x/deployment#server-requirements
-          extensions: redis
           coverage: xdebug
 
-      - name: Setup node.js
-        uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
         with:
-          node-version: "24.10.0"
+          version: "12.3.4"
+
+      - name: Setup node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: latest
+          cache: "pnpm"
 
       - name: Get composer cache directory
         id: composer-cache
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -81,8 +72,8 @@ jobs:
 
       - name: Generate vite manifest
         run: |
-          npm install
-          npm run build
+          pnpm install --frozen-lockfile
+          pnpm run build
 
       - name: Prepare the application
         run: |
@@ -95,15 +86,32 @@ jobs:
       - name: Run Laravel pint
         run: vendor/bin/pint --test
 
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "version=$(npx playwright --version | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+      - name: Cache playwright binaries
+        uses: actions/cache@v5
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers and dependencies (Cache Miss)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Install Playwright system dependencies (Cache Hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps
+
       - name: Test with pest
-        run: |
-          npx playwright install --with-deps
-          vendor/bin/pest --parallel --coverage-clover ./coverage.xml
-        env:
-          REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
+        run: vendor/bin/pest --parallel --coverage-clover ./coverage.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: yilanboy/docfunc
+          slug: kommthom/t-benninghaus

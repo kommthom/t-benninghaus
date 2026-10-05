@@ -232,7 +232,7 @@ describe('home page', function () {
 
         get($post->link_with_slug)
             ->assertStatus(200)
-            ->assertSee('https://blobs.docfunc.com/share.webp');
+            ->assertSee('https://blobs.t-benninghaus.com/share.webp');
     });
 
     test('not showing the cover image on top of the post', function () {
@@ -279,5 +279,27 @@ describe('home page', function () {
             ->call('changeOrder', PostOrderOptions::RECENT->value)
             ->assertSee($latestUpdatedPost->title)
             ->assertDontSee($latestPost->title);
+    });
+
+    it('shows revised date when post is substantially updated', function () {
+        $post = Post::factory()->create([
+            'created_at' => now()->subDays(5),
+            'updated_at' => now()->subDays(2),
+        ]);
+
+        get($post->link_with_slug)
+            ->assertOk()
+            ->assertSee('Updated on '.$post->updated_at->toDateString());
+    });
+
+    it('does not show revised date when post is not substantially updated', function () {
+        $post = Post::factory()->create([
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        get($post->link_with_slug)
+            ->assertOk()
+            ->assertDontSee('Updated on');
     });
 });

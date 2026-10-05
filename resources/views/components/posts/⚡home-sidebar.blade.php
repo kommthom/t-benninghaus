@@ -30,7 +30,7 @@ new class extends Component
 
 <script>
     Alpine.data('postsHomeSidebarPart', () => ({
-        rssLinkLabel: '訂閱 RSS',
+        rssLinkLabel: 'Copy RSS URL',
         copyWebFeedUrl() {
             navigator.clipboard.writeText(this.$el.getAttribute('href')).then(
                 () => this.rssLinkLabel = 'Copied successfully',

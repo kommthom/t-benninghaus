@@ -11,14 +11,13 @@ test('user can see post outline', function () {
     <p>This is post-body 2</p>
     HTML;
 
-
     $post = Post::factory()->create([
         'body' => $body,
     ]);
 
     $page = $this->visit($post->link_with_slug);
 
-    $page->assertSee('catalogue')
+    $page->assertSee('目錄')
         ->assertSeeLink('This is post-title 1')
         ->assertSeeLink('This is post-title 2');
 });
@@ -34,7 +33,7 @@ test('user cannot see post outline, if there is no heading', function () {
 
     $page = $this->visit($post->link_with_slug);
 
-    $page->assertDontSee('catalogue');
+    $page->assertDontSee('Inhalt');
 });
 
 test('right scroll indicator appears when a code block overflows horizontally', function () {
@@ -129,10 +128,10 @@ test('ckeditor and tagify are visible on create page after the spinner clears', 
 
     $page = visit(route('posts.create'));
 
-    // "Article Private" sits inside x-show="isReady", which only flips on
+    // "Der Artikel ist nicht öffentlich." sits inside x-show="isReady", which only flips on
     // after both ckeditor-ready and tagify-ready events fire. assertSee
     // will retry until the spinner is gone and the form is shown.
-    $page->assertSee('Article Private');
+    $page->assertSee('Der Artikel ist nicht öffentlich.');
 
     // Confirm both libraries actually mounted into the DOM.
     $hasCkeditor = $page->script('!!document.querySelector(".ck-editor")');
@@ -150,7 +149,7 @@ test('ckeditor and tagify are visible on edit page after the spinner clears', fu
 
     $page = visit(route('posts.edit', ['id' => $post->id]));
 
-    $page->assertSee('Article Private');
+    $page->assertSee('Der Artikel ist nicht öffentlich.');
 
     $hasCkeditor = $page->script('!!document.querySelector(".ck-editor")');
     $hasTagify = $page->script('!!document.querySelector("tags.tagify")');
@@ -206,8 +205,45 @@ test('it renders mermaid svg diagram, provides zoom button, and opens zoom modal
 
     $page->click('.mermaid-diagram-container button[aria-label="Zoom diagram"]');
 
-    $page->assertPresent('#zoom-in-mermaid-modal')
+    $page->assertPresent('#zoom-in-mermaid-modal[open]')
         ->assertPresent('#zoom-in-mermaid svg');
+
+    $isLocked = $page->script("document.documentElement.style.overflow === 'hidden'");
+    expect($isLocked)->toBeTrue();
+
+    // Click close button
+    $page->click('#zoom-in-mermaid-modal .close-modal-button');
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-mermaid-modal[open]');
+
+    $isUnlocked = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlocked)->toBeTrue();
+
+    // Re-open and close with Escape key
+    $page->click('.mermaid-diagram-container button[aria-label="Zoom diagram"]');
+    $page->assertPresent('#zoom-in-mermaid-modal[open]');
+
+    $page->keys('#zoom-in-mermaid-modal', 'Escape');
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-mermaid-modal[open]');
+    $isUnlockedAgain = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlockedAgain)->toBeTrue();
+
+    // Re-open and close by clicking backdrop
+    $page->click('.mermaid-diagram-container button[aria-label="Zoom diagram"]');
+    $page->assertPresent('#zoom-in-mermaid-modal[open]');
+
+    $page->script("document.querySelector('#zoom-in-mermaid-modal').click()");
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-mermaid-modal[open]');
+    $isUnlockedThird = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlockedThird)->toBeTrue();
 });
 
 test('it re-renders mermaid diagram when theme changes', function () {
@@ -245,4 +281,66 @@ test('it renders friendly error message when mermaid syntax is invalid', functio
     $page->assertSee($post->title)
         ->assertPresent('.mermaid-error')
         ->assertSee('Error rendering diagram:');
+});
+
+test('it opens and closes code block zoom modal', function () {
+    $body = <<<'HTML'
+    <pre><code class="language-php">echo 'Hello World!';</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertNoJavascriptErrors()
+        ->assertSee($post->title)
+        ->assertPresent('button[aria-label="Code in größerer Ansicht anzeigen"]');
+
+    $page->click('button[aria-label="Code in größerer Ansicht anzeigen"]');
+
+    $page->assertPresent('#zoom-in-pre-modal[open]')
+        ->assertPresent('#zoom-in-pre pre');
+
+    $isLocked = $page->script("document.documentElement.style.overflow === 'hidden'");
+    expect($isLocked)->toBeTrue();
+
+    $page->click('#zoom-in-pre-modal .close-modal-button');
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-pre-modal[open]');
+
+    $isUnlocked = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlocked)->toBeTrue();
+});
+
+test('it opens and closes image zoom modal', function () {
+    $body = <<<'HTML'
+    <figure><img src="/images/icon/icon.png" alt="Test Image"></figure>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertNoJavascriptErrors()
+        ->assertSee($post->title)
+        ->assertPresent('button[aria-label="Bild vergrößern"]');
+
+    $page->click('button[aria-label="Bild vergrößern"]');
+
+    $page->assertPresent('#zoom-in-image-modal[open]')
+        ->assertPresent('#zoom-in-image');
+
+    $isLocked = $page->script("document.documentElement.style.overflow === 'hidden'");
+    expect($isLocked)->toBeTrue();
+
+    $page->click('#zoom-in-image-modal .close-modal-button');
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-image-modal[open]');
+
+    $isUnlocked = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlocked)->toBeTrue();
 });

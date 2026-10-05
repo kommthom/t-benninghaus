@@ -154,6 +154,14 @@ class Post extends Model implements Feedable
         return (string) config('scout.prefix');
     }
 
+    /**
+     * Determine if the model should be searchable.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return ! $this->is_private;
+    }
+
     public function toFeedItem(): FeedItem
     {
         return FeedItem::create()
@@ -174,5 +182,17 @@ class Post extends Model implements Feedable
             ->latest()
             ->take(10)
             ->get();
+    }
+
+    /**
+     * Determine if the post was revised substantially after publication.
+     */
+    public function isRevised(): bool
+    {
+        return $this->updated_at !== null
+            && $this->created_at !== null
+            && $this->updated_at->gt($this->created_at)
+            && $this->created_at->diffInHours($this->updated_at, true) >= 24
+            && $this->created_at->toDateString() !== $this->updated_at->toDateString();
     }
 }

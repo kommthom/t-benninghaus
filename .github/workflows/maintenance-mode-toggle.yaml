@@ -5,7 +5,7 @@ on:
     inputs:
       name:
         description: Who to greet
-        default: Allen
+        default: Thomas
 
 permissions:
   id-token: write

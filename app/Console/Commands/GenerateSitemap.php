@@ -16,6 +16,8 @@ class GenerateSitemap extends Command
     public function handle()
     {
         $sitemap = Sitemap::create();
+        $page = 1;
+        $page_lfd = 0;
 
         // Static pages
         $sitemap->add(
@@ -39,11 +41,22 @@ class GenerateSitemap extends Command
             })
             ->lazy()
             ->each(function ($post) use ($sitemap) {
+                $page_lfd++;
                 $sitemap->add(
                     Url::create(route('posts.show', ['id' => $post->id, 'slug' => $post->slug,]))
                         ->setLastModificationDate($post->updated_at)
                         ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
                         ->setPriority(0.8));
+
+                if ($page_lfd % 10 === 0) {
+                    $page_lfd = 0;
+                    $page++;
+                    $sitemap->add(
+                    Url::create("/?page={$page}")
+                        ->setLastModificationDate(Carbon::yesterday())
+                        ->setPriority(1.0)
+                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY));
+                }
             });
 
         $sitemap->writeToFile(public_path('sitemap.xml'));
