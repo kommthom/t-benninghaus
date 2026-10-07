@@ -149,7 +149,7 @@ Das Projekt verwendet Pest 4 (mit `pest-plugin-browser` auf Basis von Playwright
 composer ci
 ```
 
-Oder führen Sie sie einzeln aus:
+Oder führe sie einzeln aus:
 
 ```sh
 php artisan test --parallel    # or: vendor/bin/pest --parallel
@@ -170,8 +170,8 @@ t-benninghaus läuft auf [Laravel Octane](https://laravel.com/docs/octane), das 
 php artisan octane:start --server=$OCTANE_SERVER --host=0.0.0.0 --port=8000
 ```
 
-> [!NOTE]
-> Installieren Sie Swoole über PECL (`pecl install swoole`) oder apt (`sudo add-apt-repository ppa:ondrej/php` und anschließend `sudo apt-get install php8.4-swoole`). Informationen zu den anderen Servern finden Sie unter <https://roadrunner.dev> und <https://frankenphp.dev>.
+> [!NOTIZ]
+> Installiere Swoole über PECL (`pecl install swoole`) oder apt (`sudo add-apt-repository ppa:ondrej/php` und anschließend `sudo apt-get install php8.4-swoole`). Informationen zu den anderen Servern finden Sie unter <https://roadrunner.dev> und <https://frankenphp.dev>.
 
 ### Supervisor
 
@@ -212,7 +212,7 @@ Edititier die crontab:
 crontab -e
 ```
 
-Fügen Sie den folgenden Eintrag hinzu, um den Laravel-Planer (https://laravel.com/docs/scheduling) jede Minute auszuführen:
+Füge den folgenden Eintrag hinzu, um den Laravel-Planer (https://laravel.com/docs/scheduling) jede Minute auszuführen:
 
 ```text
 * * * * * cd /var/www/docfunc && php artisan schedule:run >> /dev/null 2>&1
