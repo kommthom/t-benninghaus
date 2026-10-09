@@ -45,8 +45,8 @@ class AppServiceProvider extends ServiceProvider
                 ->twitter(card: TwitterCard::SummaryWithLargeImage);
         });
 
-        //if($this->app->environment('production')) {
-    	//	URL::forceScheme('https');
-	    //};
+        // if($this->app->environment('production')) {
+        //	URL::forceScheme('https');
+        // };
     }
 }

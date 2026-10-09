@@ -15,4 +15,3 @@ parameters:
 
     ignoreErrors:
         - identifier: trait.unused
-        - identifier: missingType.return

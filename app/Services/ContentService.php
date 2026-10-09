@@ -15,13 +15,13 @@ class ContentService
     /**
      * Generate slug titles for SEO optimization
      *
-     * @param  string  $title title
+     * @param  string  $title  title
      */
     public static function getSlug(string $title): string
     {
         // Remove special characters and leave only Chinese and English
         $title = preg_replace('/[^A-Za-z0-9 \p{Han}]+/u', '', $title);
-         // Replace spaces with '-'
+        // Replace spaces with '-'
         $title = preg_replace('/\s+/u', '-', $title);
         // Change all English to lowercase
         $title = strtolower($title);

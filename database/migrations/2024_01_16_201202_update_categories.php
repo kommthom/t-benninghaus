@@ -34,7 +34,7 @@ return new class extends Migration
                 HTML,
             ]);
 
-            DB::table('categories')
+        DB::table('categories')
             ->where('name', 'Draussen')
             ->update([
                 'icon' => <<<'HTML'
@@ -45,7 +45,7 @@ return new class extends Migration
                 HTML,
             ]);
 
-            DB::table('categories')
+        DB::table('categories')
             ->where('name', 'Privat')
             ->update([
                 'icon' => <<<'HTML'

@@ -43,6 +43,7 @@ class Comment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     /**
      * @return BelongsTo<Comment, $this>
      */

@@ -30,7 +30,6 @@ use Spatie\Feed\FeedItem;
  * @method int increment(string $column, float|int $amount = 1, array<string, mixed> $extra = []) Increment column value by 1.
  * @method int decrement(string $column, float|int $amount = 1, array<string, mixed> $extra = []) Decrement column value by 1.
  */
-
 class Post extends Model implements Feedable
 {
     /** @use HasFactory<PostFactory> */

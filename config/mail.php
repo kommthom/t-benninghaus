@@ -49,7 +49,7 @@ return [
         ],
 
         'mailtrap' => [
-            'transport' => 'mailtrap-sdk'
+            'transport' => 'mailtrap-sdk',
         ],
 
         'ses' => [

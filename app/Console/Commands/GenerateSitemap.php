@@ -2,17 +2,23 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Post;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
-use App\Models\Post;
 
 class GenerateSitemap extends Command
 {
     protected $signature = 'sitemap:generate';
+
     protected $description = 'Generate sitemap';
 
+    /**
+     * Generate the sitemap.
+     *
+     * @return void
+     */
     public function handle()
     {
         $sitemap = Sitemap::create();
@@ -27,12 +33,12 @@ class GenerateSitemap extends Command
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY));
         $sitemap
             ->add(Url::create('/login')
-            ->setPriority(0.6)
-            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY));
+                ->setPriority(0.6)
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY));
         $sitemap
             ->add(Url::create('/robots.txt')
-            ->setPriority(0.5)
-            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY));
+                ->setPriority(0.5)
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY));
 
         // Blog posts
         Post::all()
@@ -40,10 +46,10 @@ class GenerateSitemap extends Command
                 return $post->is_private === true;
             })
             ->lazy()
-            ->each(function ($post) use ($sitemap) {
+            ->each(function ($post) use (&$sitemap, &$page, &$page_lfd) {
                 $page_lfd++;
                 $sitemap->add(
-                    Url::create(route('posts.show', ['id' => $post->id, 'slug' => $post->slug,]))
+                    Url::create(route('posts.show', ['id' => $post->id, 'slug' => $post->slug]))
                         ->setLastModificationDate($post->updated_at)
                         ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
                         ->setPriority(0.8));
@@ -52,10 +58,10 @@ class GenerateSitemap extends Command
                     $page_lfd = 0;
                     $page++;
                     $sitemap->add(
-                    Url::create("/?page={$page}")
-                        ->setLastModificationDate(Carbon::yesterday())
-                        ->setPriority(1.0)
-                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY));
+                        Url::create("/?page={$page}")
+                            ->setLastModificationDate(Carbon::yesterday())
+                            ->setPriority(1.0)
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY));
                 }
             });
 
