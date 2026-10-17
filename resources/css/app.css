@@ -1,0 +1,365 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;1,400&family=Noto+Sans+TC:wght@400;500;700&display=swap");
+@import "tailwindcss";
+@import "./custom-ckeditor.css";
+
+@plugin "@tailwindcss/typography";
+
+@source "../../vendor/livewire/livewire/src/Features/SupportPagination/views/*.blade.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.ts";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+    /* color */
+    --color-lividus-50: oklch(0.9397 0.0149 251.16);
+    --color-lividus-100: oklch(0.8927 0.0286 246.5);
+    --color-lividus-200: oklch(0.8182 0.0499 248.44);
+    --color-lividus-300: oklch(0.7423 0.0713 248.17);
+    --color-lividus-400: oklch(0.6676 0.0939 249.39);
+    --color-lividus-500: oklch(0.594 0.1163 250.72);
+    --color-lividus-600: oklch(0.517 0.103 250.85);
+    --color-lividus-700: oklch(0.4362 0.0842 250.33);
+    --color-lividus-800: oklch(0.3509 0.0649 248.78);
+    --color-lividus-900: oklch(0.2385 0.0534 262.91);
+
+    /* font family */
+    --font-noto-sans: "Noto Sans TC", "Roboto";
+    --font-jetbrains-mono: "JetBrains Mono", "Noto Sans TC";
+    --font-inter: "Inter", "Noto Sans TC", sans-serif;
+
+    /* animate */
+    --animate-fade-in: fade-in 0.5s ease-in-out;
+    --animate-grow-width: grow-width 1s forwards;
+
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes grow-width {
+        from {
+            width: 0;
+        }
+        to {
+            width: 100%;
+        }
+    }
+}
+
+@utility group-gradient-underline-grow {
+    @apply bg-linear-to-r from-green-500 via-emerald-500 to-teal-500 dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500 bg-size-[0_3px] bg-bottom-left bg-no-repeat transition-all duration-200 ease-in group-hover:bg-size-[100%_3px];
+}
+
+@utility gradient-underline-grow {
+    @apply bg-linear-to-r from-green-500 via-emerald-500 to-teal-500 dark:from-indigo-500 dark:via-violet-500 dark:to-purple-500 bg-size-[0_3px] bg-bottom-left bg-no-repeat transition-all duration-200 ease-in hover:bg-size-[100%_3px];
+}
+
+@utility rich-text {
+    @apply prose text-lg max-w-none prose-slate dark:prose-invert leading-8
+        /* paragraph */
+    prose-p:wrap-break-word
+        /*  heading  */
+    prose-headings:font-medium prose-headings:text-emerald-600 dark:prose-headings:text-lividus-500
+    prose-h2:my-4 prose-h2:py-4 prose-h2:relative
+        /*  h2 underline  */
+    prose-h2:after:absolute prose-h2:after:bottom-0 prose-h2:after:left-0 prose-h2:after:w-full prose-h2:after:h-1 prose-h2:after:bg-linear-to-r prose-h2:after:from-emerald-500 dark:prose-h2:after:from-lividus-600 prose-h2:after:to-transparent
+        /* link */
+    prose-a:no-underline prose-a:hover:underline prose-a:decoration-2 prose-a:underline-offset-4 prose-a:text-emerald-600 prose-a:hover:text-emerald-700
+    dark:prose-a:text-lividus-400 dark:prose-a:hover:text-lividus-300
+        /* list */
+    prose-li:marker:text-emerald-500 dark:prose-li:marker:text-lividus-400
+        /* figure */
+    prose-figure:table prose-figure:w-full prose-figure:mx-auto
+        /* figure table */
+    prose-figure:has-[table]:p-4 prose-figure:has-[table]:border prose-figure:has-[table]:border-zinc-300 dark:prose-figure:has-[table]:border-zinc-600 prose-figure:has-[table]:rounded-xl
+        /* image */
+    prose-img:w-full prose-img:rounded-xl
+        /* figcaption */
+    prose-figcaption:table-caption prose-figcaption:caption-bottom prose-figcaption:wrap-break-word
+    prose-figcaption:rounded-lg prose-figcaption:p-1.5 prose-figcaption:text-center prose-figcaption:bg-zinc-200!
+    dark:prose-figcaption:bg-zinc-700! dark:prose-figcaption:text-slate-100
+        /* hr */
+    prose-hr:my-3 prose-hr:h-1 prose-hr:border-none prose-hr:bg-slate-300 dark:prose-hr:bg-slate-500
+        /* code */
+    prose-code:before:content-none prose-code:after:content-none prose-code:font-jetbrains-mono prose-code:font-medium
+        /* pre */
+    prose-pre:text-[#abb2bf] prose-pre:bg-neutral-800 prose-pre:text-lg dark:prose-pre:bg-neutral-900 prose-pre:border-none prose-pre:rounded-none
+        /* blockquote before */
+    prose-blockquote:relative prose-blockquote:before:absolute prose-blockquote:before:w-1.5 prose-blockquote:before:h-full prose-blockquote:before:rounded-sm prose-blockquote:before:top-0 prose-blockquote:before:-left-4 prose-blockquote:before:bg-emerald-300 dark:prose-blockquote:before:bg-lividus-700 prose-blockquote:before:contain-none prose-blockquote:ml-4
+        /* blockquote */
+    prose-blockquote:border-none prose-blockquote:not-italic prose-blockquote:rounded-xl prose-blockquote:text-emerald-500 prose-blockquote:bg-emerald-200/20 dark:prose-blockquote:text-lividus-200 dark:prose-blockquote:bg-lividus-800/20 prose-blockquote:py-2 prose-blockquote:px-4;
+
+    /* ckeditor5-font/theme/fontsize.css */
+    & .text-tiny {
+        @apply text-xs;
+    }
+
+    & .text-big {
+        @apply text-2xl;
+    }
+
+    & :not(pre) > code {
+        background-color: var(--color-emerald-100);
+        color: var(--color-emerald-900);
+        padding: 0.15rem 0.3rem;
+        font-weight: 600;
+        border-radius: 0.3rem;
+    }
+
+    html[data-theme="dark"] & :not(pre) > code {
+        background-color: color-mix(in oklab, var(--color-lividus-700) 40%, transparent);
+        color: var(--color-zinc-50) !important;
+    }
+
+    & blockquote p:first-of-type::before {
+        content: "" !important;
+    }
+
+    & blockquote p:last-of-type::after {
+        content: "" !important;
+    }
+
+    & blockquote {
+        isolation: isolate;
+
+        & > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            border-radius: inherit;
+            mask-image: url("../svg/quote.svg");
+            mask-size: 30%;
+            mask-position: bottom -1rem right -1rem;
+            mask-repeat: no-repeat;
+            background-color: var(--color-emerald-300);
+            opacity: 0.3;
+        }
+    }
+
+    html[data-theme="dark"] & blockquote::after {
+        background-color: var(--color-lividus-700);
+        opacity: 0.4;
+    }
+}
+
+#edit-post pre > code {
+    display: block;
+    overflow-x: auto;
+}
+
+#create-post pre > code {
+    display: block;
+    overflow-x: auto;
+}
+
+/* shiki */
+html[data-theme="dark"] pre.shiki,
+html[data-theme="dark"] pre.shiki span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+}
+
+.comment-card pre.shiki {
+    @apply -mx-4;
+}
+
+pre.shiki {
+    padding: 0 !important;
+    overflow-x: auto !important;
+}
+
+pre.shiki code {
+    display: block !important;
+    width: fit-content !important;
+    min-width: 100% !important;
+    padding: 1rem !important;
+    font-family: var(--font-jetbrains-mono), sans-serif !important;
+    font-size: var(--text-lg) !important;
+    line-height: calc(var(--spacing) * 8) !important;
+    font-weight: 600 !important;
+    /* line number */
+    counter-reset: step;
+    counter-increment: step 0;
+}
+
+/* line number */
+pre.shiki code span.line::before {
+    content: counter(step);
+    counter-increment: step;
+    width: 1.25rem;
+    margin-right: 1.5rem;
+    display: inline-block;
+    text-align: right;
+    color: --alpha(var(--color-zinc-500) / 50%);
+}
+
+pre.shiki code :is(span.line.highlighted, span.line.diff.remove, span.line.diff.add) {
+    display: inline-block !important;
+    width: calc(100% + 2rem) !important;
+    margin: 0 -1rem !important;
+    padding: 0 1rem !important;
+}
+
+pre.shiki code span.line.highlighted {
+    background-color: --alpha(var(--color-emerald-300) / 10%) !important;
+    box-shadow: inset 0.25rem 0 0 var(--color-emerald-500) !important;
+}
+
+html[data-theme="dark"] pre.shiki code span.line.highlighted {
+    background-color: --alpha(var(--color-lividus-500) / 10%) !important;
+    box-shadow: inset 0.25rem 0 0 var(--color-lividus-400) !important;
+}
+
+pre.shiki code span.line.diff.remove {
+    position: relative !important;
+    background-color: --alpha(var(--color-red-400) / 10%) !important;
+}
+
+html[data-theme="dark"] pre.shiki code span.line.diff.remove {
+    background-color: --alpha(var(--color-red-500) / 10%) !important;
+}
+
+pre.shiki code span.line.diff.add {
+    position: relative !important;
+    background-color: --alpha(var(--color-green-400) / 10%) !important;
+}
+
+html[data-theme="dark"] pre.shiki code span.line.diff.add {
+    background-color: --alpha(var(--color-green-500) / 10%) !important;
+}
+
+pre.shiki code :is(span.line.highlighted, span.line.diff.remove, span.line.diff.add) span {
+    background-color: transparent !important;
+}
+
+pre.shiki code span.line.diff.remove::after {
+    position: absolute;
+    content: "-";
+    inset-block: 0;
+    left: 2.75rem;
+    color: var(--color-red-500);
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+pre.shiki code span.line.diff.add::after {
+    position: absolute;
+    content: "+";
+    inset-block: 0;
+    left: 2.75rem;
+    color: var(--color-green-500);
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+/* scroll shadow indicators for code blocks */
+.scroll-indicator-right {
+    background: linear-gradient(to left, var(--pre-light-bg), transparent);
+}
+
+.scroll-indicator-left {
+    background: linear-gradient(to right, var(--pre-light-bg), transparent);
+}
+
+html[data-theme="dark"] .scroll-indicator-right {
+    background: linear-gradient(to left, var(--pre-dark-bg), transparent);
+}
+
+html[data-theme="dark"] .scroll-indicator-left {
+    background: linear-gradient(to right, var(--pre-dark-bg), transparent);
+}
+
+/* Alpine.js */
+[x-cloak] {
+    display: none !important;
+}
+
+/* media embed */
+iframe,
+div.twitter-tweet.twitter-tweet-rendered {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* background */
+.hero {
+    position: fixed;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+        circle,
+        var(--color-zinc-300) 1.4px,
+        transparent 1.4px
+    );
+    background-size: 10px 10px; /* The smaller the spacing between the dots, the denser they are. */
+    mask-image: linear-gradient(to bottom, black, transparent 60%);
+}
+
+html[data-theme="dark"] .hero::before {
+    background-image: radial-gradient(
+        circle,
+        var(--color-zinc-700) 1.4px,
+        transparent 1.4px
+    );
+}
+
+.mermaid-svg-wrapper svg,
+.mermaid-modal-content svg {
+    max-width: 100%;
+    height: auto;
+}
+
+html {
+    scrollbar-gutter: stable;
+}
+
+/* View Transitions for Livewire wire:transition.navigate */
+@keyframes navigate-out {
+    to {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+}
+
+@keyframes navigate-in {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem);
+    }
+}
+
+::view-transition-group(livewire-navigate) {
+    animation: none;
+}
+
+::view-transition-old(livewire-navigate) {
+    animation: navigate-out 150ms ease-in both;
+}
+
+::view-transition-new(livewire-navigate) {
+    animation: navigate-in 200ms ease-out both;
+}

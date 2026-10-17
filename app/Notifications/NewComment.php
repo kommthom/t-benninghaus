@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Notifications;
+
+use App\Models\Comment;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Notification;
+
+class NewComment extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(protected Comment $comment) {}
+
+    /**
+     * @return array<int, string>
+     */
+    public function via(object $notifiable): array
+    {
+        // Channels with notifications enabled
+        return ['database'];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        $post = $this->comment->post;
+        $link = route('comments.show', ['id' => $this->comment->id]);
+
+        // Data stored in the database
+        return [
+            'comment_id' => $this->comment->id,
+            'post_link' => $link,
+            'post_id' => $post->id,
+            'post_title' => $post->title,
+        ];
+    }
+}

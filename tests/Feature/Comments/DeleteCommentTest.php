@@ -1,0 +1,57 @@
+<?php
+
+use App\Models\Comment;
+use App\Models\User;
+
+
+test('the author can delete their comment', function () {
+    $comment = Comment::factory()->create();
+
+    Livewire::actingAs(User::find($comment->user_id));
+
+    Livewire::test('comments.list', [
+        'postId'     => $comment->post_id,
+        'postUserId' => $comment->post->user_id,
+    ])
+        ->call('destroyComment', id: $comment->id)
+        ->assertDispatched('toast',
+            status: 'success',
+            message: 'Successfully deleted comment!',
+        );
+
+    $this->assertDatabaseMissing('comments', ['id' => $comment->id]);
+});
+
+test('post author can delete other users comment', function () {
+    $comment = Comment::factory()->create();
+
+    Livewire::actingAs(User::find($comment->post->user_id));
+
+    Livewire::test('comments.list', [
+        'postId'     => $comment->post_id,
+        'postUserId' => $comment->post->user_id,
+    ])
+        ->call('destroyComment', id: $comment->id)
+        ->assertDispatched('toast',
+            status: 'success',
+            message: 'Successfully deleted comment!',
+        );
+
+    $this->assertDatabaseMissing('comments', ['id' => $comment->id]);
+});
+
+it('will show alert when user want to delete the deleted comment', function () {
+    $comment = Comment::factory()->create();
+    $commentId = $comment->id;
+    $postId = $comment->post_id;
+    $postAuthorId = $comment->post->user_id;
+
+    $comment->delete();
+
+    Livewire::test('comments.list', [
+        'postId'     => $postId,
+        'postUserId' => $postAuthorId,
+    ])
+        ->call('destroyComment', id: $commentId)
+        ->assertDispatched('toast', status: 'danger', message: 'This comment has been deleted!');
+});

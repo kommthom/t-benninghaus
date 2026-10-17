@@ -1,0 +1,346 @@
+<?php
+
+use App\Models\Post;
+use App\Models\Tag;
+
+test('user can see post outline', function () {
+    $body = <<<'HTML'
+    <h2>This is post-title 1</h2>
+    <p>This is post-body 1</p>
+    <h2>This is post-title 2</h2>
+    <p>This is post-body 2</p>
+    HTML;
+
+    $post = Post::factory()->create([
+        'body' => $body,
+    ]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertSee('All articles')
+        ->assertSeeLink('This is post-title 1')
+        ->assertSeeLink('This is post-title 2');
+});
+
+test('user cannot see post outline, if there is no heading', function () {
+    $body = <<<'HTML'
+    <p>This is a post-body</p>
+    HTML;
+
+    $post = Post::factory()->create([
+        'body' => $body,
+    ]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertDontSee('Content');
+});
+
+test('right scroll indicator appears when a code block overflows horizontally', function () {
+    // a monospace line >150 chars is wider than the 768px center column
+    $longLine = str_repeat('echo("aaaaaaaaaaaaaaaa"); ', 12);
+
+    $body = <<<HTML
+    <pre><code class="language-php">{$longLine}</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+    $page->assertSee($post->title);
+
+    // Shiki highlight + fonts.ready + ResizeObserver all need to settle
+    // before the indicator opacity flips, so poll instead of guessing a wait().
+    $opacity = $page->script(<<<'JS'
+        new Promise((resolve) => {
+            const deadline = Date.now() + 5000;
+            const check = () => {
+                const el = document.querySelector('.scroll-indicator-right');
+                if (el && el.style.opacity === '1') {
+                    return resolve('1');
+                }
+                if (Date.now() > deadline) {
+                    return resolve(el ? el.style.opacity : 'missing');
+                }
+                requestAnimationFrame(check);
+            };
+            check();
+        })
+    JS
+    );
+
+    expect($opacity)->toBe('1');
+});
+
+test('scroll indicators flip as the user scrolls a code block', function () {
+    $longLine = str_repeat('echo("aaaaaaaaaaaaaaaa"); ', 12);
+
+    $body = <<<HTML
+    <pre><code class="language-php">{$longLine}</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+    $page->assertSee($post->title);
+
+    // wait for fonts AND for the right indicator to flip to '1'.
+    // Returns the indicator opacity so we can fail fast if it never settled.
+    $ready = $page->script(<<<'JS'
+        new Promise(async (resolve) => {
+            await document.fonts.ready;
+            const deadline = Date.now() + 5000;
+            const check = () => {
+                const right = document.querySelector('.scroll-indicator-right');
+                if (right && right.style.opacity === '1') return resolve('1');
+                if (Date.now() > deadline) return resolve(right ? right.style.opacity : 'missing');
+                requestAnimationFrame(check);
+            };
+            check();
+        })
+    JS
+    );
+    expect($ready)->toBe('1');
+
+    // scroll to the far right (999999 → browser clamps to true max scroll)
+    $state = $page->script(<<<'JS'
+        new Promise((resolve) => {
+            const pre = document.querySelector('pre.shiki');
+            pre.addEventListener('scroll', () => {
+                requestAnimationFrame(() => {
+                    resolve({
+                        left: document.querySelector('.scroll-indicator-left').style.opacity,
+                        right: document.querySelector('.scroll-indicator-right').style.opacity,
+                    });
+                });
+            }, { once: true });
+            pre.scrollLeft = 999999;
+        })
+    JS
+    );
+
+    // at the far right: left indicator visible, right indicator hidden
+    expect($state)->toMatchArray(['left' => '1', 'right' => '0']);
+});
+
+test('ckeditor and tagify are visible on create page after the spinner clears', function () {
+    loginAsUser();
+
+    $page = visit(route('posts.create'));
+
+    // "Der Artikel ist nicht öffentlich." sits inside x-show="isReady", which only flips on
+    // after both ckeditor-ready and tagify-ready events fire. assertSee
+    // will retry until the spinner is gone and the form is shown.
+    $page->assertSee('Article not public');
+
+    // Confirm both libraries actually mounted into the DOM.
+    $hasCkeditor = $page->script('!!document.querySelector(".ck-editor")');
+    $hasTagify = $page->script('!!document.querySelector("tags.tagify")');
+
+    expect($hasCkeditor)->toBeTrue();
+    expect($hasTagify)->toBeTrue();
+});
+
+test('ckeditor and tagify are visible on edit page after the spinner clears', function () {
+    $user = loginAsUser();
+    $post = Post::factory()
+        ->hasAttached(Tag::factory()->count(2))
+        ->create(['user_id' => $user->id]);
+
+    $page = visit(route('posts.edit', ['id' => $post->id]));
+
+    $page->assertSee('Article not public');
+
+    $hasCkeditor = $page->script('!!document.querySelector(".ck-editor")');
+    $hasTagify = $page->script('!!document.querySelector("tags.tagify")');
+
+    expect($hasCkeditor)->toBeTrue();
+    expect($hasTagify)->toBeTrue();
+});
+
+test('reading progress bar starts at 0 and advances as user scrolls', function () {
+    // long body so the post is taller than the viewport
+    $body = str_repeat('<p>'.fake()->paragraph(20).'</p>', 30);
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    // assertSee on the title naturally waits for the isReady gate to flip
+    // (title sits inside x-show="isReady"), so by the time this passes,
+    // setupProgressBar has run on a laid-out section.
+    $page->assertSee($post->title)
+        ->assertAttribute('[role=progressbar]', 'aria-valuenow', '0');
+
+    // scroll halfway down and let the scroll handler fire
+    $page->script('window.scrollTo(0, document.documentElement.scrollHeight / 2)');
+    $page->wait(1);
+
+    $progress = (int) $page->script(
+        'document.querySelector("[role=progressbar]").getAttribute("aria-valuenow")'
+    );
+
+    expect($progress)->toBeGreaterThan(0);
+});
+
+test('it renders mermaid svg diagram, provides zoom button, and opens zoom modal', function () {
+    $body = <<<'HTML'
+    <p>Diagram below:</p>
+    <pre><code class="language-mermaid">graph TD;
+        A-->B;
+        A-->C;
+        B-->D;
+        C-->D;</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertNoJavascriptErrors()
+        ->assertSee($post->title)
+        ->assertPresent('.mermaid-diagram-container svg')
+        ->assertPresent('.mermaid-diagram-container button[aria-label="Zoom diagram"]')
+        ->assertNotPresent('pre > code.language-mermaid');
+
+    $page->click('.mermaid-diagram-container button[aria-label="Zoom diagram"]');
+
+    $page->assertPresent('#zoom-in-mermaid-modal[open]')
+        ->assertPresent('#zoom-in-mermaid svg');
+
+    $isLocked = $page->script("document.documentElement.style.overflow === 'hidden'");
+    expect($isLocked)->toBeTrue();
+
+    // Click close button
+    $page->click('#zoom-in-mermaid-modal .close-modal-button');
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-mermaid-modal[open]');
+
+    $isUnlocked = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlocked)->toBeTrue();
+
+    // Re-open and close with Escape key
+    $page->click('.mermaid-diagram-container button[aria-label="Zoom diagram"]');
+    $page->assertPresent('#zoom-in-mermaid-modal[open]');
+
+    $page->keys('#zoom-in-mermaid-modal', 'Escape');
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-mermaid-modal[open]');
+    $isUnlockedAgain = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlockedAgain)->toBeTrue();
+
+    // Re-open and close by clicking backdrop
+    $page->click('.mermaid-diagram-container button[aria-label="Zoom diagram"]');
+    $page->assertPresent('#zoom-in-mermaid-modal[open]');
+
+    $page->script("document.querySelector('#zoom-in-mermaid-modal').click()");
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-mermaid-modal[open]');
+    $isUnlockedThird = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlockedThird)->toBeTrue();
+});
+
+test('it re-renders mermaid diagram when theme changes', function () {
+    $body = <<<'HTML'
+    <pre><code class="language-mermaid">graph TD;
+        A-->B;</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertSee($post->title)
+        ->assertPresent('.mermaid-diagram-container svg');
+
+    // Switch theme to dark
+    $page->script(<<<'JS'
+        document.documentElement.setAttribute('data-theme', 'dark');
+    JS);
+
+    $page->wait(1);
+
+    $page->assertPresent('.mermaid-diagram-container svg');
+});
+
+test('it renders friendly error message when mermaid syntax is invalid', function () {
+    $body = <<<'HTML'
+    <pre><code class="language-mermaid">invalid_syntax_definitely_not_mermaid</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertSee($post->title)
+        ->assertPresent('.mermaid-error')
+        ->assertSee('Error rendering diagram:');
+});
+
+test('it opens and closes code block zoom modal', function () {
+    $body = <<<'HTML'
+    <pre><code class="language-php">echo 'Hello World!';</code></pre>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertNoJavascriptErrors()
+        ->assertSee($post->title)
+        ->assertPresent('button[aria-label="Zoom in to view code"]');
+
+    $page->click('button[aria-label="Zoom in to view code"]');
+
+    $page->assertPresent('#zoom-in-pre-modal[open]')
+        ->assertPresent('#zoom-in-pre pre');
+
+    $isLocked = $page->script("document.documentElement.style.overflow === 'hidden'");
+    expect($isLocked)->toBeTrue();
+
+    $page->click('#zoom-in-pre-modal .close-modal-button');
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-pre-modal[open]');
+
+    $isUnlocked = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlocked)->toBeTrue();
+});
+
+test('it opens and closes image zoom modal', function () {
+    $body = <<<'HTML'
+    <figure><img src="/images/icon/icon.png" alt="Test Image"></figure>
+    HTML;
+
+    $post = Post::factory()->create(['body' => $body]);
+
+    $page = $this->visit($post->link_with_slug);
+
+    $page->assertNoJavascriptErrors()
+        ->assertSee($post->title)
+        ->assertPresent('button[aria-label="Zoom in to view the image"]');
+
+    $page->click('button[aria-label="Zoom in to view the image"]');
+
+    $page->assertPresent('#zoom-in-image-modal[open]')
+        ->assertPresent('#zoom-in-image');
+
+    $isLocked = $page->script("document.documentElement.style.overflow === 'hidden'");
+    expect($isLocked)->toBeTrue();
+
+    $page->click('#zoom-in-image-modal .close-modal-button');
+
+    $page->wait(0.5);
+
+    $page->assertNotPresent('#zoom-in-image-modal[open]');
+
+    $isUnlocked = $page->script("document.documentElement.style.overflow === ''");
+    expect($isUnlocked)->toBeTrue();
+});
