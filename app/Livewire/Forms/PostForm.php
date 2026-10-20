@@ -91,12 +91,12 @@ class PostForm extends Form
 
         $autoSavePostData = json_decode($cached, true);
 
-            $this->category_id = $autoSavePostData['category_id'];
-            $this->is_private = $autoSavePostData['is_private'];
-            $this->cover_image_url = $autoSavePostData['cover_image_url'];
-            $this->title = $autoSavePostData['title'];
-            $this->tags = $autoSavePostData['tags'];
-            $this->body = $autoSavePostData['body'];
+        $this->category_id = $autoSavePostData['category_id'];
+        $this->is_private = $autoSavePostData['is_private'];
+        $this->cover_image_url = $autoSavePostData['cover_image_url'];
+        $this->title = $autoSavePostData['title'];
+        $this->tags = $autoSavePostData['tags'];
+        $this->body = $autoSavePostData['body'];
 
         return true;
     }

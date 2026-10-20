@@ -17,7 +17,6 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExcep
 use Webauthn\AuthenticatorSelectionCriteria;
 use Webauthn\Exception\InvalidDataException;
 use Webauthn\PublicKeyCredentialCreationOptions;
-use Webauthn\PublicKeyCredentialParameters;
 use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialUserEntity;
 
