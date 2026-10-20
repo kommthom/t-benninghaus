@@ -33,7 +33,6 @@ t-benninghaus ist ein persönlicher Blog, der auf Laravel 13, Livewire 4 und Tai
 
 - PHP `^8.4`
 - Laravel 13
-- Laravel Octane 2
 - Laravel Sanctum 4
 - Laravel Scout 10
 
@@ -51,9 +50,8 @@ t-benninghaus ist ein persönlicher Blog, der auf Laravel 13, Livewire 4 und Tai
 ### Integrationen
 
 - Algolia
-- AWS S3
+- AWS S3 (+ compatible)
 - Cloudflare Turnstile
-- Bref (AWS Lambda)
 
 ## Vorraussetzungen
 
@@ -131,13 +129,11 @@ php artisan serve
 - **Filesystem & S3** — Standardmäßig ist `FILESYSTEM_DISK=local` eingestellt. Für Bild-Uploads im CKEditor wird S3 verwendet; konfiguriere dazu `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION` und `AWS_BUCKET`.
 - **Algolia / Scout** — Lege `ALGOLIA_APP_ID` ​​und `ALGOLIA_SECRET` fest. `SCOUT_PREFIX` weist Indizes je nach Umgebung einen Namensraum zu.
 - **Cloudflare Turnstile** — Lege „CAPTCHA_SITE_KEY“ und „CAPTCHA_SECRET_KEY“ fest. Standardwerte in „.env.example“ sind die „always pass" -Testschlüssel von Cloudflare.
-- **Octane** — `OCTANE_SERVER` akzeptiert `swoole`, `roadrunner`, oder `frankenphp`. Standard in `.env.example` ist `swoole`.
 
 ## Entwicklung
 
 - `php artisan serve` — dev server.
 - `npm run dev` — Vite dev server mit HMR.
-- `php artisan octane:start` — production-style server (uses `OCTANE_SERVER`).
 - `php artisan pail` — Anwendungsprotokolle in Echtzeit verfolgen
 - `php artisan ide-helper:generate` und `php artisan ide-helper:models` — Metadaten für die IDE-Autovervollständigung generieren.
 
@@ -160,35 +156,6 @@ vendor/bin/pint --parallel
 > [!NOTIZ]
 > Die Tests werden gegen eine In-Memory-SQLite-Datenbank mit dem `collection`-Treiber von Scout ausgeführt (konfiguriert in der `phpunit.xml`).
 
-## Deployment
-
-### Octane
-
-t-benninghaus läuft auf [Laravel Octane](https://laravel.com/docs/octane), das drei Anwendungsserver unterstützt: Swoole, RoadRunner und FrankenPHP. Wähle einen davon über `OCTANE_SERVER` aus und starte ihn mit:
-
-```sh
-php artisan octane:start --server=$OCTANE_SERVER --host=0.0.0.0 --port=8000
-```
-
-> [!NOTIZ]
-> Installiere Swoole über PECL (`pecl install swoole`) oder apt (`sudo add-apt-repository ppa:ondrej/php` und anschließend `sudo apt-get install php8.4-swoole`). Informationen zu den anderen Servern finden Sie unter <https://roadrunner.dev> und <https://frankenphp.dev>.
-
-### Supervisor
-
-Octane worker (`/etc/supervisor/conf.d/docfunc-octane-worker.conf`):
-
-```text
-[program:docfunc-octane-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/docfunc/artisan octane:start --server=<swoole|roadrunner|frankenphp> --host=0.0.0.0 --port=8000
-autostart=true
-autorestart=true
-user=www-data
-redirect_stderr=true
-stdout_logfile=/var/log/supervisor/docfunc-octane-worker.log
-stopwaitsecs=3600
-```
-
 Queue worker (`/etc/supervisor/conf.d/docfunc-queue-worker.conf`):
 
 ```text
@@ -206,7 +173,7 @@ stopwaitsecs=3600
 
 ### Scheduler
 
-Edititier die crontab:
+Editier die crontab:
 
 ```sh
 crontab -e
@@ -217,11 +184,6 @@ Füge den folgenden Eintrag hinzu, um den Laravel-Planer (https://laravel.com/do
 ```text
 * * * * * cd /var/www/docfunc && php artisan schedule:run >> /dev/null 2>&1
 ```
-
-### Serverless (Bref / AWS Lambda)
-
-Das Projekt bündelt `bref/bref` und `bref/laravel-bridge` für AWS Lambda. Die Produktion läuft als Lambda-Funktion `docfunc-production-web` in `us-west-2`. Informationen zur Einrichtung finden Sie unter <https://bref.sh>.
-
 ## CI
 
 - **Tests** (`.github/workflows/tests.yaml`) — Läuft bei Pull-Requests und Pushes auf `main` mit einer Matrix für PHP 8.4 und 8.5; führt PHPStan, Pint (`--test`) und Pest aus (mit Upload der Code-Abdeckung an Codecov) und sendet Statusmeldungen an Telegram.

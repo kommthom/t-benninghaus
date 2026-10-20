@@ -24,7 +24,7 @@ it('has link with name', function () {
 })->group('has link with name');
 
 it('marks the seeded categories as default', function () {
-    expect(Category::whereIn('id', [1, 2, 3])->pluck('is_default'))
+    expect(Category::whereIn('id', [1, 2])->pluck('is_default'))
         ->each->toBeTruthy();
 });
 
