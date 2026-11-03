@@ -13,7 +13,7 @@
         "@tailwindcss/vite": "^4.3.3",
         "@types/yaireo__tagify": "^4.27.0",
         "@yaireo/tagify": "^4.39.0",
-        "ckeditor5": "^49.0.0",
+        "ckeditor5": "^49.0.1",
         "concurrently": "^10.0.6",
         "laravel-vite-plugin": "^3.2.0",
         "mermaid": "^12.2.0",
@@ -29,7 +29,7 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.5",
-        "@rollup/rollup-linux-x64-gnu": "4.64.6",
+        "@rollup/rollup-linux-x64-gnu": "4.67.3",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.3.3",
         "lightningcss-linux-x64-gnu": "^1.33.0"
     },
