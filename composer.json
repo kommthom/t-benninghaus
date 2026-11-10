@@ -14,7 +14,7 @@
         "ext-libxml": "*",
         "algolia/algoliasearch-client-php": "^4.51",
         "aws/aws-sdk-php": "^3.247",
-        "guzzlehttp/guzzle": "^7.2",
+        "guzzlehttp/guzzle": "^8.3",
         "intervention/image": "^4.0",
         "laravel/framework": "^13.0",
         "laravel/head": "^0.2.2",
